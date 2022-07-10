@@ -1,0 +1,21 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test-runner:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: 17
+
+      - name: propactive-jvm tests
+        run: ./gradlew propactive-jvm:test
+
+      - name: propactive-plugin tests
+        run: ./gradlew propactive-plugin:test

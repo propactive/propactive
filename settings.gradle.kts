@@ -1,1 +1,4 @@
-rootProject.name = "propactive"
+include(
+    ":propactive-plugin",
+    ":propactive-jvm",
+)
