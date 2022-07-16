@@ -1,4 +1,7 @@
-apply(plugin = "maven-publish")
+plugins {
+    id("signing")
+}
+
 apply(plugin = "org.jetbrains.kotlin.jvm")
 
 dependencies {
@@ -22,13 +25,59 @@ dependencies {
 
 publishing {
     publications {
+        val projectUrl = "https://github.com/propactive/propactive"
+
         create<MavenPublication>("mavenJava") {
             groupId = project.group.toString()
             artifactId = project.name
             version = project.version.toString()
-            description = project.description.toString()
 
             from(components["java"])
+
+            pom {
+                name.set(project.name)
+                description.set(project.description)
+                url.set(projectUrl)
+                scm {
+                    url.set(projectUrl)
+                    connection.set("scm:git:$projectUrl")
+                    developerConnection.set("scm:git:$projectUrl")
+                }
+                issueManagement {
+                    system.set("GitHub")
+                    url.set("$projectUrl/issues")
+                }
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://opensource.org/licenses/MIT")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("u-ways")
+                        name.set("U-ways E.")
+                        email.set("ue95.career@gmail.com")
+                        url.set("https://github.com/u-ways")
+                    }
+                }
+            }
+
+            repositories {
+                maven {
+                    name = "sonatypeStaging"
+                    url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                    credentials {
+                        username = System.getenv("SONATYPE_USERNAME")
+                        password = System.getenv("SONATYPE_PASSWORD")
+                    }
+                }
+            }
         }
     }
+}
+
+signing {
+    useGpgCmd()
+    sign(configurations.archives.get())
 }
