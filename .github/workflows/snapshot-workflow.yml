@@ -1,0 +1,11 @@
+name: CD
+
+# https://docs.github.com/en/actions/using-workflows/reusing-workflows
+on: [workflow_call]
+
+jobs:
+  Prepare-Snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Snapshot Deployment Step'
+        run: 'echo "WIP..."'

@@ -1,0 +1,11 @@
+name: CICD
+
+# Triggered on push for any branch
+on: [push]
+
+jobs:
+  CI:
+    uses: ./.github/workflows/test-workflow.yml
+  CD:
+    needs: [CI]
+    uses: ./.github/workflows/snapshot-workflow.yml

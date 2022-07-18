@@ -1,6 +1,6 @@
 # Propactive
 
-[![CI](https://github.com/u-ways/propactive/actions/workflows/ci.yml/badge.svg)](https://github.com/u-ways/propactive/actions/workflows/ci.yml)
+[![CICD](https://github.com/u-ways/propactive/actions/workflows/ci.yml/badge.svg)](https://github.com/u-ways/propactive/actions/workflows/CICD.yml)
 [![Code Climate](https://codeclimate.com/github/u-ways/propactive.png)](https://codeclimate.com/github/u-ways/propactive)
 [![Latest Version](https://img.shields.io/github/v/release/U-ways/propactive)](https://github.com/u-ways/propactive/releases)
 [![GitHub License](https://badgen.net/badge/license/MIT/blue)](https://github.com/u-ways/propactive/blob/master/LICENSE)
