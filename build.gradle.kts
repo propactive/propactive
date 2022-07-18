@@ -42,6 +42,17 @@ subprojects {
         jacocoTestReport {
             reports { csv.required.set(true) }
         }
+
+        jar {
+            manifest {
+                attributes(
+                    mapOf(
+                        "Implementation-Title" to project.name,
+                        "Implementation-Version" to project.version
+                    )
+                )
+            }
+        }
     }
 }
 
