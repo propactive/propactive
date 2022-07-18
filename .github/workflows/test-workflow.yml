@@ -55,5 +55,5 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actions
-          message: 'Update test coverage badge'
+          message: Update test coverage badge
           add: ./.github/badges/jacoco.svg
