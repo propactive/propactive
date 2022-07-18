@@ -40,7 +40,7 @@ subprojects {
         }
 
         jacocoTestReport {
-            reports { xml.required.set(true) }
+            reports { csv.required.set(true) }
         }
     }
 }
