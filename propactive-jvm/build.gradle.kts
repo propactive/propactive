@@ -4,6 +4,8 @@ plugins {
 
 apply(plugin = "org.jetbrains.kotlin.jvm")
 
+val isReleaseVersion = "$version".endsWith("-SNAPSHOT").not()
+
 dependencies {
     val kotlinVersion: String by project
     val kotlinxSerializationJsonVersion: String by project
@@ -37,6 +39,7 @@ publishing {
             pom {
                 name.set(project.name)
                 description.set(project.description)
+                inceptionYear.set("2022")
                 url.set(projectUrl)
                 scm {
                     url.set(projectUrl)
@@ -61,6 +64,9 @@ publishing {
                         url.set("https://github.com/u-ways")
                     }
                 }
+                distributionManagement {
+                    downloadUrl.set("$projectUrl/releases")
+                }
             }
 
             repositories {
@@ -69,10 +75,11 @@ publishing {
                     val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 
                     name = "sonatypeStaging"
-                    url = uri(if (version.endsWith("SNAPSHOT")) snapshot else releases)
+                    url = uri(if (isReleaseVersion) releases else snapshot)
+
                     credentials {
-                        username = System.getenv("SONATYPE_USERNAME")
-                        password = System.getenv("SONATYPE_PASSWORD")
+                        username = System.getenv("OSSRH_USERNAME")
+                        password = System.getenv("OSSRH_PASSWORD")
                     }
                 }
             }
@@ -81,6 +88,12 @@ publishing {
 }
 
 signing {
+    // Signing is required if this is a release version and the artifacts are to be published.
+    // Do not use hasTask() instead of allTasks as this require realization of the tasks that maybe are not necessary.
+    setRequired {
+        isReleaseVersion && gradle.taskGraph.allTasks.any { it is PublishToMavenRepository }
+    }
+
     useGpgCmd()
     sign(configurations.archives.get())
 }
