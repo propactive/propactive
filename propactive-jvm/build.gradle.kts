@@ -4,6 +4,11 @@ plugins {
 
 apply(plugin = "org.jetbrains.kotlin.jvm")
 
+val isDevVersion = "$version" == "DEV-SNAPSHOT"
+val isSemVersioned = "$version".matches(Regex("v[0-9]+\\.[0-9]+\\.[0-9]+.*?"))
+val isVersionedSnapshot = isSemVersioned && "$version".endsWith("-SNAPSHOT")
+val isVersionedRelease = isSemVersioned && isVersionedSnapshot.not()
+
 dependencies {
     val kotlinVersion: String by project
     val kotlinxSerializationJsonVersion: String by project
@@ -37,6 +42,7 @@ publishing {
             pom {
                 name.set(project.name)
                 description.set(project.description)
+                inceptionYear.set("2022")
                 url.set(projectUrl)
                 scm {
                     url.set(projectUrl)
@@ -61,15 +67,26 @@ publishing {
                         url.set("https://github.com/u-ways")
                     }
                 }
+                distributionManagement {
+                    downloadUrl.set("$projectUrl/releases")
+                }
             }
 
             repositories {
                 maven {
+                    val releases = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+
                     name = "sonatypeStaging"
-                    url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                    url = when {
+                        isVersionedRelease -> uri(releases)
+                        isVersionedSnapshot -> uri(snapshot)
+                        else -> mavenLocal().url
+                    }
+
                     credentials {
-                        username = System.getenv("SONATYPE_USERNAME")
-                        password = System.getenv("SONATYPE_PASSWORD")
+                        username = System.getenv("OSSRH_USERNAME")
+                        password = System.getenv("OSSRH_PASSWORD")
                     }
                 }
             }
@@ -78,6 +95,17 @@ publishing {
 }
 
 signing {
-    useGpgCmd()
+    // Signing only if it's a sem-versioned build
+    // See: https://docs.gradle.org/current/userguide/signing_plugin.html#sec:conditional_signing
+    setRequired { isVersionedRelease || isVersionedSnapshot }
+    if (isRequired) useGpgCmd()
     sign(configurations.archives.get())
+}
+
+tasks {
+    publish {
+        onlyIf {
+            isVersionedRelease || isVersionedSnapshot
+        }
+    }
 }
