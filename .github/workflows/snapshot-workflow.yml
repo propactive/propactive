@@ -3,9 +3,36 @@ name: CD
 # https://docs.github.com/en/actions/using-workflows/reusing-workflows
 on: [workflow_call]
 
+# This is just a list to track the env virables we need
+
+# signing.gnupg.executable=gpg
+# signing.gnupg.homeDir=/home/ued01/.gnupg
+# signing.gnupg.keyName=6D885D0F
+# signing.gnupg.passphrase=aoeu654+
+
+env:
+  SONATYPE_USERNAME: TODO
+  SONATYPE_PASSWORD: TODO
+
 jobs:
   Prepare-Snapshot:
+    environment: CICD
     runs-on: ubuntu-latest
     steps:
-      - name: 'Snapshot Deployment Step'
-        run: 'echo "WIP..."'
+      - name: 'Checkout to current branch'
+        uses: actions/checkout@v3
+      - name: 'Set up JDK 17'
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: liberica
+          cache: gradle
+      - name: 'Building Project JARs'
+        run: ./gradlew build -x test
+      - name: 'Uploading test artifacts'
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-artifacts
+          path: |
+            ./*/build/test-results/test/*.xml
+            ./*/build/reports

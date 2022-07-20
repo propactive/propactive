@@ -71,7 +71,9 @@ publishing {
 
             repositories {
                 maven {
-                    val releases = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    // FIXME: TEMP just to avoid committing to staging by accident
+                    // val releases = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+                    val releases = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
                     val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
 
                     name = "sonatypeStaging"
@@ -90,10 +92,11 @@ publishing {
 signing {
     // Signing is required if this is a release version and the artifacts are to be published.
     // Do not use hasTask() instead of allTasks as this require realization of the tasks that maybe are not necessary.
-    setRequired {
-        isReleaseVersion && gradle.taskGraph.allTasks.any { it is PublishToMavenRepository }
-    }
+    // See: https://docs.gradle.org/current/userguide/signing_plugin.html#sec:conditional_signing
+//    setRequired {
+//        isReleaseVersion // && gradle.taskGraph.allTasks.any { it is PublishArtifact }
+//    }
 
-    useGpgCmd()
+    if (isRequired) useGpgCmd()
     sign(configurations.archives.get())
 }
