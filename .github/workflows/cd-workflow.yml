@@ -39,6 +39,7 @@ jobs:
           path: ./propactive-*/build/libs
 
   Publish-Deployment:
+    if: ${{ github.ref == 'refs/heads/main' }}
     needs: Prepare-JARs
     runs-on: ubuntu-20.04
     steps:
@@ -65,10 +66,8 @@ jobs:
           gpg_private_key: ${{ env.SIGNING_GNUPG_PRIVATE_KEY }}
           passphrase: ${{ env.SIGNING_GNUPG_KEY_NAME }}
       - name: 'Publishing latest version tag'
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: make publish-latest-version-tag
       - name: 'Publishing to maven central'
         run: make publish-propactive-jvm-jars
       - name: 'Publishing to gradle plugin'
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: make publish-propactive-plugin-jars
