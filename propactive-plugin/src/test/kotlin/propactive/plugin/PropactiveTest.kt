@@ -1,10 +1,12 @@
 package propactive.plugin
 
+import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.matchers.string.shouldContain
 import io.mockk.mockk
 import io.mockk.verify
 import org.gradle.api.Project
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import propactive.task.GenerateApplicationProperties
@@ -94,6 +96,36 @@ class PropactiveTest {
                     generateApplicationProperties - .*?
                     """.trimIndent().toRegex(DOT_MATCHES_ALL)
                 }
+        }
+
+        @Test
+        fun `should register configuration extension for propactive plugin`() {
+            projectDir.also { parent ->
+                File(parent, "build.gradle.kts")
+                    .apply {
+                        writeText(
+                            """ 
+                            | plugins {
+                            |     id("io.github.propactive") version "DEV-SNAPSHOT"
+                            | }
+                            | 
+                            | propactive {
+                            |     destination = layout.buildDirectory.dir("dist").get().asFile.absolutePath
+                            |     implementationClass = "propactive.dev.Properties"
+                            |     environments = "dev"
+                            | }
+                            """.trimMargin()
+                        )
+                    }
+            }
+
+            shouldNotThrow<UnexpectedBuildFailure> {
+                GradleRunner
+                    .create()
+                    .withProjectDir(projectDir)
+                    .withPluginClasspath()
+                    .build()
+            }
         }
     }
 }
