@@ -45,6 +45,10 @@ jobs:
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v3
+        with:
+          # Fetch all history for all tags and branches
+          # See: https://github.com/actions/checkout#fetch-all-history-for-all-tags-and-branches
+          fetch-depth: 0
       - name: 'Set Git environment for automated tag release requirements'
         run: |
           git config --global user.name 'github-actions[bot]'
