@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     val kotlinVersion = "1.6.20"
 
+    id("jacoco")
     id("java-library")
     kotlin("jvm") version kotlinVersion apply false
 }
@@ -11,6 +12,7 @@ plugins {
 subprojects {
     version = System.getenv("VERSION") ?: "DEV-SNAPSHOT"
 
+    apply(plugin = "jacoco")
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
 
@@ -33,6 +35,14 @@ subprojects {
         test {
             useJUnitPlatform()
             testLogging { showStandardStreams = true }
+            finalizedBy(jacocoTestReport)
+        }
+
+        jacocoTestReport {
+            reports {
+                csv.required.set(true)
+                xml.required.set(true)
+            }
         }
 
         jar {
