@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   Prepare-Release:
-    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-20.04
     steps:
       - name: 'Set up tags REST endpoint environment variable'
