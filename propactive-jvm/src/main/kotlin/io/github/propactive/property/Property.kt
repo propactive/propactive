@@ -1,5 +1,6 @@
 package io.github.propactive.property
 
+import io.github.propactive.config.BLANK_PROPERTY
 import io.github.propactive.type.STRING
 import io.github.propactive.type.Type
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -33,19 +34,19 @@ annotation class Property(
      * ```
      * Will generate an application property for 3 environments (test, stage, and prod)
      */
-    val value: Array<String> = [""],
+    val value: Array<String> = [BLANK_PROPERTY],
     /**
      * The type of the property value. (used on runtime for validation)
      * Current natively supported types:
-     * - BASE64
-     * - BOOLEAN
-     * - DECIMAL
-     * - INTEGER
-     * - JSON
-     * - STRING
-     * - URI
-     * - URL
-     * - UUID
+     * - [io.github.propactive.type.BASE64]
+     * - [io.github.propactive.type.BOOLEAN]
+     * - [io.github.propactive.type.DECIMAL]
+     * - [io.github.propactive.type.INTEGER]
+     * - [io.github.propactive.type.JSON]
+     * - [io.github.propactive.type.STRING]
+     * - [io.github.propactive.type.URI]
+     * - [io.github.propactive.type.URL]
+     * - [io.github.propactive.type.UUID]
      *
      * You can use the interface [Type] to create your own type for custom validation.
      */
