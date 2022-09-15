@@ -28,11 +28,11 @@ Using the `plugins` & `dependencies` blocks, you can set up Propactive as follow
 
 ```kotlin
 plugins {
-    id("io.github.propactive")
+    id("io.github.propactive") version "1.1.0"
 }
 
 dependencies {
-    implementation("io.github.propactive:propactive-jvm")
+  implementation("io.github.propactive:propactive-jvm:1.1.0")
 }
 ```
 
@@ -60,18 +60,18 @@ then have a look at the rest this guide.
 
 ## Gradle Plugin configurations:
 
-Proactive provides a plugin extension that allows you to specify the destination of the created application properties file,
-set the location of the implementation class, and/or specify which environments you want to generate application properties
+Proactive provides a plugin extension that allows you to specify the destination of created application properties file,
+set the location of implementation class, and/or specify which environments you want to generate application properties
 files for by default. 
 
 Here is an example that generates the files to a directory called `dist` within your build folder, locates the implementation
-class of the application properties object at `propactive.demo.Properties`, and will only generate `prod` environment 
+class of the application properties object at `io.github.propactive.demo.Properties`, and will only generate `prod` environment 
 application properties when no options are passed to the `generateApplicationProperties` task:
 
 ```kotlin
 propactive {
-    destination = layout.buildDirectory.dir("dist").get().asFile.absolutePath
-    implementationClass = "propactive.demo.Properties"
+    destination = layout.buildDirectory.dir("properties").get().asFile.absolutePath
+    implementationClass = "io.github.propactive.demo.Properties"
     environments = "prod"
 }
 ```
@@ -80,18 +80,18 @@ propactive {
 
 [//]: # (TODO: convert to diagram when complete using "Google Draw"...)
 
-In one of the places I worked in, a sum of the projects had a streamlined process to define, test, and maintain application properties.
+In one of the places I worked in, many of our projects had a streamlined process to define, test, and maintain application properties.
 The application source code and deployment details (i.e. helm charts files, application properties, JKS files...etc.)
 were seperated in two different project repositories. This led to the following inconvenience:   
 
 - Duplication: both application project and deployment project are testing against expected properties such as checking for compulsory 
-  keys and typed values (i.e. if a values in an integer as excepted), since we do have several microservices within our stack,
-  these types of tests were duplicated across several projects. 
+  keys and typed values (i.e. if a value in an integer). Since we have several microservices within our stack,
+  these tests were duplicated across several projects. 
 - Maintainability: Since we have multiple environments to deploy our application, we usually end up with many application 
   properties files. We also have a separate module to deploy the application locally (i.e. "dev" environment) and another
   project that we use for E2E integration testing across our stack, so more application properties files were being maintained there.
   This means whenever we add a new application property, the developer needs to be domain-aware of all application property files 
-  and update each, accordingly.       
+  and accordingly update each.       
 - Incoherence: Some application property values are tested to validate if they confirm to a certain type (i.e. URL,
   BASE64, Decimal...etc.). Usually, we have a shared library that extracts common functions and is reused across several 
   projects. However, as the addition/removal of application properties is a fast-paced process, we ended with several 
@@ -130,7 +130,7 @@ app.web.server.url=http://127.0.0.1/
 ```
 
 Usually, this is fine, but as you scale, have many environments, and dozens of application properties that has different
-values for each environment, it becomes more mundane and error-prone, not only you will need to define a constant for 
+values for each environment, it becomes mundane and error-prone, not only you will need to define a constant for 
 `app.web.server.url` to test your property values, and perhaps another constant to reference it on your application side, 
 you will also need to parse each file if you want to test if the URL value is of valid format, if such precision is required.
 
@@ -164,11 +164,11 @@ This will generate a file named `prod-application.properties` with the following
 app.web.server.url=https://www.prodland.com
 ```
 
-On top of that, it will validate the key value as set by type (e.g. `URL`) such that if it's an invalid type, it will 
+On top of that, it will validate the key value set by type (e.g. `URL`), if it's an invalid type, it will 
 fail with a verbose error. For example, the error message below is produced by having a malformed protocol keyword: (i.e. "htps") 
 
 ```log
-Property named: propactive.demo.url.key within environment named: prod was expected to be of type: URL, but value was: htps://www.prodland.com
+Property named: "propactive.demo.url.key" within environment named: "prod" was expected to be of type: "URL", but value was: "htps://www.prodland.com"
 ```
 
 You can have a look below for the [list of natively supported property types](#natively-supported-property-types) or learn 
@@ -195,7 +195,7 @@ Otherwise, please see the next section to learn [how to write your own custom pr
 ## Writing Your Own Custom Property Types
 
 Writing your custom property types is quite straightforward, you just need to implement the `propactive.type.Type` interface, 
-override the `validate` type, return `true` (or the constant `propactive.type.Type.VALID`) when validation pass or `false` (or the constant `propactive.type.Type.INVALID`) 
+override the `validate` type, return `true` (or the constant `io.github.propactive.type.Type.VALID`) when validation pass or `false` (or the constant `io.github.propactive.type.Type.INVALID`) 
 when the validation fails, and then you can use the type within your `@Property` annotation as usual. 
 
 Here is a `PORT_NUMBER` type that you can use to validate if a port number is within a valid range: (i.e. `0 till 65535`)
@@ -277,10 +277,7 @@ have a blank value) This condition can be relaxed by setting the `mandatory` opt
 ```kotlin
 @Environment
 object ApplicationProperties {
-  @Property(
-    value = [""],
-    mandatory = false
-  )
+  @Property(mandatory = false)
   const val property = "propactive.property.key"
 }
 ```
