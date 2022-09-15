@@ -79,7 +79,6 @@ subprojects {
         // https://blog.gradle.org/java-toolchains
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(17))
-            vendor.set(JvmVendorSpec.ADOPTOPENJDK)
         }
     }
 }
