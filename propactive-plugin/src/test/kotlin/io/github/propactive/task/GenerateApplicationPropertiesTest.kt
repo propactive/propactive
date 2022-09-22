@@ -2,9 +2,9 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.Environment
 import io.github.propactive.property.Property
-import io.github.propactive.task.GenerateApplicationPropertiesTask.Companion.DEFAULT_BUILD_DESTINATION
-import io.github.propactive.task.GenerateApplicationPropertiesTask.Companion.DEFAULT_IMPLEMENTATION_CLASS
-import io.github.propactive.task.GenerateApplicationPropertiesTask.Companion.ENVIRONMENTS_WILDCARD
+import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_BUILD_DESTINATION
+import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_ENVIRONMENTS
+import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_IMPLEMENTATION_CLASS
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -31,7 +31,7 @@ internal class GenerateApplicationPropertiesTest {
         assertThrows<IllegalStateException> {
             GenerateApplicationProperties.invoke(
                 project,
-                ENVIRONMENTS_WILDCARD,
+                DEFAULT_ENVIRONMENTS,
                 DEFAULT_IMPLEMENTATION_CLASS,
                 DEFAULT_BUILD_DESTINATION
             )
@@ -49,8 +49,9 @@ internal class GenerateApplicationPropertiesTest {
                 every { outputs.files.files } returns setOf(mockk(relaxed = true))
             }
 
-            val project = mockk<Project> {
+            val project = mockk<Project>() {
                 every { getTasksByName("jar", true) } returns setOf(task)
+                every<String> { layout.buildDirectory.dir(buildDir.absolutePath).get().asFile.absolutePath } returns buildDir.absolutePath
             }
 
             every { URLClassLoader.newInstance(any(), any()) } returns mockk {
@@ -59,7 +60,7 @@ internal class GenerateApplicationPropertiesTest {
 
             GenerateApplicationProperties.invoke(
                 project,
-                ENVIRONMENTS_WILDCARD,
+                DEFAULT_ENVIRONMENTS,
                 DEFAULT_IMPLEMENTATION_CLASS,
                 buildDir.absolutePath
             )
