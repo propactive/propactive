@@ -1,9 +1,10 @@
 # Propactive
 
-[![CI](https://github.com/u-ways/propactive/actions/workflows/ci.yml/badge.svg)](https://github.com/u-ways/propactive/actions/workflows/ci.yml)
+[![CICD](https://github.com/u-ways/propactive/actions/workflows/CICD.yml/badge.svg)](https://github.com/u-ways/propactive/actions/workflows/CICD.yml)
+[![Code Climate](https://codeclimate.com/github/propactive/propactive.png)](https://codeclimate.com/github/propactive/propactive)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/41c79fb24e8833b59a68/test_coverage)](https://codeclimate.com/github/propactive/propactive/test_coverage)
+[![Latest Version](https://img.shields.io/github/v/release/U-ways/propactive)](https://github.com/u-ways/propactive/releases)
 [![GitHub License](https://badgen.net/badge/license/MIT/blue)](https://github.com/u-ways/propactive/blob/master/LICENSE)
-
-[//]: # ([![TEST COVERAGE - 100%]&#40;TODO&#41;]&#40;TODO&#41;)
 
 An application property generator framework that validates your property values on runtime.
 
@@ -200,7 +201,7 @@ when the validation fails, and then you can use the type within your `@Property`
 Here is a `PORT_NUMBER` type that you can use to validate if a port number is within a valid range: (i.e. `0 till 65535`)
 
 ```kotlin
-import propactive.type.Type
+import io.github.propactive.type.Type
 
 object PORT_NUMBER : Type {
   override fun validate(value: Any) = value
@@ -211,8 +212,8 @@ object PORT_NUMBER : Type {
 ```
 
 ```kotlin
-import propactive.environment.Environment
-import propactive.property.Property
+import io.github.propactive.environment.Environment
+import io.github.propactive.property.Property
 
 @Environment([
     "prod:       application.properties",

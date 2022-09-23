@@ -1,0 +1,16 @@
+name: CICD
+
+on: [push]
+
+jobs:
+  CI:
+    uses: ./.github/workflows/ci-workflow.yml
+    # This only works for organization and repository secrets
+    # See: https://github.com/actions/runner/issues/1413#issuecomment-1230408270
+    secrets: inherit
+  CD:
+    needs: [CI]
+    uses: ./.github/workflows/cd-workflow.yml
+    # This only works for organization and repository secrets
+    # See: https://github.com/actions/runner/issues/1413#issuecomment-1230408270
+    secrets: inherit

@@ -1,0 +1,73 @@
+name: CD
+
+on: [workflow_call]
+
+env:
+  OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+  OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+  SIGNING_GNUPG_EXECUTABLE: ${{ secrets.SIGNING_GNUPG_EXECUTABLE }}
+  SIGNING_GNUPG_HOME_DIR: ${{ secrets.SIGNING_GNUPG_HOME_DIR }}
+  SIGNING_GNUPG_KEY_NAME: ${{ secrets.SIGNING_GNUPG_KEY_NAME }}
+  SIGNING_GNUPG_PASSPHRASE: ${{ secrets.SIGNING_GNUPG_PASSPHRASE }}
+  SIGNING_GNUPG_PRIVATE_KEY: ${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}
+  GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+  GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+
+jobs:
+  Prepare-JARs:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: 'Checkout to current branch'
+        uses: actions/checkout@v3
+      - name: 'Set up JDK 17'
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: liberica
+          cache: gradle
+      - name: 'Importing GPG key'
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ env.SIGNING_GNUPG_PRIVATE_KEY }}
+          passphrase: ${{ env.SIGNING_GNUPG_KEY_NAME }}
+      - name: 'Building Project JARs'
+        run: make build-jars
+      - name: 'Uploading propactive-jvm JAR artifacts'
+        uses: actions/upload-artifact@v3
+        with:
+          name: jar-artifacts
+          path: ./propactive-*/build/libs
+
+  Publish-Deployment:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: Prepare-JARs
+    runs-on: ubuntu-20.04
+    steps:
+      - name: 'Checkout to current branch'
+        uses: actions/checkout@v3
+        with:
+          # Fetch all history for all tags and branches
+          # See: https://github.com/actions/checkout#fetch-all-history-for-all-tags-and-branches
+          fetch-depth: 0
+      - name: 'Set Git environment for automated tag release requirements'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
+      - name: 'Set up JDK 17'
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: liberica
+          cache: gradle
+      - name: 'Importing GPG key'
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ env.SIGNING_GNUPG_PRIVATE_KEY }}
+          passphrase: ${{ env.SIGNING_GNUPG_KEY_NAME }}
+      - name: 'Publishing latest version tag'
+        run: make publish-latest-version-tag
+      - name: 'Publishing to maven central'
+        run: make publish-propactive-jvm-jars
+      - name: 'Publishing to gradle plugin'
+        run: make publish-propactive-plugin-jars
