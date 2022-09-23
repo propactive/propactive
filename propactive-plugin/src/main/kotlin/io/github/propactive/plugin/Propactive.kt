@@ -3,6 +3,7 @@ package io.github.propactive.plugin
 import io.github.propactive.task.GenerateApplicationProperties
 import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_BUILD_DESTINATION
 import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_ENVIRONMENTS
+import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_FILENAME_OVERRIDE
 import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.task.GenerateApplicationPropertiesTask
 import org.gradle.api.Plugin
@@ -38,6 +39,11 @@ open class Propactive : Plugin<Project> {
                             task.destination = propertyOrDefault(
                                 Configuration::destination.name,
                                 (destination ?: DEFAULT_BUILD_DESTINATION)
+                            )
+
+                            task.filenameOverride = propertyOrDefault(
+                                Configuration::filenameOverride.name,
+                                (filenameOverride ?: DEFAULT_FILENAME_OVERRIDE)
                             )
                         }
                     }

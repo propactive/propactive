@@ -133,6 +133,7 @@ class PropactiveTest {
             val customDestination = "custom/path"
             val customEnvironments = "test"
             val customImplementationClass = "io.github.propactive.Test"
+            val customFilename = "customFilename"
 
             project
                 .getTasksByName(GenerateApplicationProperties.TASK_NAME, false)
@@ -142,11 +143,13 @@ class PropactiveTest {
                     setProperty(Configuration::destination.name, customDestination)
                     setProperty(Configuration::environments.name, customEnvironments)
                     setProperty(Configuration::implementationClass.name, customImplementationClass)
+                    setProperty(Configuration::filenameOverride.name, customFilename)
                 }
                 .apply {
                     destination shouldBe customDestination
                     environments shouldBe customEnvironments
                     implementationClass shouldBe customImplementationClass
+                    filenameOverride shouldBe customFilename
                 }
         }
 

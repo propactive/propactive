@@ -63,6 +63,42 @@ internal class FileFactoryTest {
                 }
         }
 
+        @Test
+        fun shouldOverrideFilenameIfCustomFilenameIsProvided() {
+            val customFilename = Random.alphaNumeric()
+            val environment = mockk<EnvironmentModel>(relaxed = true) {
+                every { filename } returns Random.alphaNumeric()
+            }
+
+            Files
+                .createTempDirectory("")
+                .toFile()
+                .apply { deleteOnExit() }
+                .let { destinationDir ->
+                    FileFactory
+                        .create(environment, destinationDir.absolutePath, customFilename)
+                        .name shouldBe customFilename
+                }
+        }
+
+        @Test
+        fun shouldNotOverrideFilenameIfCustomFilenameIsBlank() {
+            val givenFilename = Random.alphaNumeric()
+            val environment = mockk<EnvironmentModel>(relaxed = true) {
+                every { filename } returns givenFilename
+            }
+
+            Files
+                .createTempDirectory("")
+                .toFile()
+                .apply { deleteOnExit() }
+                .let { destinationDir ->
+                    FileFactory
+                        .create(environment, destinationDir.absolutePath, "")
+                        .name shouldBe givenFilename
+                }
+        }
+
         private fun mockedProperty(number: Int): PropertyModel = mockk {
             every { name } returns "property.name.$number"
             every { value } returns "property.value.$number"
