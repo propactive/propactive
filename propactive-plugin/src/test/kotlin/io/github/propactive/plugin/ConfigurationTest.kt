@@ -14,6 +14,7 @@ internal class ConfigurationTest {
             environments.shouldBeNull()
             implementationClass.shouldBeNull()
             destination.shouldBeNull()
+            filenameOverride.shouldBeNull()
         }
     }
 
@@ -22,24 +23,29 @@ internal class ConfigurationTest {
         val environmentsNewValue = "${randomUUID()}"
         val implementationClassNewValue = "${randomUUID()}"
         val destinationNewValue = "${randomUUID()}"
+        val filenameOverrideNewValue = "${randomUUID()}"
 
         Configuration()
             .apply {
                 environments = "${randomUUID()}"
                 implementationClass = "${randomUUID()}"
                 destination = "${randomUUID()}"
+                filenameOverride = "${randomUUID()}"
             }.apply {
                 environments.shouldNotBeNull()
                 implementationClass.shouldNotBeNull()
                 destination.shouldNotBeNull()
+                filenameOverride.shouldNotBeNull()
             }.apply {
                 environments = environmentsNewValue
                 implementationClass = implementationClassNewValue
                 destination = destinationNewValue
+                filenameOverride = filenameOverrideNewValue
             }.apply {
                 environments shouldBe environmentsNewValue
                 implementationClass shouldBe implementationClassNewValue
                 destination shouldBe destinationNewValue
+                filenameOverride shouldBe filenameOverrideNewValue
             }
     }
 }

@@ -79,7 +79,6 @@ subprojects {
         // https://blog.gradle.org/java-toolchains
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(17))
-            vendor.set(JvmVendorSpec.ADOPTOPENJDK)
         }
     }
 }
@@ -95,13 +94,9 @@ tasks {
 }
 
 fun Jar.withManifestDetails() {
-    manifest {
-        attributes(
-            mapOf(
-                "Implementation-Title" to project.name,
-                "Implementation-Version" to project.version,
-                "Implementation-Vendor" to "Propactive",
-            )
-        )
+    manifest.apply {
+        attributes["Implementation-Title"] = project.name
+        attributes["Implementation-Version"] = project.version
+        attributes["Implementation-Vendor"] = "Propactive"
     }
 }

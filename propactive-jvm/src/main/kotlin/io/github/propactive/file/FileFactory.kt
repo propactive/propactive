@@ -5,8 +5,11 @@ import java.io.File
 import java.nio.file.Path
 
 object FileFactory {
-    fun create(environment: EnvironmentModel, destination: String) =
-        File(Path.of(destination, environment.filename).toUri())
+    fun create(environment: EnvironmentModel, destination: String, filenameOverride: String? = null) =
+        File(Path.of(
+            destination,
+            if (filenameOverride.isNullOrBlank()) environment.filename else filenameOverride
+        ).toUri())
             .apply { parentFile.mkdirs() }
             .also { file ->
                 environment

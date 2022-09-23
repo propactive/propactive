@@ -1,18 +1,27 @@
 package io.github.propactive.plugin
 
 import io.github.propactive.task.GenerateApplicationProperties
+import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_BUILD_DESTINATION
+import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_ENVIRONMENTS
+import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.task.GenerateApplicationPropertiesTask
 import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.mockk
 import io.mockk.verify
 import org.gradle.api.Project
+import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import java.io.File
 import java.nio.file.Files
+import java.util.*
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 class PropactiveTest {
@@ -48,6 +57,135 @@ class PropactiveTest {
                         any()
                     )
             }
+        }
+    }
+
+    @Nested
+    inner class Acceptance {
+        private lateinit var project: Project
+
+        @BeforeEach
+        internal fun setUp() {
+            project = ProjectBuilder.builder()
+                .withName("temporary-project-${UUID.randomUUID()}")
+                .build()
+                .also { p -> p.plugins.apply(Propactive::class.java) }
+        }
+
+        @Test
+        fun `should register task to generate application properties`() {
+            project
+                .getTasksByName(GenerateApplicationProperties.TASK_NAME, false)
+                .shouldNotBeEmpty()
+                .first()
+                .shouldBeInstanceOf<GenerateApplicationPropertiesTask>()
+        }
+
+        @Test
+        fun `should provide sane propactive configuration defaults`() {
+            project
+                .getTasksByName(GenerateApplicationProperties.TASK_NAME, false)
+                .first()
+                .let { it as GenerateApplicationPropertiesTask }
+                .apply {
+                    destination shouldBe DEFAULT_BUILD_DESTINATION
+                    environments shouldBe DEFAULT_ENVIRONMENTS
+                    implementationClass shouldBe DEFAULT_IMPLEMENTATION_CLASS
+                }
+        }
+
+        @Test
+        fun `should register task extension to configure propactive`() {
+            project
+                .extensions
+                .findByType(Configuration::class.java)
+                .shouldNotBeNull()
+        }
+
+        @Test
+        fun `should allow modifying propactive configurations`() {
+            val customDestination = "custom/path"
+            val customEnvironments = "test"
+            val customImplementationClass = "io.github.propactive.Test"
+
+            project
+                .extensions
+                .findByType(Configuration::class.java)!!
+                .apply {
+                    destination = customDestination
+                    environments = customEnvironments
+                    implementationClass = customImplementationClass
+                }
+
+            project
+                .getTasksByName(GenerateApplicationProperties.TASK_NAME, false)
+                .first()
+                .let { it as GenerateApplicationPropertiesTask }
+                .apply {
+                    destination shouldBe customDestination
+                    environments shouldBe customEnvironments
+                    implementationClass shouldBe customImplementationClass
+                }
+        }
+
+        @Test
+        fun `should allow setting propactive configurations through system property`() {
+            val customDestination = "custom/path"
+            val customEnvironments = "test"
+            val customImplementationClass = "io.github.propactive.Test"
+            val customFilename = "customFilename"
+
+            project
+                .getTasksByName(GenerateApplicationProperties.TASK_NAME, false)
+                .first()
+                .let { it as GenerateApplicationPropertiesTask }
+                .apply {
+                    setProperty(Configuration::destination.name, customDestination)
+                    setProperty(Configuration::environments.name, customEnvironments)
+                    setProperty(Configuration::implementationClass.name, customImplementationClass)
+                    setProperty(Configuration::filenameOverride.name, customFilename)
+                }
+                .apply {
+                    destination shouldBe customDestination
+                    environments shouldBe customEnvironments
+                    implementationClass shouldBe customImplementationClass
+                    filenameOverride shouldBe customFilename
+                }
+        }
+
+        @Test
+        fun `should allow overriding propactive configurations`() {
+            val customConfigDestination = "custom/path/config"
+            val customConfigEnvironments = "testConfig"
+            val customConfigImplementationClass = "io.github.propactive.TestConfig"
+
+            val customPropertyDestination = "custom/path/Property"
+            val customPropertyEnvironments = "testProperty"
+            val customPropertyImplementationClass = "io.github.propactive.TestProperty"
+
+            project
+                .extensions
+                .findByType(Configuration::class.java)!!
+                .apply {
+                    destination = customConfigDestination
+                    environments = customConfigEnvironments
+                    implementationClass = customConfigImplementationClass
+                }
+
+            project
+                .getTasksByName(GenerateApplicationProperties.TASK_NAME, false)
+                .first()
+                .let { it as GenerateApplicationPropertiesTask }
+                .apply {
+                    setProperty(Configuration::destination.name, customPropertyDestination)
+                    setProperty(Configuration::environments.name, customPropertyEnvironments)
+                    setProperty(Configuration::implementationClass.name, customPropertyImplementationClass)
+                }
+                .apply {
+                    destination shouldBe customPropertyDestination
+                    environments shouldBe customPropertyEnvironments
+                    implementationClass shouldBe customPropertyImplementationClass
+                }
         }
     }
 
@@ -110,7 +248,7 @@ class PropactiveTest {
                             | }
                             | 
                             | propactive {
-                            |     destination = layout.buildDirectory.dir("dist").get().asFile.absolutePath
+                            |     destination = layout.buildDirectory.dir("properties").get().asFile.absolutePath
                             |     implementationClass = "propactive.dev.Properties"
                             |     environments = "dev"
                             | }

@@ -1,5 +1,6 @@
 package io.github.propactive.property
 
+import io.github.propactive.config.BLANK_PROPERTY
 import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_HAS_INVALID_TYPE
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_INACCESSIBLE
@@ -9,11 +10,8 @@ import io.github.propactive.type.INTEGER
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.junit.jupiter.api.assertThrows
 
 @TestInstance(PER_CLASS)
 internal class PropertyFactoryTest {
@@ -110,6 +108,19 @@ internal class PropertyFactoryTest {
                     .create(MandatoryPropertyWithBlankValue::class.members)
             }.message shouldBe PROPERTY_SET_MANDATORY_IS_BLANK("test.resource.value", "")()
         }
+
+        @Test
+        fun `given an object with NonMandatoryPropertyWithBlankValue, when factory creates a DAO, then it should not error`() {
+            assertDoesNotThrow {
+                PropertyFactory
+                    .create(NonMandatoryPropertyWithBlankValue::class.members)
+                    .first().apply {
+                        name shouldBe NonMandatoryPropertyWithBlankValue.PROPERTY_NAME
+                        value shouldBe BLANK_PROPERTY
+                        environment shouldBe UNSPECIFIED_ENVIRONMENT
+                    }
+            }
+        }
     }
 
     // HAPPY PATH OBJECTS
@@ -158,6 +169,11 @@ internal class PropertyFactoryTest {
 
     object MandatoryPropertyWithBlankValue {
         @Property([":"], mandatory = true)
+        const val PROPERTY_NAME = "test.resource.value"
+    }
+
+    object NonMandatoryPropertyWithBlankValue {
+        @Property(mandatory = false)
         const val PROPERTY_NAME = "test.resource.value"
     }
 
