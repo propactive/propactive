@@ -6,11 +6,10 @@
 [![Latest Version](https://img.shields.io/github/v/release/U-ways/propactive)](https://github.com/u-ways/propactive/releases)
 [![GitHub License](https://badgen.net/badge/license/MIT/blue)](https://github.com/u-ways/propactive/blob/master/LICENSE)
 
-An application property generator framework that validates your property values on runtime.
+An application property generator framework that validates and generates your `application.properties` file on runtime.
 
 - [Setup](#setup)
 - [Gradle Plugin configurations](#gradle-plugin-configurations)
-- [Why Propactive was developed? (Historical background)](#why-propactive-was-developed-historical-background)
 - [Runtime Property Validation](#runtime-property-validation)
 - [Natively Supported Property Types](#natively-supported-property-types)
 - [Writing Your Own Custom Property Types](#writing-your-own-custom-property-types)
@@ -28,11 +27,11 @@ Using the `plugins` & `dependencies` blocks, you can set up Propactive as follow
 
 ```kotlin
 plugins {
-    id("io.github.propactive") version "1.1.0"
+    id("io.github.propactive") version "1.1.1"
 }
 
 dependencies {
-  implementation("io.github.propactive:propactive-jvm:1.1.0")
+  implementation("io.github.propactive:propactive-jvm:1.1.1")
 }
 ```
 
@@ -53,8 +52,8 @@ Running the Propactive task `./gradlew generateApplicationProperties` will gener
 propactive.property.key=HelloWorld
 ```
 
-The file will be named `application.properties` and it will be located within the `dist` 
-directory of your set build destination. If you want to learn [how to configure the location of your properties object](#gradle-plugin-configurations),
+The file will be named `application.properties` and it will be located within the `dist` directory of your set build 
+destination. If you want to learn [how to configure the location of your properties object](#gradle-plugin-configurations),
 [how to set a custom application properties filename](#gradle-plugin-configurations), or [how to work with multiple environments when using Propactive](#working-with-multiple-environments), 
 then have a look at the rest this guide.
 
@@ -76,41 +75,10 @@ propactive {
 }
 ```
 
-## Why Propactive was developed? (Historical background)
-
-[//]: # (TODO: convert to diagram when complete using "Google Draw"...)
-
-In one of the places I worked in, many of our projects had a streamlined process to define, test, and maintain application properties.
-The application source code and deployment details (i.e. helm charts files, application properties, JKS files...etc.)
-were seperated in two different project repositories. This led to the following inconvenience:   
-
-- Duplication: both application project and deployment project are testing against expected properties such as checking for compulsory 
-  keys and typed values (i.e. if a value in an integer). Since we have several microservices within our stack,
-  these tests were duplicated across several projects. 
-- Maintainability: Since we have multiple environments to deploy our application, we usually end up with many application 
-  properties files. We also have a separate module to deploy the application locally (i.e. "dev" environment) and another
-  project that we use for E2E integration testing across our stack, so more application properties files were being maintained there.
-  This means whenever we add a new application property, the developer needs to be domain-aware of all application property files 
-  and accordingly update each.       
-- Incoherence: Some application property values are tested to validate if they confirm to a certain type (i.e. URL,
-  BASE64, Decimal...etc.). Usually, we have a shared library that extracts common functions and is reused across several 
-  projects. However, as the addition/removal of application properties is a fast-paced process, we ended with several 
-  methods to test the same thing. (e.g. using Regex to validate a URL whereas another would use Java's built-in `net.URL` API)
-
-For such a critical part of our deployment pipeline, this left me wondering if there is a way we can improve the development 
-and maintainability of our application properties. After all, a single incorrect application property key or value can 
-lead to unexpected downtime, and it is an issue we experienced in the past.
-
-**Therefore, Propactive was developed with the following requirements in mind:**
-- Eliminate the need to store multiple application properties files in deployment projects.
-- The ability to test/validate application properties files with a higher degree of accuracy and flexibility.
-- Reduce code duplication/maintenance by having a single source of truth for application property keys and concise way to define values.
-- Provide a set of commonly used property types for validation on runtime to reduce code boilerplate.
-
 ## Runtime Property Validation
 
 One of the key features Propactive has is the ability to validate given property values on runtime in a modular manner. 
-Let's consider the following scenario, You have an environment dependant URL value for a property called `app.web.server.url`:
+Let's consider the following scenario, You have an environment dependant URL values for a property called `app.web.server.url`:
 - prod: `https://www.prodland.com`
 - test: `http://www.nonprodland.com`
 - dev:  `http://127.0.0.1/`
@@ -132,7 +100,7 @@ app.web.server.url=http://127.0.0.1/
 Usually, this is fine, but as you scale, have many environments, and dozens of application properties that has different
 values for each environment, it becomes mundane and error-prone, not only you will need to define a constant for 
 `app.web.server.url` to test your property values, and perhaps another constant to reference it on your application side, 
-you will also need to parse each file if you want to test if the URL value is of valid format, if such precision is required.
+you will also need to parse each file if you want to test the URL value is of valid format, if such precision is required.
 
 With Propactive, this could simply be written like so:
 ```kotlin
@@ -154,7 +122,7 @@ Now locally, or [within your CI/CD](#integrating-with-your-CICD), you can genera
 file by running the following command: (omit `-Penvironments` option to generate the files for all environments)  
 
 ```shell
-# This can be added as part of your deployment or build process as required
+# TIP: This can be added as part of your deployment or build process as required
 ./gradlew generateApplicationProperties -Penvironments=prod 
 ```
 
@@ -189,7 +157,7 @@ your property values on runtime. Below is a reference for each type and the spec
 - [URL](propactive-jvm/src/main/kotlin/propactive/type/URL.kt): URL type as defined by [RFC 2396](https://www.ietf.org/rfc/rfc2396.txt)
 - [UUID](propactive-jvm/src/main/kotlin/propactive/type/UUID.kt): UUID type as defined by [RFC 4122](https://www.ietf.org/rfc/rfc4122.txt)
 
-If you believe I missed a common property type, feel free to let me know, or PR and I will be happy to merge. 
+If you believe we missed a common property type, feel free to let us know, or PR, and we will be happy to merge. 
 Otherwise, please see the next section to learn [how to write your own custom property types](#writing-your-own-custom-property-types).
 
 ## Writing Your Own Custom Property Types
@@ -332,10 +300,14 @@ You can [see this code running within our demo project](#demo-project).
 
 ## Integrating With Your CICD
 
-Documentation for this will be published as soon as the Demo project is complete...
+Work in progress
 
 ## Demo Project
 
-Work in progress...
+To make the usecase of the Proactive framework clear, we provide an example project, that make use of all above-mentioned
+features and is integrated with its own CI/CD pipeline where the application properties are validated, generated per environment,
+and a docker image is created/ran for each environment on deployment with a job summary outputted for each environment.
+
+The project can be found here: [propactive/proactive-demo](https://github.com/propactive/propactive-demo)
 
 ___
