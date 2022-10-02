@@ -31,6 +31,10 @@ test-propactive-plugin:
 	@echo "******** Running tests: propactive-plugin ... ********"
 	./gradlew propactive-plugin:test --info
 
+check-linter:
+	@echo "******** Running linter: propactive-* ... ********"
+	./gradlew ktCh --continue
+
 build-jars:
 	@echo "******** Building JARs ... ********"
 	$(VERSION_ENVIRONMENT_VARIABLE) && \

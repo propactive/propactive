@@ -3,11 +3,19 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     val kotlinVersion = "1.6.20"
+    val ktlintVersion = "11.0.0"
 
     id("jacoco")
     id("java-library")
     id("org.jetbrains.dokka") version kotlinVersion
+    id("org.jlleitschuh.gradle.ktlint") version ktlintVersion
     kotlin("jvm") version kotlinVersion apply false
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
 }
 
 subprojects {
@@ -17,8 +25,7 @@ subprojects {
     apply(plugin = "java-library")
     apply(plugin = "maven-publish")
     apply(plugin = "org.jetbrains.dokka")
-
-    repositories(RepositoryHandler::mavenCentral)
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     dependencies {
         val mockkVersion: String by project
@@ -72,6 +79,10 @@ subprojects {
             archives(sourcesJar)
             archives(javadocJar)
         }
+    }
+
+    ktlint {
+        verbose.set(true)
     }
 
     // https://docs.gradle.org/current/userguide/java_plugin.html#sec:java-extension
