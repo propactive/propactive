@@ -20,7 +20,7 @@ import org.junit.jupiter.api.fail
 import java.io.File
 import java.net.URLClassLoader
 import java.nio.file.Files
-import java.util.*
+import java.util.UUID
 
 internal class GenerateApplicationPropertiesTest {
     @Test

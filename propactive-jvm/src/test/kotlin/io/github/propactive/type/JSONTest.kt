@@ -20,9 +20,9 @@ internal class JSONTest : TypeTestRunner() {
     )
 
     override fun invalidValues(): Array<Any> = arrayOf(
-        "",                 // Empty strings are not accepted
-        "invalid",          // invalid value
-        Unit,               // Unit value
+        "", // Empty strings are not accepted
+        "invalid", // invalid value
+        Unit, // Unit value
         // Randomly malformed Json values
         """{ foo: [] }""",
         """{ "foo": "bar" "baz": 1 }""",

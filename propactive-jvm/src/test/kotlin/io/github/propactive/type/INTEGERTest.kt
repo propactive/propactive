@@ -12,9 +12,9 @@ internal class INTEGERTest : TypeTestRunner() {
 
     override fun invalidValues(): Array<Any> = arrayOf(
         "invalid", // invalid value
-        "0xFF",    // hex value
-        "10.0",    // decimal value
-        0.05,      // non-string decimal value
-        Unit,      // Unit value
+        "0xFF", // hex value
+        "10.0", // decimal value
+        0.05, // non-string decimal value
+        Unit, // Unit value
     )
 }

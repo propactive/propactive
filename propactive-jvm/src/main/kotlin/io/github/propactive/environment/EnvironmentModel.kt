@@ -9,8 +9,8 @@ data class EnvironmentModel(
 ) {
     override fun hashCode() = name.hashCode()
     override fun equals(other: Any?) = when {
-        this === other                -> true
+        this === other -> true
         javaClass != other?.javaClass -> false
-        else                          -> (name == (other as EnvironmentModel).name)
+        else -> (name == (other as EnvironmentModel).name)
     }
 }

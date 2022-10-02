@@ -6,7 +6,7 @@ package io.github.propactive.type
  */
 interface Type {
     companion object {
-        const val VALID   = true
+        const val VALID = true
         const val INVALID = false
     }
     fun validate(value: Any): Boolean

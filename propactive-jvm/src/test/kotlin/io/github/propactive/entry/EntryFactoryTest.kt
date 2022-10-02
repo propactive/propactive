@@ -16,7 +16,7 @@ internal class EntryFactoryTest {
     @TestInstance(PER_CLASS)
     inner class HappyPath {
         @ParameterizedTest
-        @CsvSource("value",":value")
+        @CsvSource("value", ":value")
         fun shouldSupportNoKeyEntriesWhenThereIsASingleEntryOnly(entry: String) {
             EntryFactory.create(arrayOf(entry))
                 .first().apply {

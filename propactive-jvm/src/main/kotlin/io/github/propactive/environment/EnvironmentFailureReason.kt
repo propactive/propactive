@@ -18,7 +18,10 @@ object EnvironmentFailureReason {
     }
 
     internal val ENVIRONMENT_INVALID_FILENAME = { environmentName: String, filename: String ->
-        { describe(environmentName) + "has a file named: $filename that does not adhere to the following regular language: ${GLOBALLY_VALID_FILENAME.pattern}" }
+        {
+            describe(environmentName) + "has a file named: $filename that does not adhere " +
+                "to the following regular language: ${GLOBALLY_VALID_FILENAME.pattern}"
+        }
     }
 
     // FACTORY FAILURES
@@ -28,7 +31,11 @@ object EnvironmentFailureReason {
     }
 
     internal val ENVIRONMENT_INVALID_KEY_EXPANSION = { entry: EntryModel ->
-        { describe(entry.key) + "is concatenated multi-environment entry, but mapped filename: \"${entry.value.trim()}\" doesn't contain a wildcard (\"*\"), and hence filename conflict will occur for: \"$entry\"" }
+        {
+            describe(entry.key) + "is concatenated multi-environment entry, " +
+                "but mapped filename: \"${entry.value.trim()}\" doesn't contain a wildcard (\"*\"), " +
+                "and hence filename conflict will occur for: \"$entry\""
+        }
     }
 
     private fun describe(environment: String) =

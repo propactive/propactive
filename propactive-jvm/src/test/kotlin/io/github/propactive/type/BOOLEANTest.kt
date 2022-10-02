@@ -13,8 +13,8 @@ internal class BOOLEANTest : TypeTestRunner() {
     )
 
     override fun invalidValues(): Array<Any> = arrayOf(
-        Unit,      // Unit value
+        Unit, // Unit value
         "invalid", // Invalid only
-        1234,      // Number
+        1234, // Number
     )
 }

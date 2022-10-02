@@ -32,7 +32,7 @@ class EnvironmentBuilder private constructor() {
             name,
             filename
                 .replace(EXPANSION_WILDCARD, name)
-                .apply { require(matches(GLOBALLY_VALID_FILENAME), ENVIRONMENT_INVALID_FILENAME(name, this))},
+                .apply { require(matches(GLOBALLY_VALID_FILENAME), ENVIRONMENT_INVALID_FILENAME(name, this)) },
             properties
                 .filter { name == it.environment }
                 .toSet()
