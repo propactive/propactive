@@ -8,8 +8,10 @@ object EntryFactory {
     fun create(entries: Array<String>) = entries
         .apply {
             if (size > 1) onEach { entry ->
-                require(entry.count { it == KEY_VALUE_DELIMITER } > 0,
-                    MISSING_KEY_VALUE_DELIMITER_FOR_A_MULTI_ENTRIES(entry))
+                require(
+                    entry.count { it == KEY_VALUE_DELIMITER } > 0,
+                    MISSING_KEY_VALUE_DELIMITER_FOR_A_MULTI_ENTRIES(entry)
+                )
             }
         }
         .map { entry ->

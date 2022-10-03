@@ -17,11 +17,15 @@ import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.UnexpectedBuildFailure
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import java.io.File
 import java.nio.file.Files
-import java.util.*
+import java.util.UUID
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 class PropactiveTest {
@@ -212,7 +216,7 @@ class PropactiveTest {
                 File(parent, "build.gradle.kts")
                     .apply {
                         writeText(
-                            """ 
+                            """
                             | plugins {
                             |     id("io.github.propactive") version "DEV-SNAPSHOT"
                             | }
@@ -242,11 +246,11 @@ class PropactiveTest {
                 File(parent, "build.gradle.kts")
                     .apply {
                         writeText(
-                            """ 
+                            """
                             | plugins {
                             |     id("io.github.propactive") version "DEV-SNAPSHOT"
                             | }
-                            | 
+                            |
                             | propactive {
                             |     destination = layout.buildDirectory.dir("properties").get().asFile.absolutePath
                             |     implementationClass = "propactive.dev.Properties"

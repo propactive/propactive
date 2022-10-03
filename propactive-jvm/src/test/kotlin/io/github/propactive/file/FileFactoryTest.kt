@@ -55,11 +55,13 @@ internal class FileFactoryTest {
                     FileFactory
                         .create(environment, destinationDir.absolutePath)
                         .readText()
-                        .shouldContain("""
+                        .shouldContain(
+                            """
                             ${property1.name}=${property1.value}
                             ${property2.name}=${property2.value}
                             ${property3.name}=${property3.value}
-                        """.trimIndent())
+                            """.trimIndent()
+                        )
                 }
         }
 

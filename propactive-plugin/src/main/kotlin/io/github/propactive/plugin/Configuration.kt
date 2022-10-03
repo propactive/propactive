@@ -9,9 +9,8 @@ package io.github.propactive.plugin
  * @param filenameOverride Allows overriding given filename for an environment. (This should only be used when generating application properties for a singular environment)
  */
 open class Configuration(
-    var environments:        String? = null,
+    var environments: String? = null,
     var implementationClass: String? = null,
-    var destination:         String? = null,
-    var filenameOverride:    String? = null,
+    var destination: String? = null,
+    var filenameOverride: String? = null,
 )
-

@@ -10,8 +10,12 @@ import io.github.propactive.type.INTEGER
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 
 @TestInstance(PER_CLASS)
 internal class PropertyFactoryTest {
@@ -176,5 +180,4 @@ internal class PropertyFactoryTest {
         @Property(mandatory = false)
         const val PROPERTY_NAME = "test.resource.value"
     }
-
 }

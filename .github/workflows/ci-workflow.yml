@@ -26,6 +26,8 @@ jobs:
           path: |
             ./*/build/test-results/test/*.xml
             ./*/build/reports
+      - name: 'Running KtLinter'
+        run: make check-linter
 
   Test-Reporter:
     needs: Test-Runner
