@@ -1,3 +1,4 @@
+import org.gradle.api.JavaVersion.VERSION_17
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -100,7 +101,7 @@ tasks {
     }
 
     withType<KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = VERSION_17.toString()
     }
 }
 
