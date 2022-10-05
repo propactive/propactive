@@ -3,9 +3,10 @@ package io.github.propactive.entry
 import io.github.propactive.config.KEY_VALUE_DELIMITER
 import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
 import io.github.propactive.entry.EntryFailureReason.MISSING_KEY_VALUE_DELIMITER_FOR_A_MULTI_ENTRIES
+import io.github.propactive.commons.Factory
 
-object EntryFactory {
-    fun create(entries: Array<String>) = entries
+object EntryFactory : Factory<Array<String>, List<EntryModel>> {
+    override fun create(entries: Array<String>) = entries
         .apply {
             if (size > 1) onEach { entry ->
                 require(
