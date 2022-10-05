@@ -13,7 +13,7 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubtypeOf
 
-internal object PropertyFactory: Factory<Collection<KCallable<*>>, List<PropertyModel>> {
+internal object PropertyFactory : Factory<Collection<KCallable<*>>, List<PropertyModel>> {
     override fun create(kCallables: Collection<KCallable<*>>) = kCallables
         .mapNotNull { it.findAnnotation<Property>()?.run { it to this } }
         .flatMap { (k, property) ->
