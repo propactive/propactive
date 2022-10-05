@@ -3,6 +3,7 @@ package io.github.propactive.property
 import io.github.propactive.config.MULTIPLE_ENVIRONMENT_DELIMITER
 import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
 import io.github.propactive.entry.EntryFactory
+import io.github.propactive.commons.Factory
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_HAS_INVALID_TYPE
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_INACCESSIBLE
 import kotlin.reflect.KCallable
@@ -12,8 +13,8 @@ import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.isSubtypeOf
 
-internal object PropertyFactory {
-    fun create(kCallables: Collection<KCallable<*>>): List<PropertyModel> = kCallables
+internal object PropertyFactory : Factory<Collection<KCallable<*>>, List<PropertyModel>> {
+    override fun create(kCallables: Collection<KCallable<*>>) = kCallables
         .mapNotNull { it.findAnnotation<Property>()?.run { it to this } }
         .flatMap { (k, property) ->
             check(k.visibility != PRIVATE, PROPERTY_FIELD_INACCESSIBLE(k.name))

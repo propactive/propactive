@@ -2,7 +2,7 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.environment.EnvironmentModel
-import io.github.propactive.file.FileFactory
+import io.github.propactive.file.FileWriter.writeToFile
 import io.github.propactive.plugin.Configuration
 import org.gradle.api.Project
 import java.io.File
@@ -52,7 +52,7 @@ object GenerateApplicationProperties {
         ?.let(EnvironmentFactory::create)
         ?.requireSingleEnvironmentWhenCustomFilenameIsGiven(environments, filenameOverride)
         ?.filter { environments.contains(it.name) || environments.contains(DEFAULT_ENVIRONMENTS) }
-        ?.forEach { environment -> FileFactory.create(environment, project.layout.buildDirectory.dir(destination).get().asFile.absolutePath, filenameOverride) }
+        ?.forEach { environment -> writeToFile(environment, project.layout.buildDirectory.dir(destination).get().asFile.absolutePath, filenameOverride) }
         ?: error("Expected to find implementation class $implementationClass")
 
     private fun Set<File>.findGivenInstanceOf(implementationClass: String) = this.firstNotNullOfOrNull {

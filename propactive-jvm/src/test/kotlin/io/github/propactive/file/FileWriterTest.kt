@@ -1,18 +1,21 @@
 package io.github.propactive.file
 
 import io.github.propactive.environment.EnvironmentModel
+import io.github.propactive.file.FileWriter.writeToFile
 import io.github.propactive.property.PropertyModel
 import io.github.propactive.support.utils.alphaNumeric
-import io.kotest.matchers.shouldBe
+import io.kotest.matchers.file.shouldExist
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
+import java.io.File
+import java.nio.file.Files.createTempDirectory
+import java.nio.file.Path
 import kotlin.random.Random
 
-internal class FileFactoryTest {
+internal class FileWriterTest {
 
     @Nested
     inner class HappyPath {
@@ -23,17 +26,13 @@ internal class FileFactoryTest {
                 every { filename } returns givenFilename
             }
 
-            Files
-                .createTempDirectory("")
+            createTempDirectory("")
                 .toFile()
                 .apply { deleteOnExit() }
                 .let { destinationDir ->
-                    FileFactory
-                        .create(environment, destinationDir.absolutePath)
-                        .apply {
-                            name shouldBe givenFilename
-                            parentFile.absolutePath shouldBe destinationDir.absolutePath
-                        }
+                    writeToFile(environment, destinationDir.absolutePath)
+
+                    File(Path.of(destinationDir.absolutePath, givenFilename).toUri()).shouldExist()
                 }
         }
 
@@ -42,18 +41,19 @@ internal class FileFactoryTest {
             val property1 = mockedProperty(1)
             val property2 = mockedProperty(2)
             val property3 = mockedProperty(3)
+            val fileName = Random.alphaNumeric()
             val environment = mockk<EnvironmentModel> {
-                every { filename } returns Random.alphaNumeric()
+                every { filename } returns fileName
                 every { properties } returns setOf(property1, property2, property3)
             }
 
-            Files
-                .createTempDirectory("")
+            createTempDirectory("")
                 .toFile()
                 .apply { deleteOnExit() }
                 .let { destinationDir ->
-                    FileFactory
-                        .create(environment, destinationDir.absolutePath)
+                    writeToFile(environment, destinationDir.absolutePath)
+
+                    File(Path.of(destinationDir.absolutePath, fileName).toUri())
                         .readText()
                         .shouldContain(
                             """
@@ -72,14 +72,13 @@ internal class FileFactoryTest {
                 every { filename } returns Random.alphaNumeric()
             }
 
-            Files
-                .createTempDirectory("")
+            createTempDirectory("")
                 .toFile()
                 .apply { deleteOnExit() }
                 .let { destinationDir ->
-                    FileFactory
-                        .create(environment, destinationDir.absolutePath, customFilename)
-                        .name shouldBe customFilename
+                    writeToFile(environment, destinationDir.absolutePath, customFilename)
+
+                    File(Path.of(destinationDir.absolutePath, customFilename).toUri()).shouldExist()
                 }
         }
 
@@ -90,14 +89,13 @@ internal class FileFactoryTest {
                 every { filename } returns givenFilename
             }
 
-            Files
-                .createTempDirectory("")
+            createTempDirectory("")
                 .toFile()
                 .apply { deleteOnExit() }
                 .let { destinationDir ->
-                    FileFactory
-                        .create(environment, destinationDir.absolutePath, "")
-                        .name shouldBe givenFilename
+                    writeToFile(environment, destinationDir.absolutePath, "")
+
+                    File(Path.of(destinationDir.absolutePath, givenFilename).toUri()).shouldExist()
                 }
         }
 
