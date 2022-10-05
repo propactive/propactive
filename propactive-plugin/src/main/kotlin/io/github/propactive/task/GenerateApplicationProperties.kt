@@ -2,6 +2,7 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.environment.EnvironmentModel
+import io.github.propactive.file.FileWriter
 import io.github.propactive.file.FileWriter.writeToFile
 import io.github.propactive.plugin.Configuration
 import org.gradle.api.Project

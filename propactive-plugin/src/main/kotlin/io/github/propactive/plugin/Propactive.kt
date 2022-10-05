@@ -1,5 +1,6 @@
 package io.github.propactive.plugin
 
+import io.github.propactive.project.ImplementationClassFinder
 import io.github.propactive.task.GenerateApplicationProperties
 import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_BUILD_DESTINATION
 import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_ENVIRONMENTS
@@ -48,12 +49,12 @@ open class Propactive : Plugin<Project> {
                         }
                     }
 
-                task.dependsOn(DEFAULT_BUILD_TASK)
+                task
+                    .dependsOn(ImplementationClassFinder.DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY)
             }
     }
 
     companion object {
-        private const val DEFAULT_BUILD_TASK = "build"
         private fun Project.propertyOrDefault(propertyName: String, default: String) =
             default.takeUnless { hasProperty(propertyName) } ?: "${property(propertyName)}"
     }

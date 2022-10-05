@@ -24,7 +24,7 @@ open class GenerateApplicationPropertiesTask : DefaultTask() {
     @TaskAction
     fun run() = project
         .logConfigurationsValues()
-        .run { invoke(project, environments, implementationClass, destination, filenameOverride) }
+        .run { invoke(project, environments, destination, filenameOverride) }
 
     init {
         group = Propactive::class.simpleName!!.lowercase()
@@ -36,7 +36,7 @@ open class GenerateApplicationPropertiesTask : DefaultTask() {
             """
             |
             | Propactive ${GenerateApplicationProperties.TASK_NAME} - Received the following configurations:
-            |  - ${Configuration::environments.name} = $environments 
+            |  - ${Configuration::environments.name} = $environments
             |  - ${Configuration::implementationClass.name} = $implementationClass
             |  - ${Configuration::destination.name} = $destination
             |  - ${Configuration::filenameOverride.name} = $filenameOverride
