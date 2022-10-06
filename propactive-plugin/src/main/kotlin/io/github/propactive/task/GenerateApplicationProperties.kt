@@ -2,7 +2,7 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.environment.EnvironmentModel
-import io.github.propactive.file.FileWriter
+import io.github.propactive.file.PropertiesFileWriter.writePropertiesFile
 import io.github.propactive.plugin.Configuration
 import io.github.propactive.project.ImplementationClassFinder.findImplementationClass
 import org.gradle.api.Project
@@ -47,7 +47,7 @@ object GenerateApplicationProperties {
         .let(EnvironmentFactory::create)
         .requireSingleEnvironmentWhenCustomFilenameIsGiven(environments, filenameOverride)
         .filter { environments.contains(it.name) || environments.contains(DEFAULT_ENVIRONMENTS) }
-        .forEach { environment -> FileWriter.writeToFile(environment, project.layout.buildDirectory.dir(destination).get().asFile.absolutePath, filenameOverride) }
+        .forEach { environment -> writePropertiesFile(environment, project.layout.buildDirectory.dir(destination).get().asFile.absolutePath, filenameOverride) }
 
     private fun Set<EnvironmentModel>.requireSingleEnvironmentWhenCustomFilenameIsGiven(
         environments: String,

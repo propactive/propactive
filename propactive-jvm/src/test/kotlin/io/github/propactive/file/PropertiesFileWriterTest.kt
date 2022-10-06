@@ -1,7 +1,7 @@
 package io.github.propactive.file
 
 import io.github.propactive.environment.EnvironmentModel
-import io.github.propactive.file.FileWriter.writeToFile
+import io.github.propactive.file.PropertiesFileWriter.writePropertiesFile
 import io.github.propactive.property.PropertyModel
 import io.github.propactive.support.utils.alphaNumeric
 import io.kotest.matchers.file.shouldExist
@@ -15,7 +15,7 @@ import java.nio.file.Files.createTempDirectory
 import java.nio.file.Path
 import kotlin.random.Random
 
-internal class FileWriterTest {
+internal class PropertiesFileWriterTest {
 
     @Nested
     inner class HappyPath {
@@ -30,7 +30,7 @@ internal class FileWriterTest {
                 .toFile()
                 .apply { deleteOnExit() }
                 .let { destinationDir ->
-                    writeToFile(environment, destinationDir.absolutePath)
+                    writePropertiesFile(environment, destinationDir.absolutePath)
 
                     File(Path.of(destinationDir.absolutePath, givenFilename).toUri()).shouldExist()
                 }
@@ -51,7 +51,7 @@ internal class FileWriterTest {
                 .toFile()
                 .apply { deleteOnExit() }
                 .let { destinationDir ->
-                    writeToFile(environment, destinationDir.absolutePath)
+                    writePropertiesFile(environment, destinationDir.absolutePath)
 
                     File(Path.of(destinationDir.absolutePath, fileName).toUri())
                         .readText()
@@ -76,7 +76,7 @@ internal class FileWriterTest {
                 .toFile()
                 .apply { deleteOnExit() }
                 .let { destinationDir ->
-                    writeToFile(environment, destinationDir.absolutePath, customFilename)
+                    writePropertiesFile(environment, destinationDir.absolutePath, customFilename)
 
                     File(Path.of(destinationDir.absolutePath, customFilename).toUri()).shouldExist()
                 }
@@ -93,7 +93,7 @@ internal class FileWriterTest {
                 .toFile()
                 .apply { deleteOnExit() }
                 .let { destinationDir ->
-                    writeToFile(environment, destinationDir.absolutePath, "")
+                    writePropertiesFile(environment, destinationDir.absolutePath, "")
 
                     File(Path.of(destinationDir.absolutePath, givenFilename).toUri()).shouldExist()
                 }

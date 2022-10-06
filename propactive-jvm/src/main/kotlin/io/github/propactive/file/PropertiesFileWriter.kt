@@ -4,14 +4,16 @@ import io.github.propactive.environment.EnvironmentModel
 import java.io.File
 import java.nio.file.Path
 
-object FileWriter {
-    fun writeToFile(environment: EnvironmentModel, destination: String, filenameOverride: String? = null) {
-        File(
-            Path.of(
-                destination,
-                filenameOverride.takeUnless { it.isNullOrBlank() } ?: environment.filename
-            ).toUri()
-        )
+object PropertiesFileWriter {
+    @JvmStatic
+    fun writePropertiesFile(
+        environment: EnvironmentModel,
+        destination: String,
+        filenameOverride: String? = null
+    ) {
+        val filename = filenameOverride.takeUnless { it.isNullOrBlank() } ?: environment.filename
+
+        File(Path.of(destination, filename).toUri())
             .apply { parentFile.mkdirs() }
             .also { file ->
                 environment
