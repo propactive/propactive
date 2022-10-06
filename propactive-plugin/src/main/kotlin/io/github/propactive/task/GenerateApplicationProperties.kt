@@ -3,12 +3,9 @@ package io.github.propactive.task
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.environment.EnvironmentModel
 import io.github.propactive.file.FileWriter
-import io.github.propactive.file.FileWriter.writeToFile
 import io.github.propactive.plugin.Configuration
+import io.github.propactive.project.ImplementationClassFinder.findImplementationClass
 import org.gradle.api.Project
-import java.io.File
-import java.net.URL
-import java.net.URLClassLoader
 
 object GenerateApplicationProperties {
     internal const val DEFAULT_ENVIRONMENTS = "*"
@@ -40,38 +37,26 @@ object GenerateApplicationProperties {
         |     Note: This should only be used when generating application properties for a singular environment.
     """.trimMargin()
 
+    @JvmStatic
     internal fun invoke(
         project: Project,
         environments: String,
-        implementationClass: String,
         destination: String,
         filenameOverride: String?,
-    ) = project
-        .getTasksByName("jar", true)
-        .fold(setOf<File>()) { acc, task -> acc.plus(task.outputs.files.files) }
-        .findGivenInstanceOf(implementationClass)
-        ?.let(EnvironmentFactory::create)
-        ?.requireSingleEnvironmentWhenCustomFilenameIsGiven(environments, filenameOverride)
-        ?.filter { environments.contains(it.name) || environments.contains(DEFAULT_ENVIRONMENTS) }
-        ?.forEach { environment -> writeToFile(environment, project.layout.buildDirectory.dir(destination).get().asFile.absolutePath, filenameOverride) }
-        ?: error("Expected to find implementation class $implementationClass")
+    ) = findImplementationClass(project)
+        .let(EnvironmentFactory::create)
+        .requireSingleEnvironmentWhenCustomFilenameIsGiven(environments, filenameOverride)
+        .filter { environments.contains(it.name) || environments.contains(DEFAULT_ENVIRONMENTS) }
+        .forEach { environment -> FileWriter.writeToFile(environment, project.layout.buildDirectory.dir(destination).get().asFile.absolutePath, filenameOverride) }
 
-    private fun Set<File>.findGivenInstanceOf(implementationClass: String) = this.firstNotNullOfOrNull {
-        URLClassLoader
-            .newInstance(arrayOf(URL("jar:file:${it.path}!/")), EnvironmentFactory::class.java.classLoader)
-            .runCatching { loadClass(implementationClass).kotlin }
-            .getOrNull()
-    }
-
-    private fun Set<EnvironmentModel>?.requireSingleEnvironmentWhenCustomFilenameIsGiven(
+    private fun Set<EnvironmentModel>.requireSingleEnvironmentWhenCustomFilenameIsGiven(
         environments: String,
         filenameOverride: String?
-    ): Set<EnvironmentModel>? {
-        val propertiesGeneratedForASingularEnvironmentOnly = this?.size == 1
+    ): Set<EnvironmentModel> {
         val isNotMultiEnvOrWildCardValue = environments
             .split(",").singleOrNull()?.equals(DEFAULT_ENVIRONMENTS)?.not() ?: false
 
-        require((filenameOverride.isNullOrBlank() || propertiesGeneratedForASingularEnvironmentOnly || isNotMultiEnvOrWildCardValue)) {
+        require((filenameOverride.isNullOrBlank() || size == 1 || isNotMultiEnvOrWildCardValue)) {
             """
                 Received Property to override filename (-P${Configuration::filenameOverride.name}): $filenameOverride
                 However, this can only be used when a single environment is requested/generated. (Tip: Use -P${Configuration::environments.name} to specify environment application properties to generate)

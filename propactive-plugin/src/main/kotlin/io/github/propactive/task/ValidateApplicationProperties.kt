@@ -1,5 +1,7 @@
 package io.github.propactive.task
 
+import io.github.propactive.environment.EnvironmentFactory
+import io.github.propactive.project.ImplementationClassFinder
 import org.gradle.api.Project
 
 object ValidateApplicationProperties {
@@ -11,5 +13,7 @@ object ValidateApplicationProperties {
 
     internal fun invoke(
         project: Project
-    ) = null
+    ) = ImplementationClassFinder
+        .findImplementationClass(project)
+        .let(EnvironmentFactory::create)
 }
