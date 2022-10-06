@@ -7,13 +7,13 @@ import io.github.propactive.entry.EntryModel
 import io.github.propactive.environment.EnvironmentBuilder.Companion.environmentBuilder
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_INVALID_KEY_EXPANSION
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_MISSING_ANNOTATION
-import io.github.propactive.commons.Factory
 import io.github.propactive.property.PropertyFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
-object EnvironmentFactory : Factory<KClass<out Any>, Set<EnvironmentModel>> {
-    override fun create(clazz: KClass<out Any>) =
+object EnvironmentFactory {
+    @JvmStatic
+    fun create(clazz: KClass<out Any>) =
         requireNotNull(clazz.findAnnotation<Environment>(), ENVIRONMENT_MISSING_ANNOTATION)
             .value
             .run(EntryFactory::create)

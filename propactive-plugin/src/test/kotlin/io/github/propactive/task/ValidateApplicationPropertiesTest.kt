@@ -16,7 +16,6 @@ internal class ValidateApplicationPropertiesTest {
 
     @Test
     fun shouldInvokeEnvironmentFactoryToTriggerValidationOfProperties() {
-        // FIXME: the staticMockk of EnvironmentFactory is not actually working
         mockkStatic(ImplementationClassFinder::class, EnvironmentFactory::class) {
             val project = mockk<Project>(relaxed = true)
 
@@ -44,7 +43,6 @@ internal class ValidateApplicationPropertiesTest {
             } returns kClass
 
             every {
-                // FIXME: the staticMockk of EnvironmentFactory is not actually working
                 EnvironmentFactory.create(kClass)
             } throws Exception("An error...")
 

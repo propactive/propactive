@@ -11,6 +11,7 @@ object ValidateApplicationProperties {
         | Validates the application properties object.
     """.trimMargin()
 
+    @JvmStatic
     internal fun invoke(
         project: Project
     ) = ImplementationClassFinder

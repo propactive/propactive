@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.io.File
 import java.nio.file.Files
-import java.util.*
+import java.util.UUID
 import kotlin.reflect.KClass
 
 internal class GenerateApplicationPropertiesTest {
