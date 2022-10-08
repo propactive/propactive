@@ -1,0 +1,16 @@
+{
+  "name": "update-release-readme",
+  "version": "1.0.0",
+  "description": "Auto updates release version in readme",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "start:dev": "nodemon index"
+  },
+  "author": "Nitish Kumar <snapdgnn@proton.me>",
+  "license": "MIT",
+  "dependencies": {
+    "@octokit/core": "^4.0.5",
+    "nodemon": "^2.0.20"
+  }
+}

@@ -26,3 +26,7 @@ hs_err_pid*
 .idea/
 .gradle/
 build/
+
+# node modules
+**/node_modules
+**/*.env

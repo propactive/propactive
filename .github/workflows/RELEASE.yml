@@ -23,3 +23,22 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d '{"tag_name":"${{ env.LATEST_TAG }}","name":"${{ env.LATEST_TAG }}","draft":true,"generate_release_notes":true}'
+
+  Update-Version:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'Set up tags REST endpoint environment variable'
+        run: echo "TAGS_REST_ENDPOINT=https://api.github.com/repos/${{ github.repository }}/tags" >> $GITHUB_ENV
+      - name: 'Derive latest created tag within repository as an environment variable'
+        run: echo "LATEST_TAG=$(curl -s ${{ env.TAGS_REST_ENDPOINT }} | jq -r '.[0].name')" >> $GITHUB_ENV
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+      - run: npm ci
+      - name: run main script
+        env: 
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NEW_VER: ${{ env.LATEST_TAG }}
+      - run: npm start || exit 0
