@@ -11,11 +11,16 @@ permissions:
 jobs:
   Prepare-Release:
     runs-on: ubuntu-20.04
+    outputs:
+      latest_tag: ${{ steps.latest_tag_deriver.outputs.latest_tag }}
     steps:
       - name: 'Set up tags REST endpoint environment variable'
         run: echo "TAGS_REST_ENDPOINT=https://api.github.com/repos/${{ github.repository }}/tags" >> $GITHUB_ENV
       - name: 'Derive latest created tag within repository as an environment variable'
-        run: echo "LATEST_TAG=$(curl -s ${{ env.TAGS_REST_ENDPOINT }} | jq -r '.[0].name')" >> $GITHUB_ENV
+        id: latest_tag_deriver
+        run: |
+          echo "LATEST_TAG=$(curl -s ${{ env.TAGS_REST_ENDPOINT }} | jq -r '.[0].name')" >> $GITHUB_ENV
+          echo "::set-output name=latest_tag::${{ env.LATEST_TAG }}"
       - name: 'Draft versioned release on Github'
         run: |
           curl -X POST \
@@ -23,3 +28,9 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d '{"tag_name":"${{ env.LATEST_TAG }}","name":"${{ env.LATEST_TAG }}","draft":true,"generate_release_notes":true}'
+  Update-Readme:
+    runs-on: ubuntu-20.04
+    needs: Prepare-Release
+    steps:
+      - name: 'Update README.md documentation to latest release version'
+        run: make update-readme-documented-versions VERSION="${{ needs.Prepare-Release.outputs.latest_tag }}"
