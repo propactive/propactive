@@ -44,6 +44,10 @@ validate-version-number:
 	@echo "******** Validating version: '$(VERSION)' ... ********"
 	./scripts/release_version_validator.sh $(VERSION)
 
+update-readme-documented-versions:
+	@echo "******** Updating documented versions in ./README.md: '$(VERSION)' ... ********"
+	./scripts/readme_release_version_updater.sh $(VERSION) ./README.md
+
 publish-latest-version-tag: validate-version-number
 	@echo "******** Publishing latest version tag '$(VERSION)' ... ********"
 	git tag $(VERSION) $(git log --pretty=format:"%H" -n 1) && \
