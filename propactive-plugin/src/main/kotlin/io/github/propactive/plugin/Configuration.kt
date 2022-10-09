@@ -1,5 +1,7 @@
 package io.github.propactive.plugin
 
+import org.gradle.api.tasks.Input
+
 /**
  * Propactive configurations.
  *
@@ -9,8 +11,15 @@ package io.github.propactive.plugin
  * @param filenameOverride Allows overriding given filename for an environment. (This should only be used when generating application properties for a singular environment)
  */
 open class Configuration(
-    var environments: String? = null,
-    var implementationClass: String? = null,
-    var destination: String? = null,
-    var filenameOverride: String? = null,
-)
+    @get:Input var environments: String = DEFAULT_ENVIRONMENTS,
+    @get:Input var implementationClass: String = DEFAULT_IMPLEMENTATION_CLASS,
+    @get:Input var destination: String = DEFAULT_BUILD_DESTINATION,
+    @get:Input var filenameOverride: String = DEFAULT_FILENAME_OVERRIDE, // TODO: can we make this nullable instead of blank?
+) {
+    companion object {
+        internal const val DEFAULT_ENVIRONMENTS = "*"
+        internal const val DEFAULT_IMPLEMENTATION_CLASS = "ApplicationProperties"
+        internal const val DEFAULT_BUILD_DESTINATION = "properties"
+        internal const val DEFAULT_FILENAME_OVERRIDE = ""
+    }
+}

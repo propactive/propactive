@@ -21,7 +21,8 @@ class EnvironmentBuilder private constructor() : Builder<EnvironmentModel> {
     companion object {
         internal val GLOBALLY_VALID_FILENAME = Regex("[A-Za-z0-9|._-]{1,255}", MULTILINE)
 
-        fun environmentBuilder() = EnvironmentBuilder()
+        @JvmStatic
+        internal fun environmentBuilder() = EnvironmentBuilder()
     }
 
     override fun build(): EnvironmentModel = apply {

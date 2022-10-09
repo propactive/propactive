@@ -26,7 +26,8 @@ class PropertyBuilder private constructor(
 
     companion object {
         internal val GLOBALLY_VALID_NAME = Regex("[A-Za-z0-9._-]{1,255}", MULTILINE)
-        fun propertyBuilder(mandatory: Boolean = false) = PropertyBuilder(mandatory)
+        @JvmStatic
+        internal fun propertyBuilder(mandatory: Boolean = false) = PropertyBuilder(mandatory)
     }
 
     override fun build(): PropertyModel = apply {

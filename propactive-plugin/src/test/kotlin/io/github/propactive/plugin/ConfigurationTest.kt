@@ -1,6 +1,9 @@
 package io.github.propactive.plugin
 
-import io.kotest.matchers.nulls.shouldBeNull
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_FILENAME_OVERRIDE
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -9,12 +12,12 @@ import java.util.UUID.randomUUID
 internal class ConfigurationTest {
 
     @Test
-    fun shouldDefaultConstructorToNullValues() {
+    fun shouldDefaultConstructorToSaneDefaults() {
         Configuration().apply {
-            environments.shouldBeNull()
-            implementationClass.shouldBeNull()
-            destination.shouldBeNull()
-            filenameOverride.shouldBeNull()
+            environments shouldBe DEFAULT_ENVIRONMENTS
+            implementationClass shouldBe DEFAULT_IMPLEMENTATION_CLASS
+            destination shouldBe DEFAULT_BUILD_DESTINATION
+            filenameOverride shouldBe DEFAULT_FILENAME_OVERRIDE
         }
     }
 

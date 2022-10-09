@@ -1,46 +1,51 @@
 package io.github.propactive.task
 
 import io.github.propactive.plugin.Configuration
-import io.github.propactive.plugin.Propactive
-import io.github.propactive.task.GenerateApplicationProperties.invoke
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
+import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
+import io.github.propactive.project.ImplementationClassFinder.DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY
 import org.gradle.api.DefaultTask
-import org.gradle.api.Project
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
 
 open class GenerateApplicationPropertiesTask : DefaultTask() {
-    @get:Input
-    internal lateinit var environments: String
+    companion object {
+        internal val TASK_NAME =
+            GenerateApplicationProperties::class.simpleName!!.replaceFirstChar(Char::lowercaseChar)
 
-    @get:Input
-    internal lateinit var implementationClass: String
-
-    @get:Input
-    internal lateinit var destination: String
-
-    @get:Input
-    internal lateinit var filenameOverride: String
+        internal val TASK_DESCRIPTION = """
+            | Generates application properties file for each given environment.
+            |
+            | Optional configurations:
+            | -P${Configuration::environments.name}
+            |     Description: Comma separated list of environments to generate the properties.
+            |     Example: test,stage,prod
+            |     Default: $DEFAULT_ENVIRONMENTS (All provided environments)
+            | -P${Configuration::implementationClass.name}
+            |     Description: Sets the location of your properties object.
+            |     Example: com.package.path.to.your.ApplicationProperties
+            |     Default: $DEFAULT_IMPLEMENTATION_CLASS (at the root of your project)
+            | -P${Configuration::destination.name}
+            |     Description: Sets the location of your generated properties file within the build directory.
+            |     Example: path/to/your/desired/location
+            |     Default: $DEFAULT_BUILD_DESTINATION (i.e. in a directory called "properties" within your build directory)
+            | -P${Configuration::filenameOverride.name}
+            |     Description: Allows overriding given filename for an environment.
+            |     Example: custom-filename-application.properties
+            |     Note: This should only be used when generating application properties for a singular environment.
+            |
+        """.trimMargin()
+    }
 
     @TaskAction
     fun run() = project
-        .logConfigurationsValues()
-        .run { invoke(project, environments, implementationClass, destination, filenameOverride) }
+        .let(GenerateApplicationProperties::invoke)
 
     init {
-        group = Propactive::class.simpleName!!.lowercase()
-        description = GenerateApplicationProperties.TASK_DESCRIPTION
-    }
+        group = PROPACTIVE_GROUP
+        description = TASK_DESCRIPTION
 
-    private fun Project.logConfigurationsValues(): Project = this.also { project ->
-        project.logger.debug(
-            """
-            |
-            | Propactive ${GenerateApplicationProperties.TASK_NAME} - Received the following configurations:
-            |  - ${Configuration::environments.name} = $environments 
-            |  - ${Configuration::implementationClass.name} = $implementationClass
-            |  - ${Configuration::destination.name} = $destination
-            |  - ${Configuration::filenameOverride.name} = $filenameOverride
-            """.trimMargin()
-        )
+        super.dependsOn(DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY)
     }
 }

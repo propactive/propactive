@@ -2,61 +2,31 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.Environment
 import io.github.propactive.plugin.Configuration
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
+import io.github.propactive.project.ImplementationClassFinder
 import io.github.propactive.property.Property
-import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_BUILD_DESTINATION
-import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_ENVIRONMENTS
-import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_FILENAME_OVERRIDE
-import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_IMPLEMENTATION_CLASS
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import org.gradle.api.Project
-import org.gradle.api.Task
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.fail
 import java.io.File
-import java.net.URLClassLoader
 import java.nio.file.Files
 import java.util.UUID
+import kotlin.reflect.KClass
 
 internal class GenerateApplicationPropertiesTest {
     @Test
-    fun shouldErrorWhenImplementationClassIsNotFound() {
-        val jarTask = mockk<Task>() {
-            every { outputs.files.files } returns setOf()
-        }
-
-        val project = mockk<Project>() {
-            every { getTasksByName("jar", true) } returns setOf(jarTask)
-        }
-
-        assertThrows<IllegalStateException> {
-            GenerateApplicationProperties.invoke(
-                project,
-                DEFAULT_ENVIRONMENTS,
-                DEFAULT_IMPLEMENTATION_CLASS,
-                DEFAULT_BUILD_DESTINATION,
-                DEFAULT_FILENAME_OVERRIDE
-            )
-        }.message shouldBe "Expected to find implementation class $DEFAULT_IMPLEMENTATION_CLASS"
-    }
-
-    @Test
     fun shouldCreatePropertyFilesWhenImplementationClassIsFound() {
-        setupScenario(WithMultipleEnvironments::class.java) { project, buildDir ->
-            val implementationClass =
-                "io.github.propactive.task.GenerateApplicationPropertiesTest.WithMultipleEnvironments"
+        setupScenario(WithMultipleEnvironments::class) { project, configuration, buildDir ->
+            configuration.implementationClass = DEFAULT_IMPLEMENTATION_CLASS
 
-            GenerateApplicationProperties.invoke(
-                project,
-                DEFAULT_ENVIRONMENTS,
-                implementationClass,
-                buildDir.absolutePath,
-                DEFAULT_FILENAME_OVERRIDE
-            )
+            GenerateApplicationProperties.invoke(project)
 
             buildDir.listFiles()?.apply {
                 count() shouldBe 2
@@ -69,20 +39,30 @@ internal class GenerateApplicationPropertiesTest {
     }
 
     @Test
-    fun shouldAllowApplicationPropertiesFilenameOverrideWhenASingularEnvironmentApplicationPropertiesHasBeenGenerated() {
-        setupScenario(WithSingularEnvironment::class.java) { project, buildDir ->
-            val implementationClass =
-                "io.github.propactive.task.GenerateApplicationPropertiesTest.WithSingularEnvironment"
-
+    fun shouldFailIfApplicationPropertiesFilenameIsSuppliedWhenMoreThanOneEnvironmentIsRequested() {
+        setupScenario(WithMultipleEnvironments::class) { project, configuration, _ ->
             val customFilename = "${UUID.randomUUID()}-application.properties"
 
-            GenerateApplicationProperties.invoke(
-                project,
-                DEFAULT_ENVIRONMENTS,
-                implementationClass,
-                buildDir.absolutePath,
-                customFilename
-            )
+            configuration.environments = DEFAULT_ENVIRONMENTS
+            configuration.filenameOverride = customFilename
+
+            shouldThrow<IllegalArgumentException> {
+                GenerateApplicationProperties.invoke(project)
+            }.message shouldBe """
+                Received Property to override filename (-P${Configuration::filenameOverride.name}): $customFilename
+                However, this can only be used when a single environment is requested/generated. (Tip: Use -P${Configuration::environments.name} to specify environment application properties to generate)
+            """.trimIndent()
+        }
+    }
+
+    @Test
+    fun shouldAllowApplicationPropertiesFilenameOverrideWhenASingularEnvironmentApplicationPropertiesHasBeenGenerated() {
+        setupScenario(WithSingularEnvironment::class) { project, configuration, buildDir ->
+            val customFilename = "${UUID.randomUUID()}-application.properties"
+
+            configuration.filenameOverride = customFilename
+
+            GenerateApplicationProperties.invoke(project)
 
             buildDir
                 .listFiles()
@@ -91,29 +71,6 @@ internal class GenerateApplicationPropertiesTest {
                     name shouldBe customFilename
                     readLines().first() shouldBe "test.resource.value=envValue"
                 }
-        }
-    }
-
-    @Test
-    fun shouldFailIfApplicationPropertiesFilenameIsSuppliedWhenMoreThanOneEnvironmentIsRequested() {
-        setupScenario(WithMultipleEnvironments::class.java) { project, buildDir ->
-            val implementationClass =
-                "io.github.propactive.task.GenerateApplicationPropertiesTest.WithMultipleEnvironments"
-
-            val customFilename = "${UUID.randomUUID()}-application.properties"
-
-            shouldThrow<IllegalArgumentException> {
-                GenerateApplicationProperties.invoke(
-                    project,
-                    DEFAULT_ENVIRONMENTS,
-                    implementationClass,
-                    buildDir.absolutePath,
-                    customFilename
-                )
-            }.message shouldBe """
-                Received Property to override filename (-P${Configuration::filenameOverride.name}): $customFilename
-                However, this can only be used when a single environment is requested/generated. (Tip: Use -P${Configuration::environments.name} to specify environment application properties to generate)
-            """.trimIndent()
         }
     }
 
@@ -130,30 +87,31 @@ internal class GenerateApplicationPropertiesTest {
     }
 
     private fun setupScenario(
-        propertiesClass: Class<*>,
-        callback: (Project, File) -> Unit
+        propertiesClass: KClass<out Any>,
+        callback: (Project, Configuration, File) -> Unit
     ) {
-        mockkStatic(URLClassLoader::class) {
+        mockkStatic(ImplementationClassFinder::class) {
             val buildDir = Files
                 .createTempDirectory(DEFAULT_BUILD_DESTINATION)
                 .toFile().apply { deleteOnExit() }
 
-            val task = mockk<Task> {
-                every { outputs.files.files } returns setOf(mockk(relaxed = true))
-            }
+            val configuration = Configuration(destination = buildDir.absolutePath)
 
             val project = mockk<Project>() {
-                every { getTasksByName("jar", true) } returns setOf(task)
                 every<String> {
                     layout.buildDirectory.dir(buildDir.absolutePath).get().asFile.absolutePath
                 } returns buildDir.absolutePath
+
+                every {
+                    extensions.findByType(Configuration::class.java)
+                } returns configuration
             }
 
-            every { URLClassLoader.newInstance(any(), any()) } returns mockk {
-                every { loadClass(any()) } returns propertiesClass
-            }
+            every {
+                ImplementationClassFinder.find(any())
+            } returns propertiesClass
 
-            callback.invoke(project, buildDir)
+            callback.invoke(project, configuration, buildDir)
         }
     }
 }
