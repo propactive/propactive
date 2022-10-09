@@ -2,9 +2,9 @@ package io.github.propactive.project
 
 import io.github.propactive.environment.Environment
 import io.github.propactive.plugin.Configuration
-import io.github.propactive.project.ImplementationClassFinder.DEFAULT_IMPLEMENTATION_CLASS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.project.ImplementationClassFinder.DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY
-import io.github.propactive.project.ImplementationClassFinder.findImplementationClass
+import io.github.propactive.project.ImplementationClassFinder.find
 import io.github.propactive.property.Property
 import io.mockk.every
 import io.mockk.mockk
@@ -44,7 +44,7 @@ internal class ImplementationClassFinderTest {
 
     @Test
     fun shouldUseDefaultTaskForWhenClassImplementationNeedsToBeCollected() {
-        findImplementationClass(project)
+        find(project)
 
         verify {
             project.getTasksByName(DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY, true)
@@ -54,10 +54,10 @@ internal class ImplementationClassFinderTest {
     @Test
     fun shouldUseDefaultImplementationClassNameWhenNoImplementationClassIsProvidedByTheConfiguration() {
         every {
-            configuration.implementationClass
+            project.extensions.findByType(Configuration::class.java)
         } returns null
 
-        findImplementationClass(project)
+        find(project)
 
         verify {
             urlClassLoader.loadClass(DEFAULT_IMPLEMENTATION_CLASS)
@@ -71,7 +71,7 @@ internal class ImplementationClassFinderTest {
      */
     @Test
     fun shouldUseTheSameClassLoaderAsRuntime() {
-        findImplementationClass(project)
+        find(project)
 
         verify { URLClassLoader.newInstance(any(), ImplementationClassFinder::class.java.classLoader) }
     }
@@ -83,7 +83,7 @@ internal class ImplementationClassFinderTest {
         } throws ClassNotFoundException()
 
         assertThrows<IllegalStateException> {
-            findImplementationClass(project)
+            find(project)
         }
     }
 

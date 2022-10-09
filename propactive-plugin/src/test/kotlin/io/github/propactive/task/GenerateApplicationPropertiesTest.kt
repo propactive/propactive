@@ -2,11 +2,11 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.Environment
 import io.github.propactive.plugin.Configuration
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.project.ImplementationClassFinder
 import io.github.propactive.property.Property
-import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_BUILD_DESTINATION
-import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_ENVIRONMENTS
-import io.github.propactive.task.GenerateApplicationProperties.DEFAULT_FILENAME_OVERRIDE
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -23,13 +23,10 @@ import kotlin.reflect.KClass
 internal class GenerateApplicationPropertiesTest {
     @Test
     fun shouldCreatePropertyFilesWhenImplementationClassIsFound() {
-        setupScenario(WithMultipleEnvironments::class) { project, buildDir ->
-            GenerateApplicationProperties.invoke(
-                project,
-                DEFAULT_ENVIRONMENTS,
-                buildDir.absolutePath,
-                DEFAULT_FILENAME_OVERRIDE
-            )
+        setupScenario(WithMultipleEnvironments::class) { project, configuration, buildDir ->
+            configuration.implementationClass = DEFAULT_IMPLEMENTATION_CLASS
+
+            GenerateApplicationProperties.invoke(project)
 
             buildDir.listFiles()?.apply {
                 count() shouldBe 2
@@ -43,16 +40,14 @@ internal class GenerateApplicationPropertiesTest {
 
     @Test
     fun shouldFailIfApplicationPropertiesFilenameIsSuppliedWhenMoreThanOneEnvironmentIsRequested() {
-        setupScenario(WithMultipleEnvironments::class) { project, buildDir ->
+        setupScenario(WithMultipleEnvironments::class) { project, configuration, _ ->
             val customFilename = "${UUID.randomUUID()}-application.properties"
 
+            configuration.environments = DEFAULT_ENVIRONMENTS
+            configuration.filenameOverride = customFilename
+
             shouldThrow<IllegalArgumentException> {
-                GenerateApplicationProperties.invoke(
-                    project,
-                    DEFAULT_ENVIRONMENTS,
-                    buildDir.absolutePath,
-                    customFilename
-                )
+                GenerateApplicationProperties.invoke(project)
             }.message shouldBe """
                 Received Property to override filename (-P${Configuration::filenameOverride.name}): $customFilename
                 However, this can only be used when a single environment is requested/generated. (Tip: Use -P${Configuration::environments.name} to specify environment application properties to generate)
@@ -62,15 +57,12 @@ internal class GenerateApplicationPropertiesTest {
 
     @Test
     fun shouldAllowApplicationPropertiesFilenameOverrideWhenASingularEnvironmentApplicationPropertiesHasBeenGenerated() {
-        setupScenario(WithSingularEnvironment::class) { project, buildDir ->
+        setupScenario(WithSingularEnvironment::class) { project, configuration, buildDir ->
             val customFilename = "${UUID.randomUUID()}-application.properties"
 
-            GenerateApplicationProperties.invoke(
-                project,
-                DEFAULT_ENVIRONMENTS,
-                buildDir.absolutePath,
-                customFilename
-            )
+            configuration.filenameOverride = customFilename
+
+            GenerateApplicationProperties.invoke(project)
 
             buildDir
                 .listFiles()
@@ -96,24 +88,30 @@ internal class GenerateApplicationPropertiesTest {
 
     private fun setupScenario(
         propertiesClass: KClass<out Any>,
-        callback: (Project, File) -> Unit
+        callback: (Project, Configuration, File) -> Unit
     ) {
         mockkStatic(ImplementationClassFinder::class) {
             val buildDir = Files
                 .createTempDirectory(DEFAULT_BUILD_DESTINATION)
                 .toFile().apply { deleteOnExit() }
 
+            val configuration = Configuration(destination = buildDir.absolutePath)
+
             val project = mockk<Project>() {
                 every<String> {
                     layout.buildDirectory.dir(buildDir.absolutePath).get().asFile.absolutePath
                 } returns buildDir.absolutePath
+
+                every {
+                    extensions.findByType(Configuration::class.java)
+                } returns configuration
             }
 
             every {
-                ImplementationClassFinder.findImplementationClass(any())
+                ImplementationClassFinder.find(any())
             } returns propertiesClass
 
-            callback.invoke(project, buildDir)
+            callback.invoke(project, configuration, buildDir)
         }
     }
 }

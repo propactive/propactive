@@ -2,6 +2,7 @@ package io.github.propactive.project
 
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.plugin.Configuration
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import org.gradle.api.Project
 import java.io.File
 import java.net.URL
@@ -10,10 +11,9 @@ import kotlin.reflect.KClass
 
 object ImplementationClassFinder {
     internal const val DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY = "jar"
-    internal const val DEFAULT_IMPLEMENTATION_CLASS = "ApplicationProperties"
 
     @JvmStatic
-    internal fun findImplementationClass(project: Project): KClass<out Any> {
+    internal fun find(project: Project): KClass<out Any> {
         val implementationClass = project
             .extensions
             .findByType(Configuration::class.java)

@@ -20,13 +20,13 @@ internal class ValidateApplicationPropertiesTest {
             val project = mockk<Project>(relaxed = true)
 
             every {
-                ImplementationClassFinder.findImplementationClass(project)
+                ImplementationClassFinder.find(project)
             } returns AnyEnvironment::class
 
             ValidateApplicationProperties.invoke(project)
 
             verify {
-                ImplementationClassFinder.findImplementationClass(project)
+                ImplementationClassFinder.find(project)
                 EnvironmentFactory.create(AnyEnvironment::class)
             }
         }
@@ -39,7 +39,7 @@ internal class ValidateApplicationPropertiesTest {
             val project = mockk<Project>(relaxed = true)
 
             every {
-                ImplementationClassFinder.findImplementationClass(project)
+                ImplementationClassFinder.find(project)
             } returns kClass
 
             every {

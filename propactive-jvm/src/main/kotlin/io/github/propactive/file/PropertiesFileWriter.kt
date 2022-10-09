@@ -11,7 +11,8 @@ object PropertiesFileWriter {
         destination: String,
         filenameOverride: String? = null
     ) {
-        val filename = filenameOverride.takeUnless { it.isNullOrBlank() } ?: environment.filename
+        val filename = filenameOverride
+            .takeUnless { it.isNullOrBlank() } ?: environment.filename
 
         File(Path.of(destination, filename).toUri())
             .apply { parentFile.mkdirs() }
