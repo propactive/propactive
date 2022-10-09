@@ -1,7 +1,7 @@
-package io.github.propactive.file
+package io.github.propactive.project
 
 import io.github.propactive.environment.EnvironmentModel
-import io.github.propactive.file.PropertiesFileWriter.writePropertiesFile
+import io.github.propactive.project.PropertiesFileWriter.writePropertiesFile
 import io.github.propactive.property.PropertyModel
 import io.github.propactive.support.utils.alphaNumeric
 import io.kotest.matchers.file.shouldExist

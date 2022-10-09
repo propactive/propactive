@@ -2,7 +2,7 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.environment.EnvironmentModel
-import io.github.propactive.file.PropertiesFileWriter.writePropertiesFile
+import io.github.propactive.project.PropertiesFileWriter.writePropertiesFile
 import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.project.ImplementationClassFinder
@@ -14,18 +14,12 @@ object GenerateApplicationProperties {
         .let(ImplementationClassFinder::find)
         .let(EnvironmentFactory::create)
         .let { environmentModels ->
-            val configuration = project.extensions.findByType(Configuration::class.java)!!
-
-            environmentModels
-                .requireSingleEnvironmentWhenCustomFilenameIsGiven(configuration.environments, configuration.filenameOverride)
-                .filter { configuration.environments.contains(it.name) || configuration.environments.contains(DEFAULT_ENVIRONMENTS) }
-                .forEach { environment ->
-                    writePropertiesFile(
-                        environment,
-                        project.layout.buildDirectory.dir(configuration.destination).get().asFile.absolutePath,
-                        configuration.filenameOverride,
-                    )
-                }
+            with(project.extensions.findByType(Configuration::class.java)!!) {
+                environmentModels
+                    .requireSingleEnvironmentWhenCustomFilenameIsGiven(environments, filenameOverride)
+                    .filter { environments.contains(it.name) || environments.contains(DEFAULT_ENVIRONMENTS) }
+                    .forEach { environment -> writePropertiesFile(environment, destination, filenameOverride) }
+            }
         }
 
     private fun Set<EnvironmentModel>.requireSingleEnvironmentWhenCustomFilenameIsGiven(
