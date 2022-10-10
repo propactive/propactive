@@ -28,19 +28,17 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
             -d '{"tag_name":"${{ env.LATEST_TAG }}","name":"${{ env.LATEST_TAG }}","draft":true,"generate_release_notes":true}'
-  Update-Readme: 
+  Update-Readme:
     needs: Prepare-Release
     runs-on: ubuntu-20.04
-    steps: 
-      - 
+    steps:
+      - name: 'Checkout to current branch'
         uses: actions/checkout@v3
-      - 
-        name: "Update README.md documentation to latest release version"
-        run: "make update-readme-documented-versions VERSION=\"${{ needs.Prepare-Release.outputs.latest_tag }}\""
-      - 
-        name: "commit the updated README.md"
+      - name: 'Update README.md documentation to latest release version'
+        run: make update-readme-documented-versions VERSION="${{ needs.Prepare-Release.outputs.latest_tag }}"
+      - name: 'commit the updated README.md'
         uses: EndBug/add-and-commit@v9
-        with: 
+        with:
           add: ./README.md
-          message: "Update README.md with latest_tag"
+          message: 'Update README.md with latest release version'
           push: true
