@@ -14,12 +14,13 @@ open class Configuration(
     @get:Input var environments: String = DEFAULT_ENVIRONMENTS,
     @get:Input var implementationClass: String = DEFAULT_IMPLEMENTATION_CLASS,
     @get:Input var destination: String = DEFAULT_BUILD_DESTINATION,
-    @get:Input var filenameOverride: String = DEFAULT_FILENAME_OVERRIDE, // TODO: can we make this nullable instead of blank?
+    @get:Input var filenameOverride: String = DEFAULT_FILENAME_OVERRIDE,
 ) {
     companion object {
         internal const val DEFAULT_ENVIRONMENTS = "*"
         internal const val DEFAULT_IMPLEMENTATION_CLASS = "ApplicationProperties"
         internal const val DEFAULT_BUILD_DESTINATION = "properties"
+        // NOTE: Gradle plugin extension values cannot be null if you want to register them as property values
         internal const val DEFAULT_FILENAME_OVERRIDE = ""
     }
 }
