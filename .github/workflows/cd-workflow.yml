@@ -49,6 +49,8 @@ jobs:
           # Fetch all history for all tags and branches
           # See: https://github.com/actions/checkout#fetch-all-history-for-all-tags-and-branches
           fetch-depth: 0
+          # Needed as default GH actions token doesn't allow triggering external workflows
+          ssh-key: "${{ secrets.RELEASE_DEPLOY_KEY }}"
       - name: 'Set Git environment for automated tag release requirements'
         run: |
           git config --global user.name 'github-actions[bot]'
