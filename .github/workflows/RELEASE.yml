@@ -10,32 +10,34 @@ permissions:
 
 jobs:
   Prepare-Release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
-      latest_tag: ${{ steps.latest_tag_deriver.outputs.latest_tag }}
+      TAGS_REST_ENDPOINT: ${{ steps.endpoint_dervier.outputs.TAGS_REST_ENDPOINT }}
+      LATEST_TAG: ${{ steps.tag_deriver.outputs.LATEST_TAG }}
     steps:
       - name: 'Set up tags REST endpoint environment variable'
-        run: echo "TAGS_REST_ENDPOINT=https://api.github.com/repos/${{ github.repository }}/tags" >> $GITHUB_ENV
+        id: endpoint_dervier
+        run: echo "TAGS_REST_ENDPOINT=https://api.github.com/repos/${{ github.repository }}/tags" >> $GITHUB_OUTPUT
       - name: 'Derive latest created tag within repository as an environment variable'
-        id: latest_tag_deriver
-        run: |
-          echo "LATEST_TAG=$(curl -s ${{ env.TAGS_REST_ENDPOINT }} | jq -r '.[0].name')" >> $GITHUB_ENV
-          echo "::set-output name=latest_tag::${{ env.LATEST_TAG }}"
+        id: tag_deriver
+        run: echo "LATEST_TAG=$(curl -s ${{ steps.endpoint_dervier.outputs.TAGS_REST_ENDPOINT }} | jq -r '.[0].name')" >> $GITHUB_OUTPUT
       - name: 'Draft versioned release on Github'
         run: |
           curl -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
-            -d '{"tag_name":"${{ env.LATEST_TAG }}","name":"${{ env.LATEST_TAG }}","draft":true,"generate_release_notes":true}'
+            -d '{"tag_name":"${{ steps.tag_deriver.outputs.LATEST_TAG }}","name":"${{ steps.tag_deriver.outputs.LATEST_TAG }}","draft":true,"generate_release_notes":true}'
   Update-Readme:
     needs: Prepare-Release
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
+    env:
+      VERSION: ${{ needs.Prepare-Release.outputs.LATEST_TAG }}
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v3
       - name: 'Update README.md documentation to latest release version'
-        run: make update-readme-documented-versions VERSION="${{ needs.Prepare-Release.outputs.latest_tag }}"
+        run: make update-readme-documented-versions
       - name: 'commit the updated README.md'
         uses: EndBug/add-and-commit@v9
         with:

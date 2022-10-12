@@ -32,7 +32,7 @@ env:
 jobs:
   Publish-Jars:
     needs: Prepare-JARs
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v3

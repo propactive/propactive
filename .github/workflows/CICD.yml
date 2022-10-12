@@ -1,6 +1,11 @@
 name: CICD
 
-on: [push]
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    types: [ opened, synchronize, edited ]
 
 jobs:
   CI:
