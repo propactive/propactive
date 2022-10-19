@@ -1,6 +1,8 @@
 package io.github.propactive.task
 
 import io.github.propactive.plugin.Configuration
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
 import io.github.propactive.project.ImplementationClassFinder.DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY
 import org.gradle.api.DefaultTask
@@ -12,17 +14,17 @@ open class ValidateApplicationPropertiesTask : DefaultTask() {
             ValidateApplicationProperties::class.simpleName!!.replaceFirstChar(Char::lowercaseChar)
 
         internal val TASK_DESCRIPTION = """
-            | Validates the application properties without generating any files.
+            |Validates the application properties without generating any files.
             |
-            | Optional configurations:
-            | -P${Configuration::environments.name}
-            |     Description: Comma separated list of environments to generate the properties.
-            |     Example: test,stage,prod
-            |     Default: ${Configuration.DEFAULT_ENVIRONMENTS} (All provided environments)
-            | -P${Configuration::implementationClass.name}
-            |     Description: Sets the location of your properties object.
-            |     Example: com.package.path.to.your.ApplicationProperties
-            |     Default: ${Configuration.DEFAULT_IMPLEMENTATION_CLASS} (at the root of your project)
+            |  Optional configurations:
+            |    -P${Configuration::environments.name}
+            |        Description: Comma separated list of environments to generate the properties for.
+            |        Example: "test,stage,prod"
+            |        Default: "$DEFAULT_ENVIRONMENTS" (All provided environments)
+            |    -P${Configuration::implementationClass.name}
+            |        Description: Sets the location of your properties object.
+            |        Example: "com.package.path.to.your.ApplicationProperties"
+            |        Default: "$DEFAULT_IMPLEMENTATION_CLASS" (At the root of your project)
             |
         """.trimMargin()
     }

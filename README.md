@@ -10,6 +10,7 @@ An application property generator framework that validates and generates your `a
 ## Table of Contents
 - [Setup](#setup)
 - [Gradle Plugin configurations](#gradle-plugin-configurations)
+- [Plugin Tasks](#plugin-tasks)
 - [Runtime Property Validation](#runtime-property-validation)
 - [Natively Supported Property Types](#natively-supported-property-types)
 - [Writing Your Custom Property Types](#writing-your-custom-property-types)
@@ -18,7 +19,6 @@ An application property generator framework that validates and generates your `a
 - [Further Test Support With The Environment Factory](#further-test-support-with-the-environment-factory)
 - [Integrating With Your CICD](#integrating-with-your-CICD)
 - [Demo Project](#demo-project)
-- [License](#license)
 
 ## Setup
 
@@ -64,16 +64,55 @@ Proactive provides a plugin extension that allows you to specify the destination
 set the location of the implementation class, and/or specify which environments you want to generate application properties
 files for by default.
 
-Here is an example that generates the files to a directory called `dist` within your build folder, locates the implementation
+Here is an example that generates the files to a directory called `properties` within your build folder, locates the implementation
 class of the application properties object at `io.github.propactive.demo.Properties`, and will only generate the `prod` environment
-application properties when no options are passed to the `generateApplicationProperties` task:
+application properties within a file named `application.properties` when the task `generateApplicationProperties` is executed:
 
 ```kotlin
 propactive {
-    destination = layout.buildDirectory.dir("properties").get().asFile.absolutePath
-    implementationClass = "io.github.propactive.demo.Properties"
     environments = "prod"
+    implementationClass = "io.github.propactive.demo.Properties"
+    destination = layout.buildDirectory.dir("properties").get().asFile.absolutePath
+    filenameOverride = "application.properties"
 }
+```
+
+## Plugin Tasks
+
+```
+Propactive tasks
+----------------
+generateApplicationProperties - Generates application properties file for each given environment.
+
+  Optional configurations:
+    -Penvironments
+        Description: Comma separated list of environments to generate the properties for.
+        Example: "test,stage,prod"
+        Default: "*" (All provided environments)
+    -PimplementationClass
+        Description: Sets the location of your properties object.
+        Example: "com.package.path.to.your.ApplicationProperties"
+        Default: "ApplicationProperties" (At the root of your project)
+    -Pdestination
+        Description: Sets the location of your generated properties file within the build directory.
+        Example: "path/to/your/desired/location"
+        Default: "properties" (i.e. in a directory called "properties" within your build directory)
+    -PfilenameOverride
+        Description: Allows overriding given filename for an environment.
+        Example: "custom-filename-application.properties"
+        Note: This should only be used when generating application properties for a singular environment.
+
+validateApplicationProperties - Validates the application properties without generating any files.
+
+  Optional configurations:
+    -Penvironments
+        Description: Comma separated list of environments to generate the properties for.
+        Example: "test,stage,prod"
+        Default: "*" (All provided environments)
+    -PimplementationClass
+        Description: Sets the location of your properties object.
+        Example: "com.package.path.to.your.ApplicationProperties"
+        Default: "ApplicationProperties" (At the root of your project)
 ```
 
 ## Runtime Property Validation
@@ -310,8 +349,3 @@ features and is integrated with its own CI/CD pipeline where the application pro
 and a docker image is created/ran for each environment on deployment with a job summary outputted for each environment.
 
 The project can be found here: [propactive/proactive-demo](https://github.com/propactive/propactive-demo)
-
-## License 
-Copyright (c) Propactive. All rights reserved.
-
-Licensed under the [MIT LICENSE](LICENSE)
