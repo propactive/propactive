@@ -7,7 +7,9 @@
 [![GitHub License](https://badgen.net/badge/license/MIT/blue)](https://github.com/u-ways/propactive/blob/master/LICENSE)
 
 An application property generator framework that validates and generates your `application.properties` file on runtime.
+
 ## Table of Contents
+
 - [Setup](#setup)
 - [Gradle Plugin configurations](#gradle-plugin-configurations)
 - [Plugin Tasks](#plugin-tasks)
@@ -17,8 +19,7 @@ An application property generator framework that validates and generates your `a
 - [Working With Multiple Environments](#working-with-multiple-environments)
 - [Blank Values For Properties (Relaxing Mandatory Values Condition)](#blank-values-for-properties-relaxing-mandatory-values-condition)
 - [Further Test Support With The Environment Factory](#further-test-support-with-the-environment-factory)
-- [Integrating With Your CICD](#integrating-with-your-CICD)
-- [Demo Project](#demo-project)
+- [Demo Project (w/ a CICD Pipeline)](#demo-project-w-a-cicd-pipeline)
 
 ## Setup
 
@@ -138,7 +139,7 @@ app.web.server.url=http://127.0.0.1/
 ```
 
 Usually, this is fine, but as you scale, you have many environments, and dozens of application properties that have different
-values for each environment, it becomes mundane and error-prone, not only you will need to define a constant for
+values for each environment. Therefore, this becomes a mundane process and error-prone. Not only you will need to define a constant for
 `app.web.server.url` to test your property values, and perhaps another constant to reference it on your application side,
 you will also need to parse each file if you want to test that the URL value is of valid format, if such precision is required.
 
@@ -158,7 +159,7 @@ object Properties {
 }
 ```
 
-Now locally, or [within your CI/CD](#integrating-with-your-CICD), you can generate the required application properties
+Now locally, or [within your CI/CD](#demo-project-w-a-cicd-pipeline), you can generate the required application properties
 file by running the following command: (omit `-Penvironments` option to generate the files for all environments)  
 
 ```shell
@@ -173,7 +174,7 @@ app.web.server.url=https://www.prodland.com
 ```
 
 On top of that, it will validate the key value set by type (e.g. `URL`), if it's an invalid type, it will
-fail with a verbose error. For example, the error message below is produced by having a malformed protocol keyword: (i.e. "htps")
+fail with a verbose error. For example, the error message below is produced by having a malformed protocol keyword: (e.g. "htps" instead of "https")
 
 ```log
 Property named: "propactive.demo.url.key" within environment named: "prod" was expected to be of type: "URL", but value was: "htps://www.prodland.com"
@@ -187,15 +188,15 @@ You can have a look below for the [list of natively supported property types](#n
 Propactive comes with a set of natively supported property types that you can use for validating
 your property values on runtime. Below is a reference for each type and the specification followed:
 
-- [BASE64](propactive-jvm/src/main/kotlin/propactive/type/BASE64.kt): BASE64 type as defined by [RFC 4648](https://www.ietf.org/rfc/rfc4648.txt)
-- [BOOLEAN](propactive-jvm/src/main/kotlin/propactive/type/BOOLEAN.kt): BOOLEAN type as defined by your JVM.
-- [DECIMAL](propactive-jvm/src/main/kotlin/propactive/type/DECIMAL.kt): DECIMAL type as defined by [IEEE 754](https://standards.ieee.org/ieee/754/6210/)
-- [INTEGER](propactive-jvm/src/main/kotlin/propactive/type/INTEGER.kt): INTEGER type is a 32-bit signed integer, as defined by your JVM.
-- [JSON](propactive-jvm/src/main/kotlin/propactive/type/JSON.kt): JSON type as defined by [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259)
-- [STRING](propactive-jvm/src/main/kotlin/propactive/type/STRING.kt): STRING type represents character strings, as defined by your JVM.
-- [URI](propactive-jvm/src/main/kotlin/propactive/type/URI.kt): URI type as defined by [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
-- [URL](propactive-jvm/src/main/kotlin/propactive/type/URL.kt): URL type as defined by [RFC 2396](https://www.ietf.org/rfc/rfc2396.txt)
-- [UUID](propactive-jvm/src/main/kotlin/propactive/type/UUID.kt): UUID type as defined by [RFC 4122](https://www.ietf.org/rfc/rfc4122.txt)
+- [BASE64](propactive-jvm/src/main/kotlin/io/github/propactive/type/BASE64.kt): BASE64 type as defined by [RFC 4648](https://www.ietf.org/rfc/rfc4648.txt)
+- [BOOLEAN](propactive-jvm/src/main/kotlin/io/github/propactive/type/BOOLEAN.kt): BOOLEAN type as defined by your JVM.
+- [DECIMAL](propactive-jvm/src/main/kotlin/io/github/propactive/type/DECIMAL.kt): DECIMAL type as defined by [IEEE 754](https://standards.ieee.org/ieee/754/6210/)
+- [INTEGER](propactive-jvm/src/main/kotlin/io/github/propactive/type/INTEGER.kt): INTEGER type is a 32-bit signed integer, as defined by your JVM.
+- [JSON](propactive-jvm/src/main/kotlin/io/github/propactive/type/JSON.kt): JSON type as defined by [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259)
+- [STRING](propactive-jvm/src/main/kotlin/io/github/propactive/type/STRING.kt): STRING type represents character strings, as defined by your JVM.
+- [URI](propactive-jvm/src/main/kotlin/io/github/propactive/type/URI.kt): URI type as defined by [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
+- [URL](propactive-jvm/src/main/kotlin/io/github/propactive/type/URL.kt): URL type as defined by [RFC 2396](https://www.ietf.org/rfc/rfc2396.txt)
+- [UUID](propactive-jvm/src/main/kotlin/io/github/propactive/type/UUID.kt): UUID type as defined by [RFC 4122](https://www.ietf.org/rfc/rfc4122.txt)
 
 If you believe we missed a common property type, feel free to let us know by opening an [issue](https://github.com/propactive/propactive/issues/new/choose) or make a PR, and we will be happy to merge.
 Otherwise, please see the next section to learn [how to write your custom property types](#writing-your-custom-property-types).
@@ -242,7 +243,7 @@ object ApplicationProperties {
 ```
 
 Running `./gradlew generateApplicationProperties` will generate the relevant application properties files, and the
-typed port number validation will occur at runtime. You can [see this code running within our demo project](#demo-project).
+typed port number validation will occur at runtime. You can [see this code running within our demo project](#demo-project-w-a-cicd-pipeline).
 
 ## Working With Multiple Environments
 
@@ -336,16 +337,14 @@ class PropertiesTest {
 }
 ```
 
-You can [see this code running within our demo project](#demo-project).
+You can [see this code running within our demo project](#demo-project-w-a-cicd-pipeline).
 
-## Integrating With Your CICD
+## Demo Project (w/ a CICD Pipeline)
 
-Work in progress
-
-## Demo Project
-
-To make the usecase of the Proactive framework clear, we provide an example project, that makes use of all above-mentioned
-features and is integrated with its own CI/CD pipeline where the application properties are validated, generated per environment,
-and a docker image is created/ran for each environment on deployment with a job summary outputted for each environment.
+To make the usecase of the Proactive framework clear, we provide an example project that makes use of above-mentioned features 
+and is integrated with its own CI/CD pipeline. You will see how the application properties are validated and generated per environment. 
+To top it up, a docker image is created/ran for each environment on deployment with a job summary outputted for each environment properties.
 
 The project can be found here: [propactive/proactive-demo](https://github.com/propactive/propactive-demo)
+
+___
