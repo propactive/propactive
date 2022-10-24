@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - '*'
+    paths:
+      - 'propactive-*/**'
   pull_request:
     types: [ opened, synchronize, edited ]
 
