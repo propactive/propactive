@@ -36,6 +36,15 @@ jobs:
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v3
+        with:
+          ref: main
+          # Use a scope-restricted (bot) account to bypass branch protection limitations
+          # see: https://github.com/community/community/discussions/13836
+          token: ${{ secrets.PROPACTIVE_BOT_ACCESS_TOKEN }}
+      - name: 'Set Git environment for automated README.md push requirements'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
       - name: 'Update README.md documentation to latest release version'
         run: make update-readme-documented-versions
       - name: 'commit the updated README.md'
