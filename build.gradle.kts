@@ -2,43 +2,38 @@ import org.gradle.api.JavaVersion.VERSION_17
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    val kotlinVersion = "1.6.20"
-    val ktlintVersion = "11.0.0"
-
-    id("jacoco")
-    id("java-library")
-    id("org.jetbrains.dokka") version kotlinVersion
-    id("org.jlleitschuh.gradle.ktlint") version ktlintVersion
-    kotlin("jvm") version kotlinVersion apply false
+    `java-library`
+    jacoco
+    signing
+    alias(libs.plugins.gradle.ktlint)
+    alias(libs.plugins.jetbrains.dokka)
+    alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }
 
 allprojects {
-    repositories {
-        mavenCentral()
-    }
+    group = "io.github.propactive"
+    version = System.getenv("VERSION") ?: "DEV-SNAPSHOT"
+    description = "An application property generator framework that validates your property values on runtime."
+
+    repositories(RepositoryHandler::mavenCentral)
 }
 
 subprojects {
-    version = System.getenv("VERSION") ?: "DEV-SNAPSHOT"
-
-    apply(plugin = "jacoco")
-    apply(plugin = "java-library")
-    apply(plugin = "maven-publish")
-    apply(plugin = "org.jetbrains.dokka")
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
+    apply<JavaLibraryPlugin>()
+    apply<JacocoPlugin>()
+    apply<SigningPlugin>()
+    apply(plugin = rootProject.libs.plugins.jetbrains.kotlin.jvm.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.jetbrains.dokka.get().pluginId)
+    apply(plugin = rootProject.libs.plugins.gradle.ktlint.get().pluginId)
 
     dependencies {
-        val mockkVersion: String by project
-        val kotestVersion: String by project
-        val equalsVerifierVersion: String by project
-        val jupiterVersion: String by project
-
-        testImplementation("io.mockk:mockk:$mockkVersion")
-        testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-        testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-        testImplementation("nl.jqno.equalsverifier:equalsverifier:$equalsVerifierVersion")
-        testImplementation("org.junit.jupiter:junit-jupiter:$jupiterVersion")
+        testImplementation(rootProject.libs.mockk)
+        testImplementation(rootProject.libs.junit.jupiter)
+        testImplementation(rootProject.libs.kotest.assertions.core)
+        testImplementation(rootProject.libs.kotest.runner.junit5)
+        testImplementation(rootProject.libs.equalsverifier)
     }
 
     tasks {

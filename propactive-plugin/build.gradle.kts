@@ -1,12 +1,8 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    val pluginPublishVersion = "0.21.0"
-
-    id("signing")
-    id("java-gradle-plugin")
-    id("com.gradle.plugin-publish") version pluginPublishVersion
+    `java-gradle-plugin`
+    alias(libs.plugins.gradle.publish)
 }
-
-apply(plugin = "org.jetbrains.kotlin.jvm")
 
 val isDevVersion = "$version" == "DEV-SNAPSHOT"
 val isSemVersioned = "$version".matches(Regex("[0-9]+\\.[0-9]+\\.[0-9]+.*?"))
