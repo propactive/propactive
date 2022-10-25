@@ -38,7 +38,7 @@ jobs:
       - name: 'Downloading all artifacts'
         uses: actions/download-artifact@v3
       - name: 'Generating test report for Github actions'
-        uses: dorny/test-reporter@v1.5.0
+        uses: dorny/test-reporter@v1.6.0
         with:
           name: 'Test Report: JUnit'
           path: ./test-artifacts/*/build/test-results/test/*.xml

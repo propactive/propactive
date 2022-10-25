@@ -27,7 +27,7 @@ jobs:
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
             https://api.github.com/repos/${{ github.repository }}/releases \
-            -d '{"draft":true,"tag_name":"${{ steps.tag_deriver.outputs.LATEST_TAG }}","name":"${{ steps.tag_deriver.outputs.LATEST_TAG }}","generate_release_notes":true,"body":"### Deployment:\n * Gradle Plugin Portal: [io.github.propactive](https:\/\/plugins.gradle.org\/plugin\/io.github.propactive)\n * Maven Central: [io.github.propactive:propactive-jvm](https:\/\/search.maven.org\/artifact\/io.github.propactive\/propactive-jvm)"}'
+            -d '{"draft":true,"tag_name":"${{ steps.tag_deriver.outputs.LATEST_TAG }}","name":"${{ steps.tag_deriver.outputs.LATEST_TAG }}","generate_release_notes":true,"body":"## Deployment:\n * Gradle Plugin Portal: [io.github.propactive](https:\/\/plugins.gradle.org\/plugin\/io.github.propactive)\n * Maven Central: [io.github.propactive:propactive-jvm](https:\/\/search.maven.org\/artifact\/io.github.propactive\/propactive-jvm)"}'
   Update-Readme:
     needs: Prepare-Release
     runs-on: ubuntu-22.04
