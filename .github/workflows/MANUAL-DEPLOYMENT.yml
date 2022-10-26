@@ -30,8 +30,7 @@ env:
   GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
 
 jobs:
-  Publish-Jars:
-    needs: Prepare-JARs
+  Manual-Deployment:
     runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout to current branch'
