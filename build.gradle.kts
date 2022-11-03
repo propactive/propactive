@@ -24,6 +24,7 @@ subprojects {
     apply<JavaLibraryPlugin>()
     apply<JacocoPlugin>()
     apply<SigningPlugin>()
+    apply<MavenPublishPlugin>()
     apply(plugin = rootProject.libs.plugins.jetbrains.kotlin.jvm.get().pluginId)
     apply(plugin = rootProject.libs.plugins.jetbrains.dokka.get().pluginId)
     apply(plugin = rootProject.libs.plugins.gradle.ktlint.get().pluginId)
