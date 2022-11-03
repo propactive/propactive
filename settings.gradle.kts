@@ -15,7 +15,7 @@ dependencyResolutionManagement {
             val kotestVersion = "5.2.2"
             val junitVersion = "5.8.2"
             val ktlintVersion = "11.0.0"
-            val publishVersion = "0.21.0"
+            val publishVersion = "1.0.0"
             val equalsVersion = "3.10"
 
             library("kotlin-reflect", "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
