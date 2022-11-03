@@ -15,6 +15,24 @@ If comments have been given in a review, they have to get integrated. For those 
 should be created and pushed to your remote development branch. Don’t forget to add a comment in the PR afterward, so 
 everyone gets notified by GitHub. Keep in mind that reviews can span multiple cycles until we are happy with the new code.
 
+## Writing Code
+
+We follow the [official Kotlin coding conventions][KCC], adhere to the [Test-driven development][TDD] style of programming,
+and are a big fan of [Robert C. Martin teachings of Clean Code][CC]. If there is something unclear of the style, just
+look at existing code which might help you to understand it better.
+
+### Commits Checklist
+
+- Each commit should have a [short & meaningful message][GCMG].
+- The body of the commit message should have reference to the issue it is fixing, if any.
+- The body of the commit message should have your Git username or email.
+- You can use the following template for your commit message:
+    ```
+    {COMMIT_MESSAGE}
+    
+    #{ISSUE_NUMBER} {USERNAME}
+    ```
+
 ### Pull Request Checklist
 
 - Create a new branch and, if needed, rebase to the current main
@@ -25,12 +43,6 @@ everyone gets notified by GitHub. Keep in mind that reviews can span multiple cy
 - If your patch is not getting reviewed, or you need a specific person to review it, 
   you can @-reply a reviewer asking for a review in the pull request or a comment.
 - Ensure you add tests relevant to the fixed bug or new feature, untested code is undesirable.
-
-## Writing Code
-
-We follow the [official Kotlin coding conventions][KCC], adhere to the [Test-driven development][TDD] style of programming, 
-and are a big fan of [Robert C. Martin teachings of Clean Code][CC]. If there is something unclear of the style, just 
-look at existing code which might help you to understand it better.
 
 ## Conduct
 
@@ -47,3 +59,4 @@ ___
 [TDD]: https://www.agilealliance.org/glossary/tdd
 [CC]: https://gist.github.com/wojteklu/73c6914cc446146b8b533c0988cf8d29
 [GHCCC]: https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct
+[GCMG]: https://cbea.ms/git-commit/#seven-rules
