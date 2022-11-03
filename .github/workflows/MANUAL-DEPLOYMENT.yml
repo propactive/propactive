@@ -49,8 +49,8 @@ jobs:
           gpg_private_key: ${{ env.SIGNING_GNUPG_PRIVATE_KEY }}
           passphrase: ${{ env.SIGNING_GNUPG_KEY_NAME }}
       - name: 'Publishing to maven central'
-        if: ${{ inputs.deployment == 'propactive-jvm (Maven Central Repository)' }} || ${{ inputs.deployment == 'all' }}
+        if: (inputs.deployment == 'propactive-jvm (Maven Central Repository)' || inputs.deployment == 'all')
         run: make publish-propactive-jvm-jars
       - name: 'Publishing to gradle plugin'
-        if: ${{ inputs.deployment == 'propactive-plugin (Gradle Plugin Portal)' }} || ${{ inputs.deployment == 'all' }}
+        if: (inputs.deployment == 'propactive-plugin (Gradle Plugin Portal)'  || inputs.deployment == 'all')
         run: make publish-propactive-plugin-jars
