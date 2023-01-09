@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 include(
     ":propactive-plugin",
     ":propactive-jvm",
@@ -9,7 +7,9 @@ dependencyResolutionManagement {
     enableFeaturePreview("VERSION_CATALOGS")
     versionCatalogs {
         create("libs") {
-            val kotlinVersion = "1.6.20"
+            val kotlinVersion = "1.8.0"
+            // NOTE: This is tmp until a 1.8.0 is released (i.e. should be coupled with kotlinVersion)
+            val dokkaVersion = "1.7.20"
             val serializationVersion = "1.4.1"
             val mockkVersion = "1.13.2"
             val kotestVersion = "5.2.2"
@@ -28,7 +28,7 @@ dependencyResolutionManagement {
             library("equalsverifier", "nl.jqno.equalsverifier:equalsverifier:$equalsVersion")
 
             plugin("jetbrains-kotlin-jvm", "org.jetbrains.kotlin.jvm").version(kotlinVersion)
-            plugin("jetbrains-dokka", "org.jetbrains.dokka").version(kotlinVersion)
+            plugin("jetbrains-dokka", "org.jetbrains.dokka").version(dokkaVersion)
             plugin("gradle-ktlint", "org.jlleitschuh.gradle.ktlint").version(ktlintVersion)
             plugin("gradle-publish", "com.gradle.plugin-publish").version(publishVersion)
         }
