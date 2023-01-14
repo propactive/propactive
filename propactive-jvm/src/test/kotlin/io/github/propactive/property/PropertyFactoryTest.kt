@@ -2,6 +2,7 @@ package io.github.propactive.property
 
 import io.github.propactive.config.BLANK_PROPERTY
 import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
+import io.github.propactive.matcher.PropertyMatcherBuilder.Companion.shouldMatchProperty
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_HAS_INVALID_TYPE
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_INACCESSIBLE
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_SET_MANDATORY_IS_BLANK
@@ -32,11 +33,12 @@ internal class PropertyFactoryTest {
         fun `given a PropertyWithNoEnvironmentKey, when factory creates a DAO, then it should associate that property with an UNSPECIFIED_ENVIRONMENT`() {
             PropertyFactory
                 .create(PropertyWithUnspecifiedEnvironmentKey::class.members)
-                .apply {
-                    this shouldHaveSize 1
-                    this.first().environment shouldBe UNSPECIFIED_ENVIRONMENT
-                    this.first().name shouldBe "test.resource.value"
-                    this.first().value shouldBe "value"
+                .apply { this shouldHaveSize 1 }
+                .first()
+                .shouldMatchProperty {
+                    withName("test.resource.value")
+                    withEnvironment(UNSPECIFIED_ENVIRONMENT)
+                    withValue("value")
                 }
         }
 
@@ -44,11 +46,12 @@ internal class PropertyFactoryTest {
         fun `given a PropertyWithSingleEnvironmentKey, when factory creates a DAO, then it should associate that property with correct environment`() {
             PropertyFactory
                 .create(PropertyWithSingleEnvironmentKey::class.members)
-                .apply {
-                    this shouldHaveSize 1
-                    this.first().environment shouldBe "env0"
-                    this.first().name shouldBe "test.resource.value"
-                    this.first().value shouldBe "value"
+                .apply { this shouldHaveSize 1 }
+                .first()
+                .shouldMatchProperty {
+                    withName("test.resource.value")
+                    withEnvironment("env0")
+                    withValue("value")
                 }
         }
 
@@ -58,9 +61,12 @@ internal class PropertyFactoryTest {
                 .create(PropertyWithEnvironmentKeyExpansion::class.members)
                 .apply {
                     this shouldHaveSize 2
-                    this.forEachIndexed { index, model ->
-                        model.environment shouldBe "env$index"
-                        model.value shouldBe "value"
+                    this.forEachIndexed { index, property ->
+                        property.shouldMatchProperty {
+                            withName("test.resource.value")
+                            withEnvironment("env$index")
+                            withValue("value")
+                        }
                     }
                 }
         }
@@ -71,9 +77,12 @@ internal class PropertyFactoryTest {
                 .create(PropertyWithMultipleEnvironmentKeysWithDifferentValues::class.members)
                 .apply {
                     this shouldHaveSize 3
-                    this.forEachIndexed { index, model ->
-                        model.environment shouldBe "env$index"
-                        model.value shouldBe "$index"
+                    this.forEachIndexed { index, property ->
+                        property.shouldMatchProperty {
+                            withName("test.resource.value")
+                            withEnvironment("env$index")
+                            withValue("$index")
+                        }
                     }
                 }
         }
@@ -118,10 +127,11 @@ internal class PropertyFactoryTest {
             assertDoesNotThrow {
                 PropertyFactory
                     .create(NonMandatoryPropertyWithBlankValue::class.members)
-                    .first().apply {
-                        name shouldBe NonMandatoryPropertyWithBlankValue.PROPERTY_NAME
-                        value shouldBe BLANK_PROPERTY
-                        environment shouldBe UNSPECIFIED_ENVIRONMENT
+                    .first()
+                    .shouldMatchProperty {
+                        withName(NonMandatoryPropertyWithBlankValue.PROPERTY_NAME)
+                        withEnvironment(UNSPECIFIED_ENVIRONMENT)
+                        withValue(BLANK_PROPERTY)
                     }
             }
         }
@@ -131,21 +141,25 @@ internal class PropertyFactoryTest {
 
     object Empty
 
+    @Suppress("unused")
     object PropertyWithUnspecifiedEnvironmentKey {
         @Property(["value"])
         const val UNSPECIFIED_ENVIRONMENT_PROPERTY = "test.resource.value"
     }
 
+    @Suppress("unused")
     object PropertyWithSingleEnvironmentKey {
         @Property(["env0:value"])
         const val SINGULAR_ENVIRONMENT_PROPERTY = "test.resource.value"
     }
 
+    @Suppress("unused")
     object PropertyWithEnvironmentKeyExpansion {
         @Property(["env0/env1:value"])
         const val MULTIPLE_ENVIRONMENT_PROPERTY = "test.resource.value"
     }
 
+    @Suppress("unused")
     object PropertyWithMultipleEnvironmentKeysWithDifferentValues {
         @Property(
             value = ["env0: 0", "env1: 1", "env2: 2"],
@@ -156,11 +170,13 @@ internal class PropertyFactoryTest {
 
     // SAD PATH OBJECTS
 
+    @Suppress("unused")
     object PrivateProperty {
         @Property([":cannot access field getter"])
         private const val PRIVATE = "test.resource.value"
     }
 
+    @Suppress("unused")
     object IncorrectFieldType {
         @Property([":field is not a String"])
         const val NOT_A_STRING = 10101

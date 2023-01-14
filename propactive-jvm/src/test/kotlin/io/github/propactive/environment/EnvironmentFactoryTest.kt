@@ -3,6 +3,7 @@ package io.github.propactive.environment
 import io.github.propactive.config.DEFAULT_ENVIRONMENT_FILENAME
 import io.github.propactive.entry.EntryModel
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_INVALID_KEY_EXPANSION
+import io.github.propactive.matcher.PropertyMatcherBuilder.Companion.shouldMatchProperty
 import io.github.propactive.property.Property
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
@@ -49,10 +50,10 @@ internal class EnvironmentFactoryTest {
                     this shouldHaveSize 2
                     this.toList().forEachIndexed { index, model ->
                         model.filename shouldBe "env$index-application.properties"
-                        model.properties.first().apply {
-                            name shouldBe "test.resource.value"
-                            environment shouldBe "env$index"
-                            value shouldBe "env${index}Value"
+                        model.properties.first().shouldMatchProperty {
+                            withName("test.resource.value")
+                            withEnvironment("env$index")
+                            withValue("env${index}Value")
                         }
                     }
                 }
