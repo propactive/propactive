@@ -1,11 +1,15 @@
 package io.github.propactive.plugin
 
+import io.github.propactive.matcher.ConfigurationMatcher.Companion.shouldMatch
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_FILENAME_OVERRIDE
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
 import io.github.propactive.plugin.PropactiveTest.PropactiveTasks.GENERATE_TASK
 import io.github.propactive.plugin.PropactiveTest.PropactiveTasks.VALIDATE_TASK
+import io.github.propactive.support.utils.alphaNumeric
 import io.github.propactive.task.GenerateApplicationProperties
 import io.github.propactive.task.GenerateApplicationPropertiesTask
 import io.github.propactive.task.ValidateApplicationProperties
@@ -39,6 +43,7 @@ import java.io.File
 import java.nio.file.Files
 import java.util.UUID
 import java.util.Properties
+import kotlin.random.Random
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 class PropactiveTest {
@@ -118,7 +123,7 @@ class PropactiveTest {
         }
 
         @Test
-        fun `should register task extension to configure propactive`() {
+        fun `should register task configuration extension`() {
             project
                 .extensions
                 .findByType(Configuration::class.java)
@@ -126,113 +131,164 @@ class PropactiveTest {
         }
 
         @Test
-        fun `should provide sane propactive configuration defaults`() {
+        fun `should provide sane configuration defaults`() {
             project
                 .extensions
                 .findByType(Configuration::class.java)!!
-                .apply {
-                    destination shouldBe DEFAULT_BUILD_DESTINATION
-                    environments shouldBe DEFAULT_ENVIRONMENTS
-                    implementationClass shouldBe DEFAULT_IMPLEMENTATION_CLASS
+                .shouldMatch {
+                    withEnvironments(DEFAULT_ENVIRONMENTS)
+                    withImplementationClass(DEFAULT_IMPLEMENTATION_CLASS)
+                    withDestination(DEFAULT_BUILD_DESTINATION)
+                    withFilenameOverride(DEFAULT_FILENAME_OVERRIDE)
+                    withImplementationClassCompileDependency(DEFAULT_IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY)
                 }
         }
 
         @Test
-        fun `should allow modifying propactive configurations`() {
-            val customDestination = "custom/path"
-            val customEnvironments = "test"
-            val customImplementationClass = "io.github.propactive.Test"
+        fun `should allow modifying default configurations`() {
+            val customEnvironments = Random.alphaNumeric("customEnvironments")
+            val customImplementationClass = Random.alphaNumeric("customImplementationClass")
+            val customDestination = Random.alphaNumeric("customDestination")
+            val customFilenameOverride = Random.alphaNumeric("customFilenameOverride")
+            val customImplementationClassCompileDependency = Random.alphaNumeric("customImplementationClassCompileDependency")
 
             project
                 .extensions
                 .findByType(Configuration::class.java)!!
                 .apply {
-                    destination = customDestination
                     environments = customEnvironments
                     implementationClass = customImplementationClass
+                    destination = customDestination
+                    filenameOverride = customFilenameOverride
+                    implementationClassCompileDependency = customImplementationClassCompileDependency
                 }
 
             project
                 .extensions
                 .findByType(Configuration::class.java)!!
-                .apply {
-                    destination shouldBe customDestination
-                    environments shouldBe customEnvironments
-                    implementationClass shouldBe customImplementationClass
+                .shouldMatch {
+                    withEnvironments(customEnvironments)
+                    withImplementationClass(customImplementationClass)
+                    withDestination(customDestination)
+                    withFilenameOverride(customFilenameOverride)
+                    withImplementationClassCompileDependency(customImplementationClassCompileDependency)
                 }
         }
 
         @Test
         fun `should allow setting propactive configurations through system properties`() {
-            val customDestination = "custom/path"
-            val customEnvironments = "test"
-            val customImplementationClass = "io.github.propactive.Test"
-            val customFilename = "customFilename"
+            val customEnvironments = Random.alphaNumeric("customEnvironments")
+            val customImplementationClass = Random.alphaNumeric("customImplementationClass")
+            val customDestination = Random.alphaNumeric("customDestination")
+            val customFilenameOverride = Random.alphaNumeric("customFilenameOverride")
+            val customImplementationClassCompileDependency = Random.alphaNumeric("customImplementationClassCompileDependency")
 
             val properties = Properties().apply {
-                put(Configuration::destination.name, customDestination)
                 put(Configuration::environments.name, customEnvironments)
                 put(Configuration::implementationClass.name, customImplementationClass)
-                put(Configuration::filenameOverride.name, customFilename)
+                put(Configuration::destination.name, customDestination)
+                put(Configuration::filenameOverride.name, customFilenameOverride)
+                put(Configuration::implementationClassCompileDependency.name, customImplementationClassCompileDependency)
             }
 
+            // 1. set configuration through system properties
             withSystemProperties(properties, SetOrOverride) {
                 project
                     .extensions
                     .findByType(Configuration::class.java)!!
                     .apply {
-                        destination = customDestination
                         environments = customEnvironments
                         implementationClass = customImplementationClass
-                        filenameOverride = customFilename
+                        destination = customDestination
+                        filenameOverride = customFilenameOverride
+                        implementationClassCompileDependency = customImplementationClassCompileDependency
                     }
             }
+
+            // 2. assert configurations were set through system properties
+            project
+                .extensions
+                .findByType(Configuration::class.java)!!
+                .shouldMatch {
+                    withEnvironments(customEnvironments)
+                    withImplementationClass(customImplementationClass)
+                    withDestination(customDestination)
+                    withFilenameOverride(customFilenameOverride)
+                    withImplementationClassCompileDependency(customImplementationClassCompileDependency)
+                }
         }
 
         @Test
         fun `should allow overriding propactive custom configurations with system properties`() {
-            val customConfigDestination = "custom/path/config"
-            val customConfigEnvironments = "testConfig"
-            val customConfigImplementationClass = "io.github.propactive.TestConfig"
+            val customConfigEnvironments = Random.alphaNumeric("customConfigEnvironments")
+            val customConfigImplementationClass = Random.alphaNumeric("customConfigImplementationClass")
+            val customConfigDestination = Random.alphaNumeric("customConfigDestination")
+            val customConfigFilenameOverride = Random.alphaNumeric("customConfigFilenameOverride")
+            val customConfigImplementationClassCompileDependency = Random.alphaNumeric("customConfigImplementationClassCompileDependency")
 
-            val customPropertyDestination = "custom/path/Property"
-            val customPropertyEnvironments = "testProperty"
-            val customPropertyImplementationClass = "io.github.propactive.TestProperty"
+            val customPropertyEnvironments = Random.alphaNumeric("customPropertyEnvironments")
+            val customPropertyImplementationClass = Random.alphaNumeric("customPropertyImplementationClass")
+            val customPropertyDestination = Random.alphaNumeric("customPropertyDestination")
+            val customPropertyFilenameOverride = Random.alphaNumeric("customPropertyFilenameOverride")
+            val customPropertyImplementationClassCompileDependency = Random.alphaNumeric("customPropertyImplementationClassCompileDependency")
 
+            // 1. Set custom configuration through extension
             project
                 .extensions
                 .findByType(Configuration::class.java)!!
                 .apply {
-                    destination = customConfigDestination
                     environments = customConfigEnvironments
                     implementationClass = customConfigImplementationClass
+                    destination = customConfigDestination
+                    filenameOverride = customConfigFilenameOverride
+                    implementationClassCompileDependency = customConfigImplementationClassCompileDependency
                 }
 
+            // 2. assert custom configuration were set
             project
                 .extensions
                 .findByType(Configuration::class.java)!!
-                .apply {
-                    destination shouldBe customConfigDestination
-                    environments shouldBe customConfigEnvironments
-                    implementationClass shouldBe customConfigImplementationClass
+                .shouldMatch {
+                    withEnvironments(customConfigEnvironments)
+                    withImplementationClass(customConfigImplementationClass)
+                    withDestination(customConfigDestination)
+                    withFilenameOverride(customConfigFilenameOverride)
+                    withImplementationClassCompileDependency(customConfigImplementationClassCompileDependency)
                 }
 
             val properties = Properties().apply {
-                put(Configuration::destination.name, customPropertyDestination)
                 put(Configuration::environments.name, customPropertyEnvironments)
                 put(Configuration::implementationClass.name, customPropertyImplementationClass)
+                put(Configuration::destination.name, customPropertyDestination)
+                put(Configuration::filenameOverride.name, customPropertyFilenameOverride)
+                put(Configuration::implementationClassCompileDependency.name, customPropertyImplementationClassCompileDependency)
             }
 
+            // 3. override configuration through system properties
             withSystemProperties(properties, SetOrOverride) {
                 project
                     .extensions
                     .findByType(Configuration::class.java)!!
                     .apply {
-                        destination = customPropertyDestination
                         environments = customPropertyEnvironments
                         implementationClass = customPropertyImplementationClass
+                        destination = customPropertyDestination
+                        filenameOverride = customPropertyFilenameOverride
+                        implementationClassCompileDependency = customPropertyImplementationClassCompileDependency
                     }
             }
+
+            // 4. assert the configurations were overridden through system properties
+            project
+                .extensions
+                .findByType(Configuration::class.java)!!
+                .shouldMatch {
+                    withEnvironments(customPropertyEnvironments)
+                    withImplementationClass(customPropertyImplementationClass)
+                    withDestination(customPropertyDestination)
+                    withFilenameOverride(customPropertyFilenameOverride)
+                    withImplementationClassCompileDependency(customPropertyImplementationClassCompileDependency)
+                }
         }
     }
 
