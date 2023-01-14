@@ -4,6 +4,7 @@ import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINA
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_FILENAME_OVERRIDE
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
@@ -18,6 +19,7 @@ internal class ConfigurationTest {
             implementationClass shouldBe DEFAULT_IMPLEMENTATION_CLASS
             destination shouldBe DEFAULT_BUILD_DESTINATION
             filenameOverride shouldBe DEFAULT_FILENAME_OVERRIDE
+            implementationClassCompileDependency shouldBe DEFAULT_IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY
         }
     }
 
@@ -27,6 +29,7 @@ internal class ConfigurationTest {
         val implementationClassNewValue = "${randomUUID()}"
         val destinationNewValue = "${randomUUID()}"
         val filenameOverrideNewValue = "${randomUUID()}"
+        val implementationClassCompileDependencyNewValue = "${randomUUID()}"
 
         Configuration()
             .apply {
@@ -34,21 +37,25 @@ internal class ConfigurationTest {
                 implementationClass = "${randomUUID()}"
                 destination = "${randomUUID()}"
                 filenameOverride = "${randomUUID()}"
+                implementationClassCompileDependency = "${randomUUID()}"
             }.apply {
                 environments.shouldNotBeNull()
                 implementationClass.shouldNotBeNull()
                 destination.shouldNotBeNull()
                 filenameOverride.shouldNotBeNull()
+                implementationClassCompileDependency.shouldNotBeNull()
             }.apply {
                 environments = environmentsNewValue
                 implementationClass = implementationClassNewValue
                 destination = destinationNewValue
                 filenameOverride = filenameOverrideNewValue
+                implementationClassCompileDependency = implementationClassCompileDependencyNewValue
             }.apply {
                 environments shouldBe environmentsNewValue
                 implementationClass shouldBe implementationClassNewValue
                 destination shouldBe destinationNewValue
                 filenameOverride shouldBe filenameOverrideNewValue
+                implementationClassCompileDependency shouldBe implementationClassCompileDependencyNewValue
             }
     }
 }
