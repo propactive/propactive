@@ -2,6 +2,7 @@ package io.github.propactive.entry
 
 import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
 import io.github.propactive.entry.EntryFailureReason.MISSING_KEY_VALUE_DELIMITER_FOR_A_MULTI_ENTRIES
+import io.github.propactive.matcher.EntryMatcher.Companion.shouldMatch
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
@@ -19,9 +20,10 @@ internal class EntryFactoryTest {
         @CsvSource("value", ":value")
         fun shouldSupportNoKeyEntriesWhenThereIsASingleEntryOnly(entry: String) {
             EntryFactory.create(arrayOf(entry))
-                .first().apply {
-                    key shouldBe UNSPECIFIED_ENVIRONMENT
-                    value shouldBe "value"
+                .first()
+                .shouldMatch {
+                    withKey(UNSPECIFIED_ENVIRONMENT)
+                    withValue("value")
                 }
         }
 
@@ -33,9 +35,11 @@ internal class EntryFactoryTest {
         )
         fun shouldSplitKeyValueForValidEntriesByDelimiter(entry: String) {
             EntryFactory.create(arrayOf(entry))
-                .first().apply {
-                    key.trim() shouldBe "key"
-                    value.trim() shouldBe "value"
+                .first()
+                .let { it.copy(it.key.trim(), it.value.trim()) }
+                .shouldMatch {
+                    withKey("key")
+                    withValue("value")
                 }
         }
     }
