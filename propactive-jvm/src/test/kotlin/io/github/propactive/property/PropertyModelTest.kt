@@ -47,7 +47,6 @@ internal class PropertyModelTest {
         val propertyA = PropertyModel(sameName, "environment", sameValue)
         val propertyB = PropertyModel(sameName, "differentEnvironment", sameValue)
 
-
         propertyA shouldNotBe propertyB
     }
 }

@@ -2,7 +2,7 @@ package io.github.propactive.property
 
 import io.github.propactive.config.BLANK_PROPERTY
 import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
-import io.github.propactive.matcher.PropertyMatcherBuilder.Companion.shouldMatchProperty
+import io.github.propactive.matcher.PropertyMatcher.Companion.shouldMatchProperty
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_HAS_INVALID_TYPE
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_INACCESSIBLE
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_SET_MANDATORY_IS_BLANK

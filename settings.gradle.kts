@@ -12,7 +12,7 @@ dependencyResolutionManagement {
             val dokkaVersion = "1.7.20"
             val serializationVersion = "1.4.1"
             val mockkVersion = "1.13.2"
-            val kotestVersion = "5.2.2"
+            val kotestVersion = "5.5.4"
             val junitVersion = "5.8.2"
             val ktlintVersion = "11.0.0"
             val publishVersion = "1.0.0"

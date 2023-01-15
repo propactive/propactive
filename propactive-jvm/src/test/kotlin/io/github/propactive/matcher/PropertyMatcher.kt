@@ -6,25 +6,32 @@ import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.equalityMatcher
 import io.kotest.matchers.should
+import java.util.StringJoiner
 
-class PropertyMatcherBuilder private constructor(): Matcher<PropertyModel> {
+class PropertyMatcher private constructor() : Matcher<PropertyModel> {
     private val matchers: MutableMap<Field, Matcher<String>> = mutableMapOf()
+    private val values: MutableMap<Field, String> = mutableMapOf()
 
     companion object {
-        fun PropertyModel.shouldMatchProperty(matcher: PropertyMatcherBuilder.() -> Unit) =
-            this should PropertyMatcherBuilder().apply(matcher)
+        fun propertyMatcher() = PropertyMatcher()
+
+        fun PropertyModel.shouldMatchProperty(matcher: PropertyMatcher.() -> Unit) =
+            this should propertyMatcher().apply(matcher)
     }
 
     internal fun withName(expected: String) = apply {
-        matchers[Field.NAME] = equalityMatcher(expected)
+        values[Field.NAME] = expected
+        matchers[Field.NAME] = equalityMatcher(values[Field.NAME])
     }
 
     internal fun withEnvironment(expected: String) = apply {
-        matchers[Field.ENVIRONMENT] = equalityMatcher(expected)
+        values[Field.ENVIRONMENT] = expected
+        matchers[Field.ENVIRONMENT] = equalityMatcher(values[Field.ENVIRONMENT])
     }
 
     internal fun withValue(expected: String) = apply {
-        matchers[Field.VALUE] = equalityMatcher(expected)
+        values[Field.VALUE] = expected
+        matchers[Field.VALUE] = equalityMatcher(values[Field.VALUE])
     }
 
     override fun test(value: PropertyModel): MatcherResult = matchers
@@ -49,4 +56,9 @@ class PropertyMatcherBuilder private constructor(): Matcher<PropertyModel> {
         ENVIRONMENT(PropertyModel::environment),
         VALUE(PropertyModel::value),
     }
+
+    override fun toString() = StringJoiner("\n  ")
+        .add("PropertyMatcher:")
+        .apply { values.forEach { (field, value) -> add("${field.name} shouldBe \"$value\"") } }
+        .toString()
 }
