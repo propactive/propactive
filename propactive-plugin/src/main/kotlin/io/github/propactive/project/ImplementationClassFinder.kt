@@ -3,6 +3,7 @@ package io.github.propactive.project
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import org.gradle.api.Project
 import java.io.File
 import java.net.URL
@@ -10,18 +11,22 @@ import java.net.URLClassLoader
 import kotlin.reflect.KClass
 
 object ImplementationClassFinder {
-    internal const val DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY = "jar"
-
     @JvmStatic
     internal fun find(project: Project): KClass<out Any> {
-        val implementationClass = project
+        val configuration = project
             .extensions
             .findByType(Configuration::class.java)
+
+        val classCompileDependency = configuration
+            ?.classCompileDependency
+            ?: DEFAULT_CLASS_COMPILE_DEPENDENCY
+
+        val implementationClass = configuration
             ?.implementationClass
             ?: DEFAULT_IMPLEMENTATION_CLASS
 
         return project
-            .getTasksByName(DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY, true)
+            .getTasksByName(classCompileDependency, true)
             .fold(setOf<File>()) { acc, task -> acc.plus(task.outputs.files.files) }
             .firstNotNullOfOrNull {
                 URLClassLoader

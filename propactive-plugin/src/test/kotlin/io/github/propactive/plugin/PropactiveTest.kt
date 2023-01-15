@@ -5,7 +5,7 @@ import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINA
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_FILENAME_OVERRIDE
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
-import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
 import io.github.propactive.plugin.PropactiveTest.PropactiveTasks.GENERATE_TASK
 import io.github.propactive.plugin.PropactiveTest.PropactiveTasks.VALIDATE_TASK
@@ -93,6 +93,7 @@ class PropactiveTest {
             project = ProjectBuilder.builder()
                 .withName("temporary-project-${UUID.randomUUID()}")
                 .build()
+                .also { p -> p.plugins.apply("java-library") }
                 .also { p -> p.plugins.apply(Propactive::class.java) }
         }
 
@@ -140,7 +141,7 @@ class PropactiveTest {
                     withImplementationClass(DEFAULT_IMPLEMENTATION_CLASS)
                     withDestination(DEFAULT_BUILD_DESTINATION)
                     withFilenameOverride(DEFAULT_FILENAME_OVERRIDE)
-                    withImplementationClassCompileDependency(DEFAULT_IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY)
+                    withImplementationClassCompileDependency(DEFAULT_CLASS_COMPILE_DEPENDENCY)
                 }
         }
 
@@ -160,7 +161,7 @@ class PropactiveTest {
                     implementationClass = customImplementationClass
                     destination = customDestination
                     filenameOverride = customFilenameOverride
-                    implementationClassCompileDependency = customImplementationClassCompileDependency
+                    classCompileDependency = customImplementationClassCompileDependency
                 }
 
             project
@@ -188,7 +189,7 @@ class PropactiveTest {
                 put(Configuration::implementationClass.name, customImplementationClass)
                 put(Configuration::destination.name, customDestination)
                 put(Configuration::filenameOverride.name, customFilenameOverride)
-                put(Configuration::implementationClassCompileDependency.name, customImplementationClassCompileDependency)
+                put(Configuration::classCompileDependency.name, customImplementationClassCompileDependency)
             }
 
             // 1. set configuration through system properties
@@ -201,7 +202,7 @@ class PropactiveTest {
                         implementationClass = customImplementationClass
                         destination = customDestination
                         filenameOverride = customFilenameOverride
-                        implementationClassCompileDependency = customImplementationClassCompileDependency
+                        classCompileDependency = customImplementationClassCompileDependency
                     }
             }
 
@@ -241,7 +242,7 @@ class PropactiveTest {
                     implementationClass = customConfigImplementationClass
                     destination = customConfigDestination
                     filenameOverride = customConfigFilenameOverride
-                    implementationClassCompileDependency = customConfigImplementationClassCompileDependency
+                    classCompileDependency = customConfigImplementationClassCompileDependency
                 }
 
             // 2. assert custom configuration were set
@@ -261,7 +262,7 @@ class PropactiveTest {
                 put(Configuration::implementationClass.name, customPropertyImplementationClass)
                 put(Configuration::destination.name, customPropertyDestination)
                 put(Configuration::filenameOverride.name, customPropertyFilenameOverride)
-                put(Configuration::implementationClassCompileDependency.name, customPropertyImplementationClassCompileDependency)
+                put(Configuration::classCompileDependency.name, customPropertyImplementationClassCompileDependency)
             }
 
             // 3. override configuration through system properties
@@ -274,7 +275,7 @@ class PropactiveTest {
                         implementationClass = customPropertyImplementationClass
                         destination = customPropertyDestination
                         filenameOverride = customPropertyFilenameOverride
-                        implementationClassCompileDependency = customPropertyImplementationClassCompileDependency
+                        classCompileDependency = customPropertyImplementationClassCompileDependency
                     }
             }
 
@@ -317,6 +318,7 @@ class PropactiveTest {
                         writeText(
                             """
                             | plugins {
+                            |     id("java-library")
                             |     id("io.github.propactive") version "DEV-SNAPSHOT"
                             | }
                             """.trimMargin(),

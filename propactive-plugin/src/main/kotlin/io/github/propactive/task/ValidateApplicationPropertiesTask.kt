@@ -4,7 +4,7 @@ import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
-import io.github.propactive.project.ImplementationClassFinder.DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY
+import io.github.propactive.task.validators.ConfigurationValidator.ENSURE_GIVEN_CLASS_COMPILE_DEPENDENCY_EXISTS
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
@@ -37,6 +37,8 @@ open class ValidateApplicationPropertiesTask : DefaultTask() {
         group = PROPACTIVE_GROUP
         description = TASK_DESCRIPTION
 
-        super.dependsOn(DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY)
+        project
+            .let(ENSURE_GIVEN_CLASS_COMPILE_DEPENDENCY_EXISTS::validate)
+            .apply { super.dependsOn(this) }
     }
 }

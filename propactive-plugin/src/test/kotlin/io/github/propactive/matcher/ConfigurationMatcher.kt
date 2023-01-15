@@ -57,6 +57,6 @@ class ConfigurationMatcher private constructor() : Matcher<Configuration> {
         DESTINATION(Configuration::destination),
         ENVIRONMENTS(Configuration::environments),
         FILENAME_OVERRIDE(Configuration::filenameOverride),
-        IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY(Configuration::implementationClassCompileDependency),
+        IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY(Configuration::classCompileDependency),
     }
 }
