@@ -44,6 +44,10 @@ open class Propactive : Plugin<Project> {
                 filenameOverride = target.propertyOrDefault(
                     Configuration::filenameOverride.name, filenameOverride,
                 )
+
+                implementationClassCompileDependency = target.propertyOrDefault(
+                    Configuration::implementationClassCompileDependency.name, implementationClassCompileDependency,
+                )
             }
     }
 
