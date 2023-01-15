@@ -1,11 +1,12 @@
 package io.github.propactive.environment
 
 import io.github.propactive.config.DEFAULT_ENVIRONMENT_FILENAME
+import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
 import io.github.propactive.entry.EntryModel
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_INVALID_KEY_EXPANSION
-import io.github.propactive.matcher.PropertyMatcher.Companion.shouldMatchProperty
+import io.github.propactive.matcher.EnvironmentMatcher.Companion.shouldMatch
+import io.github.propactive.matcher.PropertyMatcher.Companion.propertyMatcher
 import io.github.propactive.property.Property
-import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Nested
@@ -20,12 +21,12 @@ internal class EnvironmentFactoryTest {
         fun `given an empty environment object, when factory creates a DAO, then it should provide default filename`() {
             EnvironmentFactory
                 .create(Empty::class)
-                .apply {
-                    this shouldHaveSize 1
-                    this.first().apply {
-                        filename shouldBe DEFAULT_ENVIRONMENT_FILENAME
-                        properties.shouldBeEmpty()
-                    }
+                .apply { this shouldHaveSize 1 }
+                .first()
+                .shouldMatch {
+                    withName(UNSPECIFIED_ENVIRONMENT)
+                    withFilename(DEFAULT_ENVIRONMENT_FILENAME)
+                    withoutProperties()
                 }
         }
 
@@ -33,40 +34,70 @@ internal class EnvironmentFactoryTest {
         fun `given a custom filename for a single environment only, when factory creates a DAO, then it should use the given filename`() {
             EnvironmentFactory
                 .create(WithSingleFilename::class)
-                .apply {
-                    this shouldHaveSize 1
-                    this.first().apply {
-                        filename shouldBe "test-application.properties"
-                        properties.shouldBeEmpty()
-                    }
+                .apply { this shouldHaveSize 1 }
+                .first()
+                .shouldMatch {
+                    withName(UNSPECIFIED_ENVIRONMENT)
+                    withFilename("test-application.properties")
+                    withoutProperties()
                 }
         }
 
         @Test
-        fun `given WithMultipleEnvironments, when factory creates a DAO, then it should do the correct value associations`() {
+        fun `given WithDifferentEnvironmentValues, when factory creates a DAO, then it should do the correct value associations`() {
             EnvironmentFactory
                 .create(WithDifferentEnvironmentValues::class)
                 .apply {
                     this shouldHaveSize 2
-                    this.toList().forEachIndexed { index, model ->
-                        model.filename shouldBe "env$index-application.properties"
-                        model.properties.first().shouldMatchProperty {
-                            withName("test.resource.value")
-                            withEnvironment("env$index")
-                            withValue("env${index}Value")
+                    this.toList().forEachIndexed { index, environment ->
+                        environment.shouldMatch {
+                            withName("env$index")
+                            withFilename("env$index-application.properties")
+                            withProperties(
+                                propertyMatcher()
+                                    .withName("test.resource.value")
+                                    .withEnvironment("env$index")
+                                    .withValue("env${index}Value"),
+                            )
                         }
                     }
                 }
         }
 
         @Test
-        fun `given WithEnvironmentKeyExpansion, when factory creates a DAO, then it should do the correctly expand key values`() {
+        fun `given WithMultipleProperties, when factory creates a DAO, then it should do the correct value associations`() {
+            EnvironmentFactory
+                .create(WithMultipleProperties::class)
+                .apply { this shouldHaveSize 1 }
+                .first()
+                .shouldMatch {
+                    withName(UNSPECIFIED_ENVIRONMENT)
+                    withFilename("env-application.properties")
+                    withProperties(
+                        propertyMatcher()
+                            .withName(WithMultipleProperties.property1)
+                            .withEnvironment(UNSPECIFIED_ENVIRONMENT)
+                            .withValue("property1Value"),
+                        propertyMatcher()
+                            .withName(WithMultipleProperties.property2)
+                            .withEnvironment(UNSPECIFIED_ENVIRONMENT)
+                            .withValue("property2Value"),
+                    )
+                }
+        }
+
+        @Test
+        fun `given WithEnvironmentKeyExpansion, when factory creates a DAO, then it should correctly expand key values`() {
             EnvironmentFactory
                 .create(WithEnvironmentKeyExpansion::class)
                 .apply {
                     this shouldHaveSize 2
-                    this.toList().forEachIndexed { index, model ->
-                        model.filename shouldBe "env$index-application.properties"
+                    this.toList().forEachIndexed { index, environment ->
+                        environment.shouldMatch {
+                            withName("env$index")
+                            withFilename("env$index-application.properties")
+                            withoutProperties()
+                        }
                     }
                 }
         }
@@ -103,6 +134,15 @@ internal class EnvironmentFactoryTest {
     object WithDifferentEnvironmentValues {
         @Property(["env0:env0Value", "env1:env1Value"])
         const val property = "test.resource.value"
+    }
+
+    @Environment(["env-application.properties"])
+    object WithMultipleProperties {
+        @Property(["property1Value"])
+        const val property1 = "test.resource.property1"
+
+        @Property(["property2Value"])
+        const val property2 = "test.resource.property2"
     }
 
     @Environment(["env0/env1: *-application.properties"])
