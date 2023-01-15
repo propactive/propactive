@@ -5,7 +5,7 @@ import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINA
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_FILENAME_OVERRIDE
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
-import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.kotest.matchers.nulls.shouldNotBeNull
 import org.junit.jupiter.api.Test
 import java.util.UUID.randomUUID
@@ -20,7 +20,7 @@ internal class ConfigurationTest {
                 withDestination(DEFAULT_BUILD_DESTINATION)
                 withFilenameOverride(DEFAULT_FILENAME_OVERRIDE)
                 withEnvironments(DEFAULT_ENVIRONMENTS)
-                withImplementationClassCompileDependency(DEFAULT_IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY)
+                withImplementationClassCompileDependency(DEFAULT_CLASS_COMPILE_DEPENDENCY)
             }
     }
 
@@ -38,19 +38,19 @@ internal class ConfigurationTest {
                 implementationClass = "${randomUUID()}"
                 destination = "${randomUUID()}"
                 filenameOverride = "${randomUUID()}"
-                implementationClassCompileDependency = "${randomUUID()}"
+                classCompileDependency = "${randomUUID()}"
             }.apply {
                 environments.shouldNotBeNull()
                 implementationClass.shouldNotBeNull()
                 destination.shouldNotBeNull()
                 filenameOverride.shouldNotBeNull()
-                implementationClassCompileDependency.shouldNotBeNull()
+                classCompileDependency.shouldNotBeNull()
             }.apply {
                 environments = environmentsNewValue
                 implementationClass = implementationClassNewValue
                 destination = destinationNewValue
                 filenameOverride = filenameOverrideNewValue
-                implementationClassCompileDependency = implementationClassCompileDependencyNewValue
+                classCompileDependency = implementationClassCompileDependencyNewValue
             }.shouldMatch {
                 withEnvironments(environmentsNewValue)
                 withImplementationClass(implementationClassNewValue)

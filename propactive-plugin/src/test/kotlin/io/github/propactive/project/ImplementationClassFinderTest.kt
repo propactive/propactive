@@ -3,9 +3,9 @@ package io.github.propactive.project
 import io.github.propactive.environment.Environment
 import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
-import io.github.propactive.project.ImplementationClassFinder.DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY
-import io.github.propactive.project.ImplementationClassFinder.find
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.property.Property
+import io.github.propactive.support.utils.alphaNumeric
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.net.URLClassLoader
+import kotlin.random.Random
 
 internal class ImplementationClassFinderTest {
     private lateinit var urlClassLoader: URLClassLoader
@@ -43,24 +44,58 @@ internal class ImplementationClassFinderTest {
     }
 
     @Test
-    fun shouldUseDefaultTaskForWhenClassImplementationNeedsToBeCollected() {
-        find(project)
-
-        verify {
-            project.getTasksByName(DEFAULT_IMPLEMENTATION_CLASS_DERIVER_DEPENDENCY, true)
-        }
-    }
-
-    @Test
-    fun shouldUseDefaultImplementationClassNameWhenNoImplementationClassIsProvidedByTheConfiguration() {
+    fun shouldDefaultClassCompileDependencyWhenNoConfigurationIsProvided() {
         every {
             project.extensions.findByType(Configuration::class.java)
         } returns null
 
-        find(project)
+        ImplementationClassFinder.find(project)
+
+        verify {
+            project.getTasksByName(DEFAULT_CLASS_COMPILE_DEPENDENCY, true)
+        }
+    }
+
+    @Test
+    fun shouldDefaultImplementationClassNameWhenNoConfigurationIsProvided() {
+        every {
+            project.extensions.findByType(Configuration::class.java)
+        } returns null
+
+        ImplementationClassFinder.find(project)
 
         verify {
             urlClassLoader.loadClass(DEFAULT_IMPLEMENTATION_CLASS)
+        }
+    }
+
+    @Test
+    fun shouldUseGivenClassCompileDependencyWhenConfigurationIsProvided() {
+        val givenClassCompileDependency = Random.alphaNumeric("classCompileDependency")
+
+        every {
+            project.extensions.findByType(Configuration::class.java)
+        } returns Configuration(classCompileDependency = givenClassCompileDependency)
+
+        ImplementationClassFinder.find(project)
+
+        verify {
+            project.getTasksByName(givenClassCompileDependency, true)
+        }
+    }
+
+    @Test
+    fun shouldUseGivenImplementationClassNameWhenConfigurationIsProvided() {
+        val givenImplementationClassName = Random.alphaNumeric("implementationClassName")
+
+        every {
+            project.extensions.findByType(Configuration::class.java)
+        } returns Configuration(implementationClass = givenImplementationClassName)
+
+        ImplementationClassFinder.find(project)
+
+        verify {
+            urlClassLoader.loadClass(givenImplementationClassName)
         }
     }
 
@@ -71,7 +106,7 @@ internal class ImplementationClassFinderTest {
      */
     @Test
     fun shouldUseTheSameClassLoaderAsRuntime() {
-        find(project)
+        ImplementationClassFinder.find(project)
 
         verify { URLClassLoader.newInstance(any(), ImplementationClassFinder::class.java.classLoader) }
     }
@@ -83,7 +118,7 @@ internal class ImplementationClassFinderTest {
         } throws ClassNotFoundException()
 
         assertThrows<IllegalStateException> {
-            find(project)
+            ImplementationClassFinder.find(project)
         }
     }
 
