@@ -85,6 +85,26 @@ internal class EnvironmentFactoryTest {
                     )
                 }
         }
+        @Test
+        fun `given WithDifferentEnvironmentValuesAndMultipleProperties, when factory creates a DAO, then it should do the correct value associations`() {
+            EnvironmentFactory
+                .create(WithDifferentEnvironmentValuesAndMultipleProperties::class)
+                .apply {
+                    this shouldHaveSize 2
+                    this.toList().forEachIndexed { index, environment ->
+                        environment.shouldMatch {
+                            withName("env$index")
+                            withFilename("env$index-application.properties")
+                            withProperties(
+                                propertyMatcher()
+                                    .withName("test.resource.property${index + 1}")
+                                    .withEnvironment("env$index")
+                                    .withValue("property${index + 1}Value"),
+                            )
+                        }
+                    }
+                }
+        }
 
         @Test
         fun `given WithEnvironmentKeyExpansion, when factory creates a DAO, then it should correctly expand key values`() {
@@ -142,6 +162,15 @@ internal class EnvironmentFactoryTest {
         const val property1 = "test.resource.property1"
 
         @Property(["property2Value"])
+        const val property2 = "test.resource.property2"
+    }
+
+    @Environment(["env0: env0-application.properties", "env1: env1-application.properties"])
+    object WithDifferentEnvironmentValuesAndMultipleProperties {
+        @Property(["env0: property1Value"])
+        const val property1 = "test.resource.property1"
+
+        @Property(["env1: property2Value"])
         const val property2 = "test.resource.property2"
     }
 
