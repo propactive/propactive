@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" strict="true" name="Log4jXMLConfigForTests">
+    <Properties>
+        <Property name="CONSOLE_LOG_PATTERN">%m %ex%n</Property>
+    </Properties>
+    <Appenders>
+        <Appender type="Console" name="consoleAppender" target="SYSTEM_OUT">
+            <Layout type="PatternLayout" pattern="${CONSOLE_LOG_PATTERN}"/>
+        </Appender>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO" additivity="true">
+            <AppenderRef ref="consoleAppender"/>
+        </Root>
+        <Logger name="Propactive" level="TRACE" additivity="false">
+            <AppenderRef ref="consoleAppender"/>
+        </Logger>
+    </Loggers>
+</Configuration>
