@@ -3,15 +3,17 @@ package io.github.propactive.entry
 import io.github.propactive.config.KEY_VALUE_DELIMITER
 import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
 import io.github.propactive.entry.EntryFailureReason.MISSING_KEY_VALUE_DELIMITER_FOR_A_MULTI_ENTRIES
+import io.github.propactive.logging.PropactiveLogger.trace
 
 object EntryFactory {
     @JvmStatic
     fun create(entries: Array<String>) = entries
+        .trace { "Expanding Entries: " + toList() }
         .apply {
             if (size > 1) onEach { entry ->
                 require(
                     entry.count { it == KEY_VALUE_DELIMITER } > 0,
-                    MISSING_KEY_VALUE_DELIMITER_FOR_A_MULTI_ENTRIES(entry)
+                    MISSING_KEY_VALUE_DELIMITER_FOR_A_MULTI_ENTRIES(entry),
                 )
             }
         }

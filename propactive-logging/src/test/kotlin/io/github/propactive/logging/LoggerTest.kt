@@ -87,35 +87,35 @@ class LoggerTest {
     }
 
     @Test
-    fun shouldHighlightInfoPrefixWithMagentaColor() {
+    fun shouldHighlightInfoWithMagentaColor() {
         info {
             "..."
         }
 
         infoCollector
             .logs().single()
-            .shouldStartWith(Color.magenta("info  ->"))
+            .shouldStartWith(Color.magenta("..."))
     }
 
     @Test
-    fun shouldHighlightDebugPrefixWithBlueColor() {
+    fun shouldHighlightDebugWithBlueColor() {
         debug {
             "..."
         }
 
         debugCollector
             .logs().single()
-            .shouldStartWith(Color.blue("debug ->"))
+            .shouldStartWith(Color.blue("..."))
     }
 
     @Test
-    fun shouldHighlightTracePrefixWithCyanColor() {
+    fun shouldHighlightTraceWithCyanColor() {
         trace {
             "..."
         }
 
         traceCollector
             .logs().single()
-            .shouldStartWith(Color.cyan("trace ->"))
+            .shouldStartWith(Color.cyan("..."))
     }
 }

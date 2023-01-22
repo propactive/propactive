@@ -8,22 +8,16 @@ object PropactiveLogger {
 
     @JvmStatic
     fun <T : Any> T.info(supplier: T.() -> String): T = this.apply {
-        DELEGATE.info {
-            "${Color.magenta("info  ->")} ${supplier.invoke(this)}"
-        }
+        DELEGATE.info { Color.magenta(supplier.invoke(this)) }
     }
 
     @JvmStatic
     fun <T : Any> T.debug(supplier: T.() -> String): T = this.apply {
-        DELEGATE.debug {
-            "${Color.blue("debug ->")} ${supplier.invoke(this)}"
-        }
+        DELEGATE.debug { Color.blue(supplier.invoke(this)) }
     }
 
     @JvmStatic
     fun <T : Any> T.trace(supplier: T.() -> String): T = this.apply {
-        DELEGATE.trace {
-            "${Color.cyan("trace ->")} ${supplier.invoke(this)}"
-        }
+        DELEGATE.trace { Color.cyan(supplier.invoke(this)) }
     }
 }
