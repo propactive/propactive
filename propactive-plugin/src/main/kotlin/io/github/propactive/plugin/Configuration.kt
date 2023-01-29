@@ -22,8 +22,17 @@ open class Configuration(
         internal const val DEFAULT_ENVIRONMENTS = "*"
         internal const val DEFAULT_IMPLEMENTATION_CLASS = "ApplicationProperties"
         internal const val DEFAULT_BUILD_DESTINATION = "properties"
+
         // NOTE: Gradle plugin extension values cannot be null if you want to register them as property values
         internal const val DEFAULT_FILENAME_OVERRIDE = ""
         internal const val DEFAULT_CLASS_COMPILE_DEPENDENCY = "jar"
     }
+
+    override fun toString(): String = "Configuration(" +
+        "environments=$environments, " +
+        "implementationClass=$implementationClass, " +
+        "destination=$destination, " +
+        "filenameOverride=$filenameOverride, " +
+        "classCompileDependency=$classCompileDependency" +
+        ")"
 }

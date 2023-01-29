@@ -3,6 +3,9 @@ package io.github.propactive.property
 import io.github.propactive.config.MULTIPLE_ENVIRONMENT_DELIMITER
 import io.github.propactive.config.UNSPECIFIED_ENVIRONMENT
 import io.github.propactive.entry.EntryFactory
+import io.github.propactive.logging.PropactiveLogger.debug
+import io.github.propactive.logging.PropactiveLogger.info
+import io.github.propactive.logging.PropactiveLogger.trace
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_HAS_INVALID_TYPE
 import io.github.propactive.property.PropertyFailureReason.PROPERTY_FIELD_INACCESSIBLE
 import kotlin.reflect.KCallable
@@ -15,7 +18,10 @@ import kotlin.reflect.full.isSubtypeOf
 internal object PropertyFactory {
     @JvmStatic
     fun create(kCallables: Collection<KCallable<*>>) = kCallables
+        .info { "Constructing Properties..." }
+        .trace { "With KCallables: $this" }
         .mapNotNull { it.findAnnotation<Property>()?.run { it to this } }
+        .debug { "With Properties: $this" }
         .flatMap { (k, property) ->
             check(k.visibility != PRIVATE, PROPERTY_FIELD_INACCESSIBLE(k.name))
             check(k.returnType.isSubtypeOf(String::class.createType()), PROPERTY_FIELD_HAS_INVALID_TYPE(k.name))
@@ -37,6 +43,7 @@ internal object PropertyFactory {
                         }
                 }
         }
+        .info { "Done - Total Number of Property Permutations: $size" }
 
     private fun String.expandIfMultipleKeysPerEntry(): List<String> = this
         .split(MULTIPLE_ENVIRONMENT_DELIMITER)

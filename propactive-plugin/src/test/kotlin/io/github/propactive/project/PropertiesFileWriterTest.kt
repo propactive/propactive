@@ -42,7 +42,7 @@ internal class PropertiesFileWriterTest {
             val property2 = mockedProperty(2)
             val property3 = mockedProperty(3)
             val fileName = Random.alphaNumeric()
-            val environment = mockk<EnvironmentModel> {
+            val environment = mockk<EnvironmentModel>(relaxed = true) {
                 every { filename } returns fileName
                 every { properties } returns setOf(property1, property2, property3)
             }

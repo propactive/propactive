@@ -7,29 +7,34 @@ import io.github.propactive.entry.EntryModel
 import io.github.propactive.environment.EnvironmentBuilder.Companion.environmentBuilder
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_INVALID_KEY_EXPANSION
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_MISSING_ANNOTATION
+import io.github.propactive.logging.PropactiveLogger.debug
+import io.github.propactive.logging.PropactiveLogger.info
 import io.github.propactive.property.PropertyFactory
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
 
 object EnvironmentFactory {
     @JvmStatic
-    fun create(clazz: KClass<out Any>) =
-        requireNotNull(clazz.findAnnotation<Environment>(), ENVIRONMENT_MISSING_ANNOTATION)
-            .value
-            .run(EntryFactory::create)
-            .expandIfMultipleKeysPerEntry()
-            .let { entries ->
-                with(PropertyFactory.create(clazz.members)) {
-                    entries.map { (environment, filename) ->
-                        environmentBuilder()
-                            .withName(environment)
-                            .withFilename(filename)
-                            .withProperties(this)
-                            .build()
-                    }
+    fun create(clazz: KClass<out Any>): Set<EnvironmentModel> = clazz
+        .info { "Constructing Environments..." }
+        .debug { "With annotations: $annotations" }
+        .run { requireNotNull(findAnnotation<Environment>(), ENVIRONMENT_MISSING_ANNOTATION) }
+        .value
+        .run(EntryFactory::create)
+        .expandIfMultipleKeysPerEntry()
+        .let { entries ->
+            with(PropertyFactory.create(clazz.members)) {
+                entries.map { (environment, filename) ->
+                    environmentBuilder()
+                        .withName(environment)
+                        .withFilename(filename)
+                        .withProperties(this)
+                        .build()
                 }
             }
-            .toSet()
+        }
+        .toSet()
+        .debug { "Done - Number of Environments: $size" }
 
     private fun List<EntryModel>.expandIfMultipleKeysPerEntry() = this.flatMap { entry ->
         entry.key

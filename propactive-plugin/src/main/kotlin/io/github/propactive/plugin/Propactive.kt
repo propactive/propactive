@@ -1,5 +1,7 @@
 package io.github.propactive.plugin
 
+import io.github.propactive.logging.PropactiveLogger.debug
+import io.github.propactive.logging.PropactiveLogger.trace
 import io.github.propactive.task.GenerateApplicationPropertiesTask
 import io.github.propactive.task.ValidateApplicationPropertiesTask
 import org.gradle.api.Plugin
@@ -9,10 +11,12 @@ open class Propactive : Plugin<Project> {
     override fun apply(target: Project) {
         target
             .extensions
+            .debug { "Creating extension: ${Configuration::class.simpleName}" }
             .create(PROPACTIVE_GROUP, Configuration::class.java)
 
         target
             .tasks
+            .debug { "Registering Task: ${GenerateApplicationPropertiesTask.TASK_NAME}" }
             .register(
                 GenerateApplicationPropertiesTask.TASK_NAME,
                 GenerateApplicationPropertiesTask::class.java,
@@ -20,6 +24,7 @@ open class Propactive : Plugin<Project> {
 
         target
             .tasks
+            .debug { "Registering Task: ${ValidateApplicationPropertiesTask.TASK_NAME}" }
             .register(
                 ValidateApplicationPropertiesTask.TASK_NAME,
                 ValidateApplicationPropertiesTask::class.java,
@@ -54,7 +59,11 @@ open class Propactive : Plugin<Project> {
     companion object {
         internal val PROPACTIVE_GROUP = Propactive::class.simpleName!!.lowercase()
 
-        private fun Project.propertyOrDefault(propertyName: String, default: String) =
-            default.takeUnless { hasProperty(propertyName) } ?: "${property(propertyName)}"
+        private fun Project.propertyOrDefault(propertyName: String, default: String): String =
+            (
+                default
+                    .takeUnless { hasProperty(propertyName) } ?: "${property(propertyName)}"
+                )
+                .trace { "Set $propertyName to: $this" }
     }
 }

@@ -6,6 +6,8 @@ import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_FIL
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_INVALID_FILENAME
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_NAME_IS_NOT_SET
 import io.github.propactive.environment.EnvironmentFailureReason.ENVIRONMENT_PROPERTIES_IS_NOT_SET
+import io.github.propactive.logging.PropactiveLogger.debug
+import io.github.propactive.logging.PropactiveLogger.trace
 import io.github.propactive.property.PropertyModel
 import kotlin.text.RegexOption.MULTILINE
 
@@ -25,19 +27,23 @@ class EnvironmentBuilder private constructor() : Builder<EnvironmentModel> {
         internal fun environmentBuilder() = EnvironmentBuilder()
     }
 
-    override fun build(): EnvironmentModel = apply {
-        check(::name.isInitialized, ENVIRONMENT_NAME_IS_NOT_SET)
-        check(::filename.isInitialized, ENVIRONMENT_FILENAME_IS_NOT_SET(name))
-        check(::properties.isInitialized, ENVIRONMENT_PROPERTIES_IS_NOT_SET(name))
-    }.run {
-        EnvironmentModel(
-            name,
-            filename
-                .replace(EXPANSION_WILDCARD, name)
-                .apply { require(matches(GLOBALLY_VALID_FILENAME), ENVIRONMENT_INVALID_FILENAME(name, this)) },
-            properties
-                .filter { name == it.environment }
-                .toSet(),
-        )
-    }
+    override fun build(): EnvironmentModel = this
+        .apply {
+            check(::name.isInitialized, ENVIRONMENT_NAME_IS_NOT_SET)
+            check(::filename.isInitialized, ENVIRONMENT_FILENAME_IS_NOT_SET(name))
+            check(::properties.isInitialized, ENVIRONMENT_PROPERTIES_IS_NOT_SET(name))
+        }
+        .debug { "Building environment: $name ($filename)" }
+        .run {
+            EnvironmentModel(
+                name,
+                filename
+                    .replace(EXPANSION_WILDCARD, name)
+                    .apply { require(matches(GLOBALLY_VALID_FILENAME), ENVIRONMENT_INVALID_FILENAME(name, this)) },
+                properties
+                    .filter { name == it.environment }
+                    .toSet(),
+            )
+        }
+        .trace { "Built environment: $this" }
 }
