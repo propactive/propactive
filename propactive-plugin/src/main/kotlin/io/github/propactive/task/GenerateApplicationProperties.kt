@@ -2,6 +2,7 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.environment.EnvironmentModel
+import io.github.propactive.logging.PropactiveLogger.info
 import io.github.propactive.project.PropertiesFileWriter.writePropertiesFile
 import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
@@ -11,11 +12,13 @@ import org.gradle.api.Project
 object GenerateApplicationProperties {
     @JvmStatic
     internal fun invoke(project: Project) = project
+        .info { "Generating application properties..." }
         .let(ImplementationClassFinder::find)
         .let(EnvironmentFactory::create)
         .let { environmentModels ->
             with(project.extensions.findByType(Configuration::class.java)!!) {
                 environmentModels
+                    .info { "Found $size environment(s) to generate properties for..." }
                     .requireSingleEnvironmentWhenCustomFilenameIsGiven(environments, filenameOverride)
                     .filter { environments.contains(it.name) || environments.contains(DEFAULT_ENVIRONMENTS) }
                     .forEach { environment -> writePropertiesFile(environment, destination, filenameOverride) }

@@ -31,12 +31,12 @@ internal class ImplementationClassFinderTest {
 
         configuration = mockk(relaxed = true)
 
-        urlClassLoader = mockk() {
+        urlClassLoader = mockk {
             every { loadClass(any()) } returns WithEmptyEnvironment::class.java
             every { URLClassLoader.newInstance(any(), any()) } returns this
         }
 
-        project = mockk() {
+        project = mockk {
             val task = mockk<Task> { every { outputs.files.files } returns setOf(mockk(relaxed = true)) }
             every { extensions.findByType(Configuration::class.java) } returns configuration
             every { getTasksByName(any(), true) } returns setOf(task)

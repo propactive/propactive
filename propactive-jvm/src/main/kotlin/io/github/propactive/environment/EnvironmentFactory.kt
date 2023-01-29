@@ -34,7 +34,7 @@ object EnvironmentFactory {
             }
         }
         .toSet()
-        .info { "Done - Number of Environments: $size" }
+        .debug { "Done - Number of Environments: $size" }
 
     private fun List<EntryModel>.expandIfMultipleKeysPerEntry() = this.flatMap { entry ->
         entry.key
