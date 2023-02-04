@@ -30,8 +30,6 @@ subprojects {
     apply(plugin = rootProject.libs.plugins.gradle.ktlint.get().pluginId)
 
     dependencies {
-        implementation(rootProject.libs.log4j.api.kotlin)
-        testImplementation(rootProject.libs.log4j.core)
         testImplementation(rootProject.libs.mockk)
         testImplementation(rootProject.libs.junit.jupiter)
         testImplementation(rootProject.libs.kotest.assertions.core)
