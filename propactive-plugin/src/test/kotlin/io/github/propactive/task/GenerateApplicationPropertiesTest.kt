@@ -22,6 +22,21 @@ import kotlin.reflect.KClass
 
 internal class GenerateApplicationPropertiesTest {
     @Test
+    fun shouldCorrelateFileGeneratedInBuildDirToTheActualFileReturned() {
+        setupScenario(WithSingularEnvironment::class) { project, _, buildDir ->
+            GenerateApplicationProperties
+                .invoke(project)
+                .single()
+                .also { generatedFile ->
+                    buildDir
+                        .listFiles()
+                        ?.single()
+                        ?.shouldBe(generatedFile)
+                }
+        }
+    }
+
+    @Test
     fun shouldCreatePropertyFilesWhenImplementationClassIsFound() {
         setupScenario(WithMultipleEnvironments::class) { project, configuration, buildDir ->
             configuration.implementationClass = DEFAULT_IMPLEMENTATION_CLASS
