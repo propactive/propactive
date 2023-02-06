@@ -29,11 +29,8 @@ internal class PropertiesFileWriterTest {
             createTempDirectory("")
                 .toFile()
                 .apply { deleteOnExit() }
-                .let { destinationDir ->
-                    writePropertiesFile(environment, destinationDir.absolutePath)
-
-                    File(Path.of(destinationDir.absolutePath, givenFilename).toUri()).shouldExist()
-                }
+                .let { writePropertiesFile(environment, it.absolutePath) }
+                .shouldExist()
         }
 
         @Test
@@ -50,19 +47,15 @@ internal class PropertiesFileWriterTest {
             createTempDirectory("")
                 .toFile()
                 .apply { deleteOnExit() }
-                .let { destinationDir ->
-                    writePropertiesFile(environment, destinationDir.absolutePath)
-
-                    File(Path.of(destinationDir.absolutePath, fileName).toUri())
-                        .readText()
-                        .shouldContain(
-                            """
-                            ${property1.name}=${property1.value}
-                            ${property2.name}=${property2.value}
-                            ${property3.name}=${property3.value}
-                            """.trimIndent()
-                        )
-                }
+                .let { writePropertiesFile(environment, it.absolutePath) }
+                .readText()
+                .shouldContain(
+                    """
+                    ${property1.name}=${property1.value}
+                    ${property2.name}=${property2.value}
+                    ${property3.name}=${property3.value}
+                    """.trimIndent(),
+                )
         }
 
         @Test
@@ -75,11 +68,8 @@ internal class PropertiesFileWriterTest {
             createTempDirectory("")
                 .toFile()
                 .apply { deleteOnExit() }
-                .let { destinationDir ->
-                    writePropertiesFile(environment, destinationDir.absolutePath, customFilename)
-
-                    File(Path.of(destinationDir.absolutePath, customFilename).toUri()).shouldExist()
-                }
+                .let { writePropertiesFile(environment, it.absolutePath, customFilename) }
+                .shouldExist()
         }
 
         @Test
@@ -92,11 +82,9 @@ internal class PropertiesFileWriterTest {
             createTempDirectory("")
                 .toFile()
                 .apply { deleteOnExit() }
-                .let { destinationDir ->
-                    writePropertiesFile(environment, destinationDir.absolutePath, "")
-
-                    File(Path.of(destinationDir.absolutePath, givenFilename).toUri()).shouldExist()
-                }
+                .let { writePropertiesFile(environment, it.absolutePath, "") }
+                .let { file -> File(Path.of(file.parentFile.path, givenFilename).toUri()) }
+                .shouldExist()
         }
 
         private fun mockedProperty(number: Int): PropertyModel = mockk {

@@ -12,11 +12,11 @@ object PropertiesFileWriter {
         environment: EnvironmentModel,
         destination: String,
         filenameOverride: String? = null
-    ) {
+    ): File {
         val filename = filenameOverride
             .takeUnless { it.isNullOrBlank() } ?: environment.filename
 
-        File(Path.of(destination, filename).toUri())
+        return File(Path.of(destination, filename).toUri())
             .apply { parentFile.mkdirs() }
             .debug { "Writing properties to file location: $absolutePath" }
             .also { file ->

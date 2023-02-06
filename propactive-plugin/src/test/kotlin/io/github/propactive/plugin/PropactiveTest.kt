@@ -2,36 +2,27 @@ package io.github.propactive.plugin
 
 import io.github.propactive.matcher.ConfigurationMatcher.Companion.shouldMatch
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_FILENAME_OVERRIDE
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
-import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
-import io.github.propactive.plugin.PropactiveTest.PropactiveTasks.GENERATE_TASK
-import io.github.propactive.plugin.PropactiveTest.PropactiveTasks.VALIDATE_TASK
+import io.github.propactive.support.tasks.PluginTask
 import io.github.propactive.support.utils.alphaNumeric
-import io.github.propactive.task.GenerateApplicationProperties
 import io.github.propactive.task.GenerateApplicationPropertiesTask
-import io.github.propactive.task.ValidateApplicationProperties
 import io.github.propactive.task.ValidateApplicationPropertiesTask
-import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.extensions.system.OverrideMode.SetOrOverride
 import io.kotest.extensions.system.withSystemProperties
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.UnexpectedBuildFailure
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -39,12 +30,9 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
-import java.io.File
-import java.nio.file.Files
 import java.util.UUID
 import java.util.Properties
 import kotlin.random.Random
-import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 class PropactiveTest {
     @Nested
@@ -76,8 +64,8 @@ class PropactiveTest {
         }
 
         @ParameterizedTest
-        @EnumSource(PropactiveTasks::class)
-        fun `should register GenerateApplicationPropertiesTask`(task: PropactiveTasks) {
+        @EnumSource(PluginTask::class)
+        fun `should register GenerateApplicationPropertiesTask`(task: PluginTask) {
             verify {
                 target.tasks.register(task.taskName, task.taskReference)
             }
@@ -291,98 +279,5 @@ class PropactiveTest {
                     withImplementationClassCompileDependency(customPropertyImplementationClassCompileDependency)
                 }
         }
-    }
-
-    @Nested
-    @TestInstance(PER_CLASS)
-    inner class Integration {
-        private lateinit var projectDir: File
-
-        @BeforeEach
-        fun setUp() {
-            projectDir = Files
-                .createTempDirectory("projectDir")
-                .toFile()
-        }
-
-        @AfterEach
-        fun tearDown() {
-            projectDir.delete()
-        }
-
-        @Test
-        fun `should display propactive tasks description`() {
-            projectDir.also { parent ->
-                File(parent, "build.gradle.kts")
-                    .apply {
-                        writeText(
-                            """
-                            | plugins {
-                            |     id("java-library")
-                            |     id("io.github.propactive") version "DEV-SNAPSHOT"
-                            | }
-                            """.trimMargin(),
-                        )
-                    }
-            }
-
-            GradleRunner
-                .create()
-                .withProjectDir(projectDir)
-                .withArguments("tasks")
-                .withPluginClasspath()
-                .build()
-                .apply {
-                    output shouldContain """
-                    Propactive tasks
-                    ----------------
-                    ${GENERATE_TASK.taskName} - .*?
-
-                    ${VALIDATE_TASK.taskName} - .*?
-                    """.trimIndent().toRegex(DOT_MATCHES_ALL)
-                }
-        }
-
-        @Test
-        fun `should register configuration extension for propactive plugin`() {
-            projectDir.also { parent ->
-                File(parent, "build.gradle.kts")
-                    .apply {
-                        writeText(
-                            """
-                            | plugins {
-                            |     id("io.github.propactive") version "DEV-SNAPSHOT"
-                            | }
-                            |
-                            | $PROPACTIVE_GROUP {
-                            |     ${Configuration::destination.name} = "$DEFAULT_BUILD_DESTINATION"
-                            |     ${Configuration::implementationClass.name} = "$DEFAULT_IMPLEMENTATION_CLASS"
-                            |     ${Configuration::environments.name} = "$DEFAULT_ENVIRONMENTS"
-                            | }
-                            """.trimMargin(),
-                        )
-                    }
-            }
-
-            shouldNotThrow<UnexpectedBuildFailure> {
-                GradleRunner
-                    .create()
-                    .withProjectDir(projectDir)
-                    .withPluginClasspath()
-                    .build()
-            }
-        }
-    }
-
-    @Suppress("unused")
-    enum class PropactiveTasks(val taskName: String, val taskReference: Class<out DefaultTask>) {
-        GENERATE_TASK(
-            GenerateApplicationProperties::class.simpleName!!.replaceFirstChar(Char::lowercaseChar),
-            GenerateApplicationPropertiesTask::class.java,
-        ),
-        VALIDATE_TASK(
-            ValidateApplicationProperties::class.simpleName!!.replaceFirstChar(Char::lowercaseChar),
-            ValidateApplicationPropertiesTask::class.java,
-        ),
     }
 }

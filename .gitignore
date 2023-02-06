@@ -26,3 +26,8 @@ hs_err_pid*
 .idea/
 .gradle/
 build/
+
+# hprof files are heap dump of the memory of java-based processes. Huge hprof files most commonly
+# indicate out of memory issues about the related processes. These hprof files can be configured
+# at startup to track and monitor memory performance issues
+*.hprof

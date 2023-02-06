@@ -8,10 +8,11 @@ import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.project.ImplementationClassFinder
 import org.gradle.api.Project
+import java.io.File
 
 object GenerateApplicationProperties {
     @JvmStatic
-    internal fun invoke(project: Project) = project
+    internal fun invoke(project: Project): List<File> = project
         .info { "Generating application properties..." }
         .let(ImplementationClassFinder::find)
         .let(EnvironmentFactory::create)
@@ -21,7 +22,7 @@ object GenerateApplicationProperties {
                     .info { "Found $size environment(s) to generate properties for..." }
                     .requireSingleEnvironmentWhenCustomFilenameIsGiven(environments, filenameOverride)
                     .filter { environments.contains(it.name) || environments.contains(DEFAULT_ENVIRONMENTS) }
-                    .forEach { environment -> writePropertiesFile(environment, destination, filenameOverride) }
+                    .map { environment -> writePropertiesFile(environment, destination, filenameOverride) }
             }
         }
 
