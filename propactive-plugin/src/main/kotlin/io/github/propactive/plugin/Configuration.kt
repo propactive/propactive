@@ -19,6 +19,9 @@ open class Configuration(
     @get:Input var classCompileDependency: String = DEFAULT_CLASS_COMPILE_DEPENDENCY,
 ) {
     companion object {
+        // Cached default configuration
+        internal val DEFAULT_CONFIGURATION = Configuration()
+
         internal const val DEFAULT_ENVIRONMENTS = "*"
         internal const val DEFAULT_IMPLEMENTATION_CLASS = "ApplicationProperties"
         internal const val DEFAULT_BUILD_DESTINATION = "properties"

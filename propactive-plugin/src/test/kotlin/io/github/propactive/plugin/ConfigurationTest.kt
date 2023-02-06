@@ -25,6 +25,18 @@ internal class ConfigurationTest {
     }
 
     @Test
+    fun shouldHaveSaneDefaultsForCachedDefaultConfiguration() {
+        Configuration.DEFAULT_CONFIGURATION
+            .shouldMatch {
+                withImplementationClass(DEFAULT_IMPLEMENTATION_CLASS)
+                withDestination(DEFAULT_BUILD_DESTINATION)
+                withFilenameOverride(DEFAULT_FILENAME_OVERRIDE)
+                withEnvironments(DEFAULT_ENVIRONMENTS)
+                withImplementationClassCompileDependency(DEFAULT_CLASS_COMPILE_DEPENDENCY)
+            }
+    }
+
+    @Test
     fun shouldAllowMutabilityForConfigurationFields() {
         val environmentsNewValue = "${randomUUID()}"
         val implementationClassNewValue = "${randomUUID()}"

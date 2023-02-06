@@ -27,9 +27,13 @@ test-propactive-jvm:
 	@echo "******** Running tests: propactive-jvm ... ********"
 	./gradlew propactive-jvm:test --info
 
-test-propactive-plugin:
+test-acceptance-propactive-plugin:
 	@echo "******** Running tests: propactive-plugin ... ********"
-	./gradlew propactive-plugin:test --info
+	./gradlew propactive-plugin:test --tests '*Test' --info
+
+test-integration-propactive-plugin:
+	@echo "******** Running tests: propactive-plugin ... ********"
+	./gradlew propactive-plugin:test --tests '*IT' --info
 
 check-linter:
 	@echo "******** Running linter: propactive-* ... ********"

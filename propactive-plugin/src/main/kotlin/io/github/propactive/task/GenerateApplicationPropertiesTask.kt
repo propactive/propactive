@@ -1,18 +1,20 @@
 package io.github.propactive.task
 
+import io.github.propactive.environment.EnvironmentFactory
+import io.github.propactive.file.FileFactory
 import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
-import io.github.propactive.task.validators.ConfigurationValidator.ENSURE_GIVEN_CLASS_COMPILE_DEPENDENCY_EXISTS
-import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
-open class GenerateApplicationPropertiesTask : DefaultTask() {
+open class GenerateApplicationPropertiesTask : ApplicationPropertiesTask() {
     companion object {
         internal val TASK_NAME =
-            GenerateApplicationProperties::class.simpleName!!.replaceFirstChar(Char::lowercaseChar)
+            GenerateApplicationPropertiesTask::class.simpleName!!
+                .replaceFirstChar(Char::lowercaseChar)
+                .removeSuffix("Task")
 
         internal val TASK_DESCRIPTION = """
             |Generates application properties file for each given environment.
@@ -39,15 +41,15 @@ open class GenerateApplicationPropertiesTask : DefaultTask() {
     }
 
     @TaskAction
-    fun run() = project
-        .let(GenerateApplicationProperties::invoke)
+    fun run() = compiledClasses
+        .find(implementationClass)
+        .run(EnvironmentFactory::create)
+        .run(FileFactory::create)
+        .filter { environments.contains(it.environment) || environments.contains(DEFAULT_ENVIRONMENTS) }
+        .forEach { it.write(destination, filenameOverride) }
 
     init {
         group = PROPACTIVE_GROUP
         description = TASK_DESCRIPTION
-
-        project
-            .let(ENSURE_GIVEN_CLASS_COMPILE_DEPENDENCY_EXISTS::validate)
-            .apply { super.dependsOn(this) }
     }
 }

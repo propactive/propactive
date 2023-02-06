@@ -16,8 +16,10 @@ jobs:
           cache: gradle
       - name: 'tests: propactive-jvm'
         run: make test-propactive-jvm
-      - name: 'tests: propactive-plugin'
-        run: make test-propactive-plugin
+      - name: 'tests: propactive-plugin (acceptance)'
+        run: make test-acceptance-propactive-plugin
+      - name: 'tests: propactive-plugin (integration)'
+        run: make test-integration-propactive-plugin
       - name: 'Uploading test artifacts'
         if: success() || failure()
         uses: actions/upload-artifact@v3

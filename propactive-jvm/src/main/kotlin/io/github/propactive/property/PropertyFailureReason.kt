@@ -42,5 +42,5 @@ object PropertyFailureReason {
     }
 
     private fun describe(field: String, environment: String = UNSPECIFIED_ENVIRONMENT) =
-        "Property named: $field " + if (environment.isNotBlank()) "within environment named: $environment " else " "
+        "Property named: $field " + if (environment.isNotBlank()) "within environment named: $environment " else ""
 }

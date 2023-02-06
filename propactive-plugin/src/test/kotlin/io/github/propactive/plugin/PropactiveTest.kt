@@ -7,7 +7,6 @@ import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_FILENAME_OVERRIDE
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
-import io.github.propactive.support.tasks.PluginTask
 import io.github.propactive.support.utils.alphaNumeric
 import io.github.propactive.task.GenerateApplicationPropertiesTask
 import io.github.propactive.task.ValidateApplicationPropertiesTask
@@ -21,6 +20,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
@@ -29,9 +29,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
-import java.util.UUID
-import java.util.Properties
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import java.util.stream.Stream
 import kotlin.random.Random
 
 class PropactiveTest {
@@ -64,12 +64,18 @@ class PropactiveTest {
         }
 
         @ParameterizedTest
-        @EnumSource(PluginTask::class)
-        fun `should register GenerateApplicationPropertiesTask`(task: PluginTask) {
-            verify {
-                target.tasks.register(task.taskName, task.taskReference)
-            }
+        @MethodSource("allPluginTasksArg")
+        fun `should register GenerateApplicationPropertiesTask`(
+            taskName: String,
+            taskReference: Class<out Task>
+        ) {
+            verify { target.tasks.register(taskName, taskReference) }
         }
+
+        private fun allPluginTasksArg() = Stream.of(
+            Arguments.of(GenerateApplicationPropertiesTask.TASK_NAME, GenerateApplicationPropertiesTask::class.java),
+            Arguments.of(ValidateApplicationPropertiesTask.TASK_NAME, ValidateApplicationPropertiesTask::class.java),
+        )
     }
 
     @Nested
@@ -79,7 +85,7 @@ class PropactiveTest {
         @BeforeEach
         internal fun setUp() {
             project = ProjectBuilder.builder()
-                .withName("temporary-project-${UUID.randomUUID()}")
+                .withName("temporary-project-${java.util.UUID.randomUUID()}")
                 .build()
                 .also { p -> p.plugins.apply("java-library") }
                 .also { p -> p.plugins.apply(Propactive::class.java) }
@@ -172,7 +178,7 @@ class PropactiveTest {
             val customFilenameOverride = Random.alphaNumeric("customFilenameOverride")
             val customImplementationClassCompileDependency = Random.alphaNumeric("customImplementationClassCompileDependency")
 
-            val properties = Properties().apply {
+            val properties = java.util.Properties().apply {
                 put(Configuration::environments.name, customEnvironments)
                 put(Configuration::implementationClass.name, customImplementationClass)
                 put(Configuration::destination.name, customDestination)
@@ -245,7 +251,7 @@ class PropactiveTest {
                     withImplementationClassCompileDependency(customConfigImplementationClassCompileDependency)
                 }
 
-            val properties = Properties().apply {
+            val properties = java.util.Properties().apply {
                 put(Configuration::environments.name, customPropertyEnvironments)
                 put(Configuration::implementationClass.name, customPropertyImplementationClass)
                 put(Configuration::destination.name, customPropertyDestination)
