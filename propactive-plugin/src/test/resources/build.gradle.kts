@@ -18,7 +18,7 @@ propactive {
 
 repositories {
     mavenCentral()
-    mavenLocal { url = uri("file://${System.getProperty("user.home")}/.m2/repository") }
+    mavenLocal()
 }
 
 dependencies {
