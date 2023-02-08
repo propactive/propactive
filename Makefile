@@ -61,7 +61,7 @@ publish-propactive-jvm-jars: validate-version-number
 	@echo "******** Publishing JARs: propactive-jvm ... ********"
 	$(VERSION_ENVIRONMENT_VARIABLE) && \
 	$(OSSRH_ENVIRONMENT_VARIABLES) && \
-	./gradlew propactive-jvm:publish $(GPG_SIGNING_PROPERTIES) --info
+	./gradlew propactive-jvm:publishToSonatype closeAndReleaseSonatypeStagingRepository $(GPG_SIGNING_PROPERTIES) --info
 
 publish-propactive-plugin-jars: validate-version-number
 	@echo "******** Publishing JARs: propactive-plugin ... ********"
