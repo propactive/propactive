@@ -1,6 +1,7 @@
 import org.gradle.api.JavaVersion.VERSION_17
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.time.Duration
 
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
@@ -9,6 +10,7 @@ plugins {
     signing
     alias(libs.plugins.gradle.ktlint)
     alias(libs.plugins.jetbrains.dokka)
+    alias(libs.plugins.gradle.publish.nexus)
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
 }
 
@@ -98,6 +100,28 @@ tasks {
 
     withType<KotlinCompile>().configureEach {
         kotlinOptions.jvmTarget = VERSION_17.toString()
+    }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype {
+            stagingProfileId.set("io.github.propactive")
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
+            username.set(System.getenv("SONATYPE_USERNAME"))
+            password.set(System.getenv("SONATYPE_PASSWORD"))
+        }
+    }
+
+    /**
+     * When closing or releasing a staging repository the plugin first
+     * initiates the transition and then retries a configurable number
+     * of times with a configurable delay after each attempt.
+     */
+    transitionCheckOptions {
+        maxRetries.set(60)
+        delayBetween.set(Duration.ofSeconds(10))
     }
 }
 

@@ -67,25 +67,6 @@ publishing {
                     downloadUrl.set("$projectUrl/releases")
                 }
             }
-
-            repositories {
-                maven {
-                    val releases = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                    val snapshot = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-
-                    name = "sonatypeStaging"
-                    url = when {
-                        isVersionedRelease -> uri(releases)
-                        isVersionedSnapshot -> uri(snapshot)
-                        else -> mavenLocal().url
-                    }
-
-                    credentials {
-                        username = System.getenv("OSSRH_USERNAME")
-                        password = System.getenv("OSSRH_PASSWORD")
-                    }
-                }
-            }
         }
     }
 }
