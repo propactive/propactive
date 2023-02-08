@@ -29,11 +29,11 @@ Using the `plugins` & `dependencies` blocks, you can set up Propactive as follow
 
 ```kotlin
 plugins {
-    id("io.github.propactive") version "1.2.2"
+    id("io.github.propactive") version "1.2.3"
 }
 
 dependencies {
-  implementation("io.github.propactive:propactive-jvm:1.2.2")
+  implementation("io.github.propactive:propactive-jvm:1.2.3")
 }
 ```
 
