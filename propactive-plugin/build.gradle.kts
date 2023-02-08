@@ -28,7 +28,6 @@ pluginBundle {
 
 dependencies {
     api(project(":propactive-jvm"))
-    api(project(":propactive-logging"))
 
     implementation(gradleApi())
     testImplementation(gradleTestKit())

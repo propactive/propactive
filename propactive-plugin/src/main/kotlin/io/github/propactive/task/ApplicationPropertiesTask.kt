@@ -8,6 +8,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
@@ -20,6 +21,9 @@ abstract class ApplicationPropertiesTask : DefaultTask() {
     private val configuration: Configuration = project.extensions
         .findByType(Configuration::class.java)
         ?: DEFAULT_CONFIGURATION
+
+    @get:Internal
+    internal val logger = project.logger
 
     @get:Input
     val environments: String = configuration.environments

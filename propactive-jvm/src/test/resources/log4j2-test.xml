@@ -9,7 +9,7 @@
         </Appender>
     </Appenders>
     <Loggers>
-        <Root level="INFO">
+        <Root level="INFO" additivity="true">
             <AppenderRef ref="consoleAppender"/>
         </Root>
         <Logger name="Propactive" level="TRACE" additivity="false">

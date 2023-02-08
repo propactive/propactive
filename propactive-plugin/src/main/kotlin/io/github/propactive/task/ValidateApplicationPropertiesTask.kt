@@ -32,8 +32,12 @@ open class ValidateApplicationPropertiesTask : ApplicationPropertiesTask() {
 
     @TaskAction
     fun run() = compiledClasses
+        .apply { logger.info("Validating application properties") }
         .find(implementationClass)
+        .apply { logger.debug("Found implementation class: {}", this) }
         .run(EnvironmentFactory::create)
+        .apply { logger.debug("Validated the following environment models: {}", this) }
+        .apply { logger.info("Done - validated application properties") }
 
     init {
         group = PROPACTIVE_GROUP

@@ -8,10 +8,11 @@ val isVersionedSnapshot = isSemVersioned && "$version".endsWith("-SNAPSHOT")
 val isVersionedRelease = isSemVersioned && isVersionedSnapshot.not()
 
 dependencies {
-    api(project(":propactive-logging"))
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlin.reflect)
     implementation(libs.kotlin.stdlib)
+    implementation(libs.log4j.core)
+    implementation(libs.log4j.api.kotlin)
 }
 
 /**
