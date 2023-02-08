@@ -1,58 +1,58 @@
 package io.github.propactive.plugin
 
-import io.github.propactive.logging.PropactiveLogger.debug
-import io.github.propactive.logging.PropactiveLogger.trace
 import io.github.propactive.task.GenerateApplicationPropertiesTask
 import io.github.propactive.task.ValidateApplicationPropertiesTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import kotlin.reflect.KMutableProperty1
 
 open class Propactive : Plugin<Project> {
     override fun apply(target: Project) {
+        val logger = target.logger
+
         target
             .extensions
-            .debug { "Creating extension: ${Configuration::class.simpleName}" }
+            .apply { logger.debug("Creating extension: {}", Configuration::class.simpleName) }
             .create(PROPACTIVE_GROUP, Configuration::class.java)
 
         target
             .tasks
-            .debug { "Registering Task: ${GenerateApplicationPropertiesTask.TASK_NAME}" }
-            .register(
-                GenerateApplicationPropertiesTask.TASK_NAME,
-                GenerateApplicationPropertiesTask::class.java,
-            )
+            .apply { logger.debug("Registering Task: {}", GenerateApplicationPropertiesTask.TASK_NAME) }
+            .register(GenerateApplicationPropertiesTask.TASK_NAME, GenerateApplicationPropertiesTask::class.java)
 
         target
             .tasks
-            .debug { "Registering Task: ${ValidateApplicationPropertiesTask.TASK_NAME}" }
-            .register(
-                ValidateApplicationPropertiesTask.TASK_NAME,
-                ValidateApplicationPropertiesTask::class.java,
-            )
+            .apply { logger.debug("Registering Task: {}", ValidateApplicationPropertiesTask.TASK_NAME) }
+            .register(ValidateApplicationPropertiesTask.TASK_NAME, ValidateApplicationPropertiesTask::class.java)
 
         target
             .extensions
+            .apply { logger.debug("Configuring extension: {}", Configuration::class.simpleName) }
             .findByType(Configuration::class.java)
             ?.apply {
-                environments = target.propertyOrDefault(
-                    Configuration::environments.name, environments,
-                )
+                fun String.debug(property: KMutableProperty1<Configuration, String>) = apply {
+                    logger.debug("Configuring '{}' with value: {}", property.name, this)
+                }
 
-                implementationClass = target.propertyOrDefault(
-                    Configuration::implementationClass.name, implementationClass,
-                )
+                environments = target
+                    .propertyOrDefault(Configuration::environments.name, environments)
+                    .debug(Configuration::environments)
 
-                destination = target.propertyOrDefault(
-                    Configuration::destination.name, destination,
-                )
+                implementationClass = target
+                    .propertyOrDefault(Configuration::implementationClass.name, implementationClass)
+                    .debug(Configuration::implementationClass)
 
-                filenameOverride = target.propertyOrDefault(
-                    Configuration::filenameOverride.name, filenameOverride,
-                )
+                destination = target
+                    .propertyOrDefault(Configuration::destination.name, destination,)
+                    .debug(Configuration::destination)
 
-                classCompileDependency = target.propertyOrDefault(
-                    Configuration::classCompileDependency.name, classCompileDependency,
-                )
+                filenameOverride = target
+                    .propertyOrDefault(Configuration::filenameOverride.name, filenameOverride)
+                    .debug(Configuration::filenameOverride)
+
+                classCompileDependency = target
+                    .propertyOrDefault(Configuration::classCompileDependency.name, classCompileDependency)
+                    .debug(Configuration::classCompileDependency)
             }
     }
 
@@ -60,10 +60,8 @@ open class Propactive : Plugin<Project> {
         internal val PROPACTIVE_GROUP = Propactive::class.simpleName!!.lowercase()
 
         private fun Project.propertyOrDefault(propertyName: String, default: String): String =
-            (
-                default
-                    .takeUnless { hasProperty(propertyName) } ?: "${property(propertyName)}"
-                )
-                .trace { "Set $propertyName to: $this" }
+            default
+                .takeUnless { hasProperty(propertyName) }
+                ?: "${property(propertyName)}"
     }
 }

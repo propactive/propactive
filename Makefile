@@ -27,10 +27,6 @@ test-propactive-jvm:
 	@echo "******** Running tests: propactive-jvm ... ********"
 	./gradlew propactive-jvm:test --info
 
-test-propactive-logging:
-	@echo "******** Running tests: propactive-logging ... ********"
-	./gradlew propactive-logging:test --info
-
 test-acceptance-propactive-plugin:
 	@echo "******** Running tests: propactive-plugin ... ********"
 	./gradlew propactive-plugin:test --tests '*Test' --info
@@ -66,12 +62,6 @@ publish-propactive-jvm-jars: validate-version-number
 	$(VERSION_ENVIRONMENT_VARIABLE) && \
 	$(OSSRH_ENVIRONMENT_VARIABLES) && \
 	./gradlew propactive-jvm:publish $(GPG_SIGNING_PROPERTIES) --info
-
-publish-propactive-logging-jars: validate-version-number
-	@echo "******** Publishing JARs: propactive-logging ... ********"
-	$(VERSION_ENVIRONMENT_VARIABLE) && \
-	$(OSSRH_ENVIRONMENT_VARIABLES) && \
-	./gradlew propactive-logging:publish $(GPG_SIGNING_PROPERTIES) --info
 
 publish-propactive-plugin-jars: validate-version-number
 	@echo "******** Publishing JARs: propactive-plugin ... ********"

@@ -16,8 +16,6 @@ jobs:
           cache: gradle
       - name: 'tests: propactive-jvm'
         run: make test-propactive-jvm
-      - name: 'tests: propactive-logging'
-        run: make test-propactive-logging
       - name: 'tests: propactive-plugin (acceptance)'
         run: make test-acceptance-propactive-plugin
       - name: 'tests: propactive-plugin (integration)'

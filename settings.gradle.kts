@@ -1,7 +1,6 @@
 include(
     ":propactive-plugin",
     ":propactive-jvm",
-    ":propactive-logging",
 )
 
 dependencyResolutionManagement {
