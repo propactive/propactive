@@ -51,5 +51,5 @@ jobs:
         uses: EndBug/add-and-commit@v9
         with:
           add: ./README.md
-          message: 'Update README.md with latest release version'
+          message: '[Propactive-Bot] Update README.md with latest release version'
           push: true
