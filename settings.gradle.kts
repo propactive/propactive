@@ -13,7 +13,7 @@ dependencyResolutionManagement {
             val kotestVersion = "5.5.4"
             val junitVersion = "5.8.2"
             val ktlintVersion = "11.0.0"
-            val publishVersion = "1.0.0"
+            val publishVersion = "1.1.0"
             val publishNexusVersion = "1.1.0"
             val equalsVersion = "3.10"
             val log4jKotlinVersion = "1.2.0" // TODO: Upgrade to 1.3.0 if my PR is merged
