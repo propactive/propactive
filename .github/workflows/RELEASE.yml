@@ -52,4 +52,4 @@ jobs:
         with:
           add: ./README.md
           message: '[Propactive-Bot] Update README.md with latest release version'
-          push: true
+          push: origin main --force
