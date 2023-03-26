@@ -8,7 +8,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             val kotlinVersion = "1.8.0"
-            val dokkaVersion = "1.7.20" // NOTE: This is tmp until a 1.8.0 is released (i.e. should be coupled with kotlinVersion)
+            val dokkaVersion = "1.8.10"
             val serializationVersion = "1.4.1"
             val mockkVersion = "1.13.2"
             val kotestVersion = "5.5.4"
