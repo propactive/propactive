@@ -84,4 +84,10 @@ tasks {
     publish {
         onlyIf { isVersionedRelease || isVersionedSnapshot }
     }
+
+    // TMP #70: This is a workaround for an ongoing issue with: `publishJavaPublicationToSonatypeRepository`
+    //      It seems that the task is not correctly configured to run after the `sign` task, so the signature
+    //      is not included in the published artifact. Once a fix is released, this workaround can be removed.
+    //      See: https://github.com/gradle-nexus/publish-plugin/issues/208
+    withType<PublishToMavenRepository>().configureEach { mustRunAfter(withType<Sign>()) }
 }
