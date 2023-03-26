@@ -4,7 +4,6 @@ include(
 )
 
 dependencyResolutionManagement {
-    enableFeaturePreview("VERSION_CATALOGS")
     versionCatalogs {
         create("libs") {
             val kotlinVersion = "1.8.10"

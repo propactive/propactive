@@ -10,20 +10,18 @@ val isVersionedSnapshot = isSemVersioned && "$version".endsWith("-SNAPSHOT")
 val isVersionedRelease = isSemVersioned && isVersionedSnapshot.not()
 
 gradlePlugin {
+    website.set("https://github.com/propactive/propactive/blob/main/README.md")
+    vcsUrl.set("https://github.com/propactive/propactive.git")
+
     plugins {
         create("propactive") {
             id = project.group.toString()
             displayName = project.name
             description = project.description.toString()
             implementationClass = "${project.group}.plugin.Propactive"
+            tags.set(listOf("properties", "property-management", "property-testing", "application.properties"))
         }
     }
-}
-
-pluginBundle {
-    website = "https://github.com/u-ways/propactive/blob/main/README.md"
-    vcsUrl = "https://github.com/u-ways/propactive.git"
-    tags = listOf("properties", "property-management", "property-testing", "application.properties")
 }
 
 dependencies {
