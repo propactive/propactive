@@ -7,7 +7,7 @@ dependencyResolutionManagement {
     enableFeaturePreview("VERSION_CATALOGS")
     versionCatalogs {
         create("libs") {
-            val kotlinVersion = "1.8.0"
+            val kotlinVersion = "1.8.10"
             val dokkaVersion = "1.8.10"
             val serializationVersion = "1.4.1"
             val mockkVersion = "1.13.2"
