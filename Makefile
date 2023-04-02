@@ -2,7 +2,7 @@
 
 # Application meta-data
 APP_NAME=propactive
-# NOTE: You can always override, example: `make recipe VERSION="x.x.x"`
+# NOTE: You can always override, example: `make [recipe] VERSION="x.x.x"`
 VERSION?=`./scripts/version_deriver.sh`
 
 # Signing information for propactive JARs
@@ -94,20 +94,31 @@ endef
 
 # SETUP #####################################################
 
-# User is given by the Gradle image we are running.
-# It runs using uid/gid 1000 to avoid running as root.
+# Although the Gradle image has a user named "gradle",
+# We might need to use the "root" user here because GH actions
+# uid/gid is not 1000. Meaning that the "gradle" user
+# won't have access to the mounted volumes.
 # See: https://hub.docker.com/_/gradle
-USER=gradle
-# User home directory inside the container
-USER_HOME=/home/$(USER)
-# Working directory inside the container
-PROJECT_DIR=$(USER_HOME)/$(APP_NAME)
-# Volumes to mount:
+DOCKER_USER=gradle
+DOCKER_USER_HOME=/home/$(DOCKER_USER)
+DOCKER_PROJECT_DIR=$(DOCKER_USER_HOME)/$(APP_NAME)
+
+# Host volumes to mount:
 HOST_PROJECT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 HOST_GRADLE_DATA?=$(HOME)/.gradle
 HOST_MAVEN_DATA?=$(HOME)/.m2
-# Image details
-ALPINE_GRADLE_IMAGE=gradle:8.0.2-jdk17-alpine
+
+# IMAGE DETAILS #################################################
+
+# Gradle's official Ubuntu JDK17 image.
+#   See:
+#     https://github.com/keeganwitt/docker-gradle/blob/master/jdk17/Dockerfile
+#   NOTE:
+#     Use a Ubuntu image instead of Linux Alpine as official Alpine uses musl libc
+#     instead of the more common glibc used by most other Linux distributions. (Many pre-built
+#     binaries, including many JDK distributions, expect glibc, so running Alpine risks running
+#     into unexpected errors)
+DOCKER_GRADLE_IMAGE=gradle:8.1.1-jdk17-jammy
 # Toolchain runner container name
 TOOLCHAIN_RUNNER_CONTAINER_NAME=$(APP_NAME)-toolchain-runner
 
@@ -117,9 +128,9 @@ TOOLCHAIN_RUNNER_CONTAINER_NAME=$(APP_NAME)-toolchain-runner
 # HOST_GRADLE_DATA:rw  - cache
 # HOST_MAVEN_DATA:rw   - cache
 define TOOLCHAIN_CONTAINER_VOLUMES
-	-v $(HOST_PROJECT_DIR):$(PROJECT_DIR) \
-	-v $(HOST_GRADLE_DATA):$(USER_HOME)/.gradle:rw \
-	-v $(HOST_MAVEN_DATA):$(USER_HOME)/.m2:rw
+	-v $(HOST_PROJECT_DIR):$(DOCKER_PROJECT_DIR) \
+	-v $(HOST_GRADLE_DATA):$(DOCKER_USER_HOME)/.gradle:rw \
+	-v $(HOST_MAVEN_DATA):$(DOCKER_USER_HOME)/.m2:rw
 endef
 
 # INJECTED ENVIRONMENT #####################################################
@@ -128,6 +139,36 @@ define TOOLCHAIN_CONTAINER_ENVIRONMENT_VARIABLES
 	$(VERSION_ENVIRONMENT_VARIABLE) \
     $(OSSRH_ENVIRONMENT_VARIABLES) \
     $(GRADLE_PUBLISH_ENVIRONMENT_VARIABLES)
+endef
+
+# ID MATCHER #################################################
+
+# Match user's UID and GID (i.e. correct access to cached files)
+HOST_UID=`id -u`
+HOST_GID=`id -g`
+
+# The GitHub Actions runner uses a non-standard UID/GID
+# which causes permission issues when mounting volumes.
+# Below definition will change the UID/GID of the "gradle"
+# user in the image to match the host's UID/GID.
+#
+# We then run the provided command as the "gradle" user.
+define MATCH_HOST_UID_GID
+	usermod -u "$(HOST_UID)" gradle && \
+	groupmod -g "$(HOST_GID)" gradle
+endef
+
+# USER MATCHER #################################################
+
+# Our docker image runs as root (so we can modify gradle's UID and GID to match
+# our CI runner IDs) this means once we execute our commands on user switch,
+# we need to ensure the environment variables Gradle relies on are updated
+# accordingly.
+#
+# See: https://docs.gradle.org/current/userguide/build_environment.html
+define GRADLE_USER_MATCHER
+    -e GRADLE_USER_HOME=$(DOCKER_USER_HOME)/.gradle \
+    -e HOME=$(DOCKER_USER_HOME)
 endef
 
 # RUNNER #########################################################
@@ -146,10 +187,10 @@ endef
 #  See: https://www.gnu.org/software/make/manual/html_node/Call-Function.html
 define toolchain_runner
 	(docker rm -f $(TOOLCHAIN_RUNNER_CONTAINER_NAME) || true) && \
-	docker pull $(ALPINE_GRADLE_IMAGE) && \
-	docker run --rm -u gradle --name $(TOOLCHAIN_RUNNER_CONTAINER_NAME) \
+	docker pull $(DOCKER_GRADLE_IMAGE) && \
+	docker run --rm -u root --name $(TOOLCHAIN_RUNNER_CONTAINER_NAME) \
 	$(TOOLCHAIN_CONTAINER_VOLUMES) \
 	$(TOOLCHAIN_CONTAINER_ENVIRONMENT_VARIABLES) \
-	-w $(PROJECT_DIR) $(ALPINE_GRADLE_IMAGE) \
-	$(1)
+	$(GRADLE_USER_MATCHER) \
+	-w $(DOCKER_PROJECT_DIR) $(DOCKER_GRADLE_IMAGE) sh -c "$(MATCH_HOST_UID_GID) && su gradle && $(1)"
 endef
