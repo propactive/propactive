@@ -104,7 +104,7 @@ tasks {
 }
 
 nexusPublishing {
-    repositories {
+    this.repositories {
         sonatype {
             // NOTE:
             //  You can find this value from your staging profile within the Nexus UI
