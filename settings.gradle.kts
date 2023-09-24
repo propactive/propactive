@@ -3,6 +3,19 @@ include(
     ":propactive-jvm",
 )
 
+/**
+ * The org.gradle.disco-toolchains plugin provides a repository to help auto-downloading
+ * JVMs. It is based on the foojay DiscoAPI. Requires Gradle 7.6 or later to work.
+ *
+ *  See:
+ *  - https://docs.gradle.org/current/userguide/toolchains.html#sub:download_repositories
+ *  - https://github.com/gradle/foojay-toolchains
+ */
+plugins {
+    val fooJayPluginVersion = "0.7.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version fooJayPluginVersion
+}
+
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {

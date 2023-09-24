@@ -89,6 +89,11 @@ subprojects {
         // https://blog.gradle.org/java-toolchains
         toolchain {
             languageVersion.set(JavaLanguageVersion.of(17))
+            // NOTE:
+            //  Always ensure this matches the dockerised JDK version
+            //  To see Gradle JVM Vendor to Foojay JVM Distribution, visit:
+            //  - https://github.com/gradle/foojay-toolchains#vendors
+            vendor.set(JvmVendorSpec.ADOPTIUM)
         }
     }
 }
