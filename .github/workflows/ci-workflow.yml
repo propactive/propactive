@@ -8,30 +8,6 @@ jobs:
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v3
-      # Next steps:
-      # 1. Create a directory for the gradle cache
-      # 2. Test it inside the docker container by trying to create a file in the cache directory
-      - name: 'Sandbox'
-        run: |
-          echo "---------------------------- For each user check their uid and gid"
-          id
-          echo "---------------------------- Checking $HOME ownerships"
-          ls -la $HOME
-          echo "---------------------------- Checking $GITHUB_WORKSPACE"
-          ls -la $GITHUB_WORKSPACE
-          echo "---------------------------- Creating $HOME/.gradle/test"
-          mkdir -p $HOME/.gradle/test
-
-          echo "---------------------------- For each user check their uid and gid (Docker)"
-          make run-cmd-inside-toolchain-runner CMD="id"
-          echo "---------------------------- Changing "gradle" user uid and gid to match host user"
-          make run-cmd-inside-toolchain-runner CMD="usermod -u 1001 gradle; groupmod -g 127 gradle; id gradle"
-          echo "---------------------------- Checking /home ownerships (Docker)"
-          make run-cmd-inside-toolchain-runner CMD="ls -la /home"
-          echo "---------------------------- Checking Propactive workspace (Docker)"
-          make run-cmd-inside-toolchain-runner CMD="ls -la /home/gradle/propactive"
-          echo "---------------------------- Creating /home/.gradle/test (Docker)"
-          make run-cmd-inside-toolchain-runner CMD="mkdir -p /home/.gradle/test"
       - name: 'Setup Gradle caching'
         uses: actions/cache@v3
         with:
@@ -45,9 +21,9 @@ jobs:
       - name: 'tests: propactive-plugin (integration)'
         run: make test-integration-propactive-plugin
       # TMP: #70 This should be removed once gradle-nexus/publish-plugin/issues/208 is fixed
-      - name: 'A timebomb to address #70 on the 01/05/2023'
+      - name: 'A timebomb to address #70 on the 01/10/2023'
         run: |
-          if [[ $(date +%s) -gt 1682895600 ]]; then
+          if [[ $(date +%s) -gt 1696114800 ]]; then
             echo "It has been 1 month since #70 was opened."
             echo "Please check if gradle-nexus/publish-plugin/issues/208 has been fixed."
             echo "  If it has, please update the plugin and re-enable the CD workflow."
