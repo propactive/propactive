@@ -8,12 +8,6 @@ jobs:
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v3
-      - name: 'Set up JDK 17'
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: liberica
-          cache: gradle
       - name: 'tests: propactive-jvm'
         run: make test-propactive-jvm
       - name: 'tests: propactive-plugin (acceptance)'
@@ -21,9 +15,9 @@ jobs:
       - name: 'tests: propactive-plugin (integration)'
         run: make test-integration-propactive-plugin
       # TMP: #70 This should be removed once gradle-nexus/publish-plugin/issues/208 is fixed
-      - name: 'A timebomb to address #70 on the 01/05/2023'
+      - name: 'A timebomb to address #70 on the 01/10/2023'
         run: |
-          if [[ $(date +%s) -gt 1682895600 ]]; then
+          if [[ $(date +%s) -gt 1696114800 ]]; then
             echo "It has been 1 month since #70 was opened."
             echo "Please check if gradle-nexus/publish-plugin/issues/208 has been fixed."
             echo "  If it has, please update the plugin and re-enable the CD workflow."
