@@ -16,8 +16,6 @@ jobs:
     # See: https://github.com/actions/runner/issues/1413#issuecomment-1230408270
     secrets: inherit
   CD:
-    # TMP: #70 Disable CD until gradle-nexus/publish-plugin/issues/208 is fixed
-    if: false
     needs: [CI]
     uses: ./.github/workflows/cd-workflow.yml
     # This only works for organization and repository secrets
