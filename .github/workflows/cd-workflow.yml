@@ -1,6 +1,9 @@
 name: CD
 
-on: [workflow_call]
+on: [
+  workflow_call,
+  workflow_dispatch
+]
 
 env:
   OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}

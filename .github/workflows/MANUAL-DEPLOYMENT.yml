@@ -1,3 +1,12 @@
+# NOTE:
+#  Unlike the cd-workflow.yml, this workflow can only be manually triggered
+#  and will not create a new release tag. Therefore, if you want to deploy
+#  a new release, you must first create a new release tag in the git repository.
+#
+# USECASE:
+#  - If a release tag already exists, but you want to re-deploy the same version (i.e. failed deployment)
+#  - If you want to release or re-deploy a given version for the plugin (Gradle Portal) only.
+#  - If you want to release or re-deploy a given version for the jvm (Maven Central) only.
 name: MANUAL-DEPLOYMENT
 
 on:
