@@ -38,12 +38,6 @@ signing {
     sign(configurations.archives.get())
 }
 
-// The Gradle Nexus plugin has a bug that requires us to manually
-// configure the signing tasks to run before the publishing tasks.
-// see: https://github.com/gradle-nexus/publish-plugin/issues/208
-val signingTasks: TaskCollection<Sign> = tasks.withType<Sign>()
-tasks.withType<PublishToMavenRepository>().configureEach { mustRunAfter(signingTasks) }
-
 tasks {
     publishPlugins { onlyIf { isVersionedRelease } }
 }
