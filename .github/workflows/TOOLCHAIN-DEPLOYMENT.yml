@@ -2,14 +2,14 @@
 # workflows to build and push images to Docker Hub and other registries.
 #
 # See: https://docs.docker.com/build/ci/github-actions/
-name: Toolchain Deployment
+name: TOOLCHAIN-DEPLOYMENT
 
 on:
   push:
     branches:
       - main
     paths:
-      - ./Dockerfile
+      - Dockerfile
 
 env:
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
