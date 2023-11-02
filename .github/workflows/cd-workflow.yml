@@ -22,13 +22,11 @@ jobs:
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v3
-      - name: 'Importing GPG key'
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ env.SIGNING_GNUPG_PRIVATE_KEY }}
-          passphrase: ${{ env.SIGNING_GNUPG_KEY_NAME }}
+      - name: 'Escape newlines in GPG private key (required for Makefile tooling)'
+        id: escape_newlines
+        run: ./scripts/escape_newlines.sh "${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}" >> $GITHUB_OUTPUT
       - name: 'Building Project JARs'
-        run: make build-jars
+        run: make build-jars SIGNING_GNUPG_PRIVATE_KEY="${{ steps.escape_newlines.outputs.escaped_key }}"
       - name: 'Uploading propactive-jvm JAR artifacts'
         uses: actions/upload-artifact@v3
         with:
@@ -52,14 +50,9 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-      - name: 'Importing GPG key'
-        uses: crazy-max/ghaction-import-gpg@v5
-        with:
-          gpg_private_key: ${{ env.SIGNING_GNUPG_PRIVATE_KEY }}
-          passphrase: ${{ env.SIGNING_GNUPG_KEY_NAME }}
       - name: 'Publishing latest version tag'
         run: make publish-latest-version-tag
       - name: 'Publishing to maven central'
-        run: make publish-propactive-jvm-jars
+        run: make publish-propactive-jvm-jars SIGNING_GNUPG_PRIVATE_KEY="${{ needs.Prepare-JARs.outputs.escaped_key }}"
       - name: 'Publishing to gradle plugin'
-        run: make publish-propactive-plugin-jars
+        run: make publish-propactive-plugin-jars SIGNING_GNUPG_PRIVATE_KEY="${{ needs.Prepare-JARs.outputs.escaped_key }}"
