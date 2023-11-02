@@ -29,8 +29,8 @@ dependencyResolutionManagement {
             val publishVersion = "1.1.0"
             val publishNexusVersion = "1.3.0"
             val equalsVersion = "3.10"
-            val log4jKotlinVersion = "1.2.0" // TODO: Upgrade to 1.3.0 if my PR is merged
-            val log4jVersion = "2.19.0"
+            val log4jKotlinVersion = "1.3.0"
+            val log4jVersion = "2.20.0"
 
             library("kotlin-reflect", "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
             library("kotlin-stdlib", "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")

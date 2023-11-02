@@ -23,8 +23,8 @@ repositories {
 
 dependencies {
     val propactiveVersion = "DEV-SNAPSHOT"
-    val log4jKotlinVersion = "1.2.0" // TODO: Upgrade to 1.3.0 if my PR is merged
-    val log4jVersion = "2.19.0"
+    val log4jKotlinVersion = "1.3.0"
+    val log4jVersion = "2.20.0"
 
     implementation("io.github.propactive:propactive-jvm:$propactiveVersion")
     implementation("org.apache.logging.log4j:log4j-api-kotlin:$log4jKotlinVersion")
