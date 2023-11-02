@@ -18,10 +18,10 @@ jobs:
       - name: 'tests: propactive-plugin (integration)'
         run: make test-integration-propactive-plugin
       # TMP: #70 This should be removed once gradle-nexus/publish-plugin/issues/208 is fixed
-      - name: 'A timebomb to address #70 on the 01/10/2023'
+      - name: 'A timebomb to address #70 on the 2023-12-01'
         run: |
-          if [[ $(date +%s) -gt 1696114800 ]]; then
-            echo "It has been 1 month since #70 was opened."
+          if [[ $(date +%s) -gt 1701388800 ]]; then
+            echo "It has been many months since #70 was opened."
             echo "Please check if gradle-nexus/publish-plugin/issues/208 has been fixed."
             echo "  If it has, please update the plugin and re-enable the CD workflow."
             echo "  else, please increase this timebomb by 1 month."

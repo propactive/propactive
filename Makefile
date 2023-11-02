@@ -32,7 +32,7 @@ check-linter:
 
 build-jars:
 	@echo "******** Building JARs ... ********"
-	$(call toolchain_runner,./gradlew build -x test $(GPG_SIGNING_PROPERTIES) --info)
+	@$(call toolchain_runner,./gradlew build -x test $(GPG_SIGNING_PROPERTIES) --info,-e GPG_PRIVATE_KEY="$(SIGNING_GNUPG_PRIVATE_KEY)" -e GPG_PRIVATE_KEY_PASSPHRASE="$(SIGNING_GNUPG_PASSPHRASE)")
 
 build-jars-no-signing:
 	@echo "******** Building JARs (without signing)... ********"
@@ -53,11 +53,15 @@ publish-latest-version-tag: validate-version-number
 
 publish-propactive-jvm-jars: validate-version-number
 	@echo "******** Publishing JARs: propactive-jvm ... ********"
-	$(call toolchain_runner,./gradlew propactive-jvm:publishToSonatype closeAndReleaseSonatypeStagingRepository $(GPG_SIGNING_PROPERTIES) --info)
+	@$(call toolchain_runner,./gradlew propactive-jvm:publishToSonatype closeAndReleaseSonatypeStagingRepository $(GPG_SIGNING_PROPERTIES) --info,-e GPG_PRIVATE_KEY="$(SIGNING_GNUPG_PRIVATE_KEY)" -e GPG_PRIVATE_KEY_PASSPHRASE="$(SIGNING_GNUPG_PASSPHRASE)")
 
 publish-propactive-plugin-jars: validate-version-number
 	@echo "******** Publishing JARs: propactive-plugin ... ********"
-	$(call toolchain_runner,./gradlew propactive-plugin:publishPlugins $(GPG_SIGNING_PROPERTIES) --info)
+	@$(call toolchain_runner,./gradlew propactive-plugin:publishPlugins $(GPG_SIGNING_PROPERTIES) --info,-e GPG_PRIVATE_KEY="$(SIGNING_GNUPG_PRIVATE_KEY)" -e GPG_PRIVATE_KEY_PASSPHRASE="$(SIGNING_GNUPG_PASSPHRASE)")
+
+publish-propactive-to-maven-local: validate-version-number
+	@echo "******** Publishing JARs To Maven local ... ********"
+	@$(call toolchain_runner,./gradlew publishToMavenLocal $(GPG_SIGNING_PROPERTIES) --info,-e GPG_PRIVATE_KEY="$(SIGNING_GNUPG_PRIVATE_KEY)" -e GPG_PRIVATE_KEY_PASSPHRASE="$(SIGNING_GNUPG_PASSPHRASE)")
 
 # VARIABLES
 
@@ -80,6 +84,7 @@ SIGNING_GNUPG_EXECUTABLE?=$(PROPACTIVE_SIGNING_GNUPG_EXECUTABLE)
 SIGNING_GNUPG_HOME_DIR?=$(PROPACTIVE_SIGNING_GNUPG_HOME_DIR)
 SIGNING_GNUPG_KEY_NAME?=$(PROPACTIVE_SIGNING_GNUPG_KEY_NAME)
 SIGNING_GNUPG_PASSPHRASE?=$(PROPACTIVE_SIGNING_GNUPG_PASSPHRASE)
+SIGNING_GNUPG_PRIVATE_KEY?=$(PROPACTIVE_SIGNING_GNUPG_PRIVATE_KEY)
 
 define GPG_SIGNING_PROPERTIES
  -Psigning.gnupg.executable=$(SIGNING_GNUPG_EXECUTABLE) \
@@ -108,7 +113,7 @@ login-toolchain:
 	@echo "******** Running toolchain image as an interactive shell ... ********"
 	@$(call toolchain_runner,bash -li,-it -e TERM='xterm-256color' -h '[Propactive|Runner]')
 
-# Example: make toolchain-exec cmd="ls -la"
+# Example: make exec-toolchain cmd="ls -la"
 exec-toolchain:
 	@$(call toolchain_runner,$(cmd))
 

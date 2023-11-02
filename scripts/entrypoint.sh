@@ -22,6 +22,7 @@ DEFAULT_USER_UID="$(id -u $DEFAULT_USER)"
 DEFAULT_USER_GID="$(id -g $DEFAULT_USER)"
 
 USER="${SET_DOCKER_USER:-$DEFAULT_USER}"
+GPG_HOME_DIR="/home/$USER/.gnupg"
 
 # Check if the user exists, if not, create the user
 if ! id "$USER" &>/dev/null; then
@@ -43,6 +44,37 @@ if [ -n "$SET_DOCKER_USER_GID"  ] && [ "$DEFAULT_USER_GID" != "$SET_DOCKER_USER_
     groupmod -g "$SET_DOCKER_USER_GID" $USER;
     echo "Also changing group ownership of /home/$USER to GID $SET_DOCKER_USER_GID"
     chgrp -R "$SET_DOCKER_USER_GID" "/home/$USER"
+fi
+
+# If a GPG private key is provided, proceed with the GPG setup
+if [[ -n $GPG_PRIVATE_KEY ]]; then
+    if [[ -z $GPG_PRIVATE_KEY_PASSPHRASE ]]; then
+        echo "Error: GPG_PRIVATE_KEY_PASSPHRASE is not set. Unable to import the private key."
+        exit 1
+    fi
+
+    if ! command -v gpg &> /dev/null; then
+        echo "Error: gpg is not installed. Unable to import the private key."
+        exit 1
+    fi
+
+    if [[ ! -d $GPG_HOME_DIR ]]; then
+        echo "Creating GPG home directory: $GPG_HOME_DIR..."
+        mkdir -p $GPG_HOME_DIR
+    fi
+
+    echo "Importing GPG private key..."
+    # NOTE: We use `echo -e` to allow for `\n` to be interpreted as newlines
+    #       as we escape the newlines in the GPG_PRIVATE_KEY variable to prevent
+    #       Make from interpreting them as newlines and breaking the build.
+    echo -e "$GPG_PRIVATE_KEY" | gpg --homedir $GPG_HOME_DIR --pinentry-mode loopback --passphrase "$GPG_PRIVATE_KEY_PASSPHRASE" --import
+
+    echo "Setting safe permissions on $GPG_HOME_DIR..."
+    chown -R $USER:$USER $GPG_HOME_DIR
+    chmod 600 $GPG_HOME_DIR/*
+    chmod 700 $GPG_HOME_DIR
+else
+    echo "No GPG private key provided. Skipping GPG setup."
 fi
 
 # Run the provided command as the specified (or default) user
