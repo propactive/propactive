@@ -59,6 +59,10 @@ publish-propactive-plugin-jars: validate-version-number
 	@echo "******** Publishing JARs: propactive-plugin ... ********"
 	@$(call toolchain_runner,./gradlew propactive-plugin:publishPlugins $(GPG_SIGNING_PROPERTIES) --info,-e GPG_PRIVATE_KEY="$(SIGNING_GNUPG_PRIVATE_KEY)" -e GPG_PRIVATE_KEY_PASSPHRASE="$(SIGNING_GNUPG_PASSPHRASE)")
 
+publish-propactive-to-maven-local: validate-version-number
+	@echo "******** Publishing JARs To Maven local ... ********"
+	@$(call toolchain_runner,./gradlew publishToMavenLocal $(GPG_SIGNING_PROPERTIES) --info,-e GPG_PRIVATE_KEY="$(SIGNING_GNUPG_PRIVATE_KEY)" -e GPG_PRIVATE_KEY_PASSPHRASE="$(SIGNING_GNUPG_PASSPHRASE)")
+
 # VARIABLES
 
 APP_NAME=propactive
