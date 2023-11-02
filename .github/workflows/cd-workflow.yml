@@ -12,6 +12,13 @@ env:
   SIGNING_GNUPG_HOME_DIR: ${{ vars.SIGNING_GNUPG_HOME_DIR }}
   SIGNING_GNUPG_KEY_NAME: ${{ secrets.SIGNING_GNUPG_KEY_NAME }}
   SIGNING_GNUPG_PASSPHRASE: ${{ secrets.SIGNING_GNUPG_PASSPHRASE }}
+  # NOTE:
+  #   The `secrets.SIGNING_GNUPG_PRIVATE_KEY` value is stored with newlines replaced with \n
+  #   The newlines escaping is needed due to Makefile newline support limitations. We couldn't
+  #   Escape this within a step and share it as a GITHUB_OUTPUT variable as we encountered
+  #   issues with the escaping being lost when the variable was used in a subsequent step.
+  #   (Perhaps we can try to make this work with GITHUB_OUTPUT in the future instead of
+  #    having to store an escaped version of the private key in the secrets store)
   SIGNING_GNUPG_PRIVATE_KEY: ${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}
   GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
   GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
@@ -22,11 +29,8 @@ jobs:
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v3
-      - name: 'Escape newlines in GPG private key (required for Makefile tooling)'
-        id: escape_newlines
-        run: ./scripts/escape_newlines.sh "${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}" | xargs -I {} echo "escaped_key={}" >> $GITHUB_OUTPUT
       - name: 'Building Project JARs'
-        run: make build-jars SIGNING_GNUPG_PRIVATE_KEY="${{ steps.escape_newlines.outputs.escaped_key }}"
+        run: make build-jars SIGNING_GNUPG_PRIVATE_KEY="${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}"
       - name: 'Uploading propactive-jvm JAR artifacts'
         uses: actions/upload-artifact@v3
         with:
@@ -53,6 +57,6 @@ jobs:
       - name: 'Publishing latest version tag'
         run: make publish-latest-version-tag
       - name: 'Publishing to maven central'
-        run: make publish-propactive-jvm-jars SIGNING_GNUPG_PRIVATE_KEY="${{ needs.Prepare-JARs.outputs.escaped_key }}"
+        run: make publish-propactive-jvm-jars SIGNING_GNUPG_PRIVATE_KEY="${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}"
       - name: 'Publishing to gradle plugin'
-        run: make publish-propactive-plugin-jars SIGNING_GNUPG_PRIVATE_KEY="${{ needs.Prepare-JARs.outputs.escaped_key }}"
+        run: make publish-propactive-plugin-jars SIGNING_GNUPG_PRIVATE_KEY="${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}"
