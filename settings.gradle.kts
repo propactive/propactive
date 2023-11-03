@@ -19,16 +19,16 @@ plugins {
 dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
-            val kotlinVersion = "1.8.10"
-            val dokkaVersion = "1.8.10"
-            val serializationVersion = "1.4.1"
-            val mockkVersion = "1.13.2"
-            val kotestVersion = "5.5.4"
-            val junitVersion = "5.8.2"
-            val ktlintVersion = "11.0.0"
-            val publishVersion = "1.1.0"
+            val kotlinVersion = "1.9.20"
+            val dokkaVersion = "1.9.10" // TODO Upgrade to 1.9.20 when it is released (see https://github.com/Kotlin/dokka/milestone/30 )
+            val serializationVersion = "1.6.0"
+            val mockkVersion = "1.13.8"
+            val kotestVersion = "5.7.2"
+            val junitVersion = "5.10.0"
+            val ktlintVersion = "11.6.1"
+            val publishVersion = "1.2.1"
             val publishNexusVersion = "1.3.0"
-            val equalsVersion = "3.10"
+            val equalsVersion = "3.15.3"
             val log4jKotlinVersion = "1.3.0"
             val log4jVersion = "2.20.0"
 
