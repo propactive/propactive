@@ -38,7 +38,7 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
 
     override fun beforeAll(context: ExtensionContext) {
         val projectDirectory = ProjectDirectory(
-            Files.createTempDirectory("under-test-project-").toFile()
+            Files.createTempDirectory("under-test-project-").toFile(),
         ).apply {
             withResource("settings.gradle.kts")
             withResource("build.gradle.kts")

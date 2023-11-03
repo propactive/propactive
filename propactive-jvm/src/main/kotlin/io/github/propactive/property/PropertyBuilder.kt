@@ -14,7 +14,7 @@ import io.github.propactive.type.Type
 import kotlin.text.RegexOption.MULTILINE
 
 class PropertyBuilder private constructor(
-    private val mandatory: Boolean = false
+    private val mandatory: Boolean = false,
 ) : Builder<PropertyModel> {
     private lateinit var name: String
     private lateinit var environment: String

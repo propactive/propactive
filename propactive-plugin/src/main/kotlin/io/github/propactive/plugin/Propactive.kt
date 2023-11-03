@@ -43,7 +43,7 @@ open class Propactive : Plugin<Project> {
                     .debug(Configuration::implementationClass)
 
                 destination = target
-                    .propertyOrDefault(Configuration::destination.name, destination,)
+                    .propertyOrDefault(Configuration::destination.name, destination)
                     .debug(Configuration::destination)
 
                 filenameOverride = target

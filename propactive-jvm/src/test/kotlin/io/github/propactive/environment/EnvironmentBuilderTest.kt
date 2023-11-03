@@ -27,7 +27,7 @@ class EnvironmentBuilderTest {
     @MethodSource("missingExpectedSettersArgs")
     fun `should throw IllegalStateException when property expected values are not set`(
         environmentBuilder: EnvironmentBuilder,
-        errorMessage: String
+        errorMessage: String,
     ) {
         assertThrows<IllegalStateException> { environmentBuilder.build() }
             .message shouldBe errorMessage
@@ -37,7 +37,7 @@ class EnvironmentBuilderTest {
     @MethodSource("invalidStateOfSettersArgs")
     fun `should throw IllegalArgumentException when property setters has invalid setters`(
         environmentBuilder: EnvironmentBuilder,
-        errorMessage: String
+        errorMessage: String,
     ) {
         assertThrows<IllegalArgumentException> { environmentBuilder.build() }
             .message shouldBe errorMessage
@@ -46,18 +46,18 @@ class EnvironmentBuilderTest {
     private fun missingExpectedSettersArgs() = Stream.of(
         arguments(
             environmentBuilder(),
-            ENVIRONMENT_NAME_IS_NOT_SET()
+            ENVIRONMENT_NAME_IS_NOT_SET(),
         ),
         arguments(
             environmentBuilder()
                 .withName(GIVEN_ENVIRONMENT),
-            ENVIRONMENT_FILENAME_IS_NOT_SET(GIVEN_ENVIRONMENT)()
+            ENVIRONMENT_FILENAME_IS_NOT_SET(GIVEN_ENVIRONMENT)(),
         ),
         arguments(
             environmentBuilder()
                 .withName(GIVEN_ENVIRONMENT)
                 .withFilename(GIVEN_FILENAME),
-            ENVIRONMENT_PROPERTIES_IS_NOT_SET(GIVEN_ENVIRONMENT)()
+            ENVIRONMENT_PROPERTIES_IS_NOT_SET(GIVEN_ENVIRONMENT)(),
         ),
     )
 
@@ -67,7 +67,7 @@ class EnvironmentBuilderTest {
                 .withName(GIVEN_ENVIRONMENT)
                 .withFilename("@@invalid@@")
                 .withProperties(emptyList()),
-            ENVIRONMENT_INVALID_FILENAME(GIVEN_ENVIRONMENT, "@@invalid@@")()
+            ENVIRONMENT_INVALID_FILENAME(GIVEN_ENVIRONMENT, "@@invalid@@")(),
         ),
     )
 }

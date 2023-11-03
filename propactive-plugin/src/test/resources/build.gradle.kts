@@ -2,7 +2,7 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.8.10"
+    val kotlinVersion = "1.9.20"
     val propactiveVersion = "DEV-SNAPSHOT"
 
     id("java-library")
@@ -23,8 +23,8 @@ repositories {
 
 dependencies {
     val propactiveVersion = "DEV-SNAPSHOT"
-    val log4jKotlinVersion = "1.2.0" // TODO: Upgrade to 1.3.0 if my PR is merged
-    val log4jVersion = "2.19.0"
+    val log4jKotlinVersion = "1.3.0"
+    val log4jVersion = "2.20.0"
 
     implementation("io.github.propactive:propactive-jvm:$propactiveVersion")
     implementation("org.apache.logging.log4j:log4j-api-kotlin:$log4jKotlinVersion")
@@ -37,12 +37,12 @@ tasks {
     }
 
     withType<KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = "17"
+        kotlinOptions.jvmTarget = "21"
     }
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }

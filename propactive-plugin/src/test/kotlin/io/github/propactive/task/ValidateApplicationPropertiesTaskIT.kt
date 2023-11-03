@@ -12,13 +12,13 @@ import org.junit.jupiter.api.Test
 import java.io.File
 
 class ValidateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
-    ValidateApplicationPropertiesTask.TASK_NAME
+    ValidateApplicationPropertiesTask.TASK_NAME,
 ) {
     @Test
     @Order(1)
     fun `should succeed validation when a valid ApplicationProperties is given`(
         projectDir: ProjectDirectory,
-        buildOutput: BuildOutput
+        buildOutput: BuildOutput,
     ) {
         GradleRunner
             .create()
@@ -34,7 +34,7 @@ class ValidateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
     @Order(2)
     fun `should use cached output when task is ran and no sourcecode changes occurred`(
         projectDir: ProjectDirectory,
-        buildOutput: BuildOutput
+        buildOutput: BuildOutput,
     ) {
         GradleRunner
             .create()

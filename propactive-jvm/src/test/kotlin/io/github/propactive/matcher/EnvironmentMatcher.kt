@@ -72,7 +72,7 @@ class EnvironmentMatcher private constructor() : Matcher<EnvironmentModel> {
                         // Used to track which properties have passing matchers
                         data class PropertyToPassingMatcherResult(
                             val property: PropertyModel,
-                            val matcher: PropertyMatcher
+                            val matcher: PropertyMatcher,
                         )
 
                         val passedResults = propertyMatchers.mapNotNull { matcher ->

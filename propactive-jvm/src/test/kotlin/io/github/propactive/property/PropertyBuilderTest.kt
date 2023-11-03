@@ -32,7 +32,7 @@ class PropertyBuilderTest {
     @MethodSource("missingExpectedSettersArgs")
     fun `should throw IllegalStateException when property expected values are not set`(
         propertyBuilder: PropertyBuilder,
-        errorMessage: String
+        errorMessage: String,
     ) {
         assertThrows<IllegalStateException> { propertyBuilder.build() }
             .message shouldBe errorMessage
@@ -42,7 +42,7 @@ class PropertyBuilderTest {
     @MethodSource("invalidStateOfSettersArgs")
     fun `should throw IllegalArgumentException when property setters has invalid setters`(
         propertyBuilder: PropertyBuilder,
-        errorMessage: String
+        errorMessage: String,
     ) {
         assertThrows<IllegalArgumentException> { propertyBuilder.build() }
             .message shouldBe errorMessage
@@ -51,15 +51,15 @@ class PropertyBuilderTest {
     private fun missingExpectedSettersArgs() = Stream.of(
         arguments(
             propertyBuilder(),
-            PROPERTY_NAME_IS_NOT_SET()
+            PROPERTY_NAME_IS_NOT_SET(),
         ),
         arguments(
             propertyBuilder().withName(GIVEN_NAME),
-            PROPERTY_ENVIRONMENT_IS_NOT_SET(GIVEN_NAME)()
+            PROPERTY_ENVIRONMENT_IS_NOT_SET(GIVEN_NAME)(),
         ),
         arguments(
             propertyBuilder().withName(GIVEN_NAME).withEnvironment(GIVEN_ENVIRONMENT),
-            PROPERTY_VALUE_IS_NOT_SET(GIVEN_NAME, GIVEN_ENVIRONMENT)()
+            PROPERTY_VALUE_IS_NOT_SET(GIVEN_NAME, GIVEN_ENVIRONMENT)(),
         ),
     )
 
@@ -69,14 +69,14 @@ class PropertyBuilderTest {
                 .withName("@@invalid@@")
                 .withEnvironment(GIVEN_ENVIRONMENT)
                 .withValue(GIVEN_STRING_VALUE),
-            PROPERTY_FIELD_HAS_INVALID_NAME("@@invalid@@", GIVEN_ENVIRONMENT)()
+            PROPERTY_FIELD_HAS_INVALID_NAME("@@invalid@@", GIVEN_ENVIRONMENT)(),
         ),
         arguments(
             propertyBuilder(IS_MANDATORY)
                 .withName(GIVEN_NAME)
                 .withEnvironment(GIVEN_ENVIRONMENT)
                 .withValue(""),
-            PROPERTY_SET_MANDATORY_IS_BLANK(GIVEN_NAME, GIVEN_ENVIRONMENT)()
+            PROPERTY_SET_MANDATORY_IS_BLANK(GIVEN_NAME, GIVEN_ENVIRONMENT)(),
         ),
         arguments(
             propertyBuilder()
@@ -84,7 +84,7 @@ class PropertyBuilderTest {
                 .withEnvironment(GIVEN_ENVIRONMENT)
                 .withType(INTEGER)
                 .withValue("invalid"),
-            PROPERTY_VALUE_HAS_INVALID_TYPE(GIVEN_NAME, GIVEN_ENVIRONMENT, "invalid", INTEGER)()
+            PROPERTY_VALUE_HAS_INVALID_TYPE(GIVEN_NAME, GIVEN_ENVIRONMENT, "invalid", INTEGER)(),
         ),
     )
 }

@@ -5,7 +5,7 @@ import io.github.propactive.property.PropertyModel
 data class EnvironmentModel(
     val name: String,
     val filename: String,
-    val properties: Set<PropertyModel>
+    val properties: Set<PropertyModel>,
 ) {
     override fun hashCode() = name.hashCode()
     override fun equals(other: Any?) = when {
