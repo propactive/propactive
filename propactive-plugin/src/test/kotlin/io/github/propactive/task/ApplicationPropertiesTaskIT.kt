@@ -14,7 +14,7 @@ import java.io.File
 @TestMethodOrder(OrderAnnotation::class)
 @ExtendWith(KotlinEnvironmentExtension::class)
 abstract class ApplicationPropertiesTaskIT(
-    internal val taskUnderTest: String
+    internal val taskUnderTest: String,
 ) {
 
     @BeforeAll

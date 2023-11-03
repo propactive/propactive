@@ -23,6 +23,7 @@ class FileFactoryTest {
                 .withProperties(listOf(GIVEN_PROPERTY_MODEL))
         }
     }
+
     @Test
     fun `should create the correct file model for a given environment model`() {
         GIVEN_ENVIRONMENT_BUILDER()
@@ -47,7 +48,7 @@ class FileFactoryTest {
                 listOf(
                     GIVEN_PROPERTY_MODEL,
                     PropertyModel(anotherPropertyName, GIVEN_ENVIRONMENT_NAME, anotherPropertyValue),
-                )
+                ),
             )
             .build()
             .let(::setOf)

@@ -24,7 +24,7 @@ object FileFactory {
                 environment.filename,
                 environment
                     .properties
-                    .joinToString(separator = "\n") { property -> "${property.name}=${property.value}" }
+                    .joinToString(separator = "\n") { property -> "${property.name}=${property.value}" },
             )
         }
         .trace { "Created file models: $this" }

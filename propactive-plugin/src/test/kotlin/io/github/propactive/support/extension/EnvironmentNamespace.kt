@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import kotlin.random.Random
 
 internal class EnvironmentNamespace(
-    id: String = Random.alphaNumeric("environment-namespace")
+    id: String = Random.alphaNumeric("environment-namespace"),
 ) {
     private val namespace = ExtensionContext.Namespace.create(id)
 

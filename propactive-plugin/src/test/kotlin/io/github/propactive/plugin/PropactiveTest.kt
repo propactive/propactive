@@ -67,7 +67,7 @@ class PropactiveTest {
         @MethodSource("allPluginTasksArg")
         fun `should register GenerateApplicationPropertiesTask`(
             taskName: String,
-            taskReference: Class<out Task>
+            taskReference: Class<out Task>,
         ) {
             verify { target.tasks.register(taskName, taskReference) }
         }

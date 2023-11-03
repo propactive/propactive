@@ -13,13 +13,13 @@ import org.junit.jupiter.api.Test
 import java.io.File
 
 class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
-    GenerateApplicationPropertiesTask.TASK_NAME
+    GenerateApplicationPropertiesTask.TASK_NAME,
 ) {
     @Test
     @Order(1)
     fun `should be able to generate a new property file when on first run`(
         projectDir: ProjectDirectory,
-        buildOutput: BuildOutput
+        buildOutput: BuildOutput,
     ) {
         GradleRunner
             .create()
@@ -37,7 +37,7 @@ class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
     @Order(2)
     fun `should use cached output when task is ran and no sourcecode changes occurred`(
         projectDir: ProjectDirectory,
-        buildOutput: BuildOutput
+        buildOutput: BuildOutput,
     ) {
         GradleRunner
             .create()

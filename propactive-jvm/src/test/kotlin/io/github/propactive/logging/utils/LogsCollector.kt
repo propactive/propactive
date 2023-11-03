@@ -11,7 +11,7 @@ import org.apache.logging.log4j.core.appender.ConsoleAppender
  */
 class LogsCollector(
     private val logger: Logger,
-    private val requiredLevel: Level = Level.INFO
+    private val requiredLevel: Level = Level.INFO,
 ) {
     private val originalLevel = logger.level
     private val originalLayout = findConsoleAppender(logger).layout
@@ -36,11 +36,13 @@ class LogsCollector(
     fun find(predicate: (String) -> Boolean) = logs().find(predicate)
 
     private tailrec fun findConsoleAppender(logger: Logger): Appender {
-        if (logger.appenders.isEmpty() && logger.isAdditive.not())
+        if (logger.appenders.isEmpty() && logger.isAdditive.not()) {
             error("Cannot find a ConsoleAppender for logger ${logger.name}")
-        else return logger
-            .appenders.values
-            .find { it is ConsoleAppender }
-            ?: findConsoleAppender(logger.parent)
+        } else {
+            return logger
+                .appenders.values
+                .find { it is ConsoleAppender }
+                ?: findConsoleAppender(logger.parent)
+        }
     }
 }

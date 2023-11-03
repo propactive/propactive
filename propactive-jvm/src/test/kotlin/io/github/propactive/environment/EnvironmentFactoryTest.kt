@@ -85,6 +85,7 @@ internal class EnvironmentFactoryTest {
                     )
                 }
         }
+
         @Test
         fun `given WithDifferentEnvironmentValuesAndMultipleProperties, when factory creates a DAO, then it should do the correct value associations`() {
             EnvironmentFactory
