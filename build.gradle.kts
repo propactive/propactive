@@ -1,4 +1,4 @@
-import org.gradle.api.JavaVersion.VERSION_17
+import org.gradle.api.JavaVersion.VERSION_21
 import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Duration
@@ -88,7 +88,7 @@ subprojects {
     java {
         // https://blog.gradle.org/java-toolchains
         toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
+            languageVersion.set(JavaLanguageVersion.of(21))
             // NOTE:
             //  Always ensure this matches the dockerised JDK version
             //  To see Gradle JVM Vendor to Foojay JVM Distribution, visit:
@@ -104,7 +104,7 @@ tasks {
     }
 
     withType<KotlinCompile>().configureEach {
-        kotlinOptions.jvmTarget = VERSION_17.toString()
+        kotlinOptions.jvmTarget = VERSION_21.toString()
     }
 }
 
