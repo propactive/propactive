@@ -30,7 +30,7 @@ dependencyResolutionManagement {
             val publishNexusVersion = "1.3.0"
             val equalsVersion = "3.15.3"
             val log4jKotlinVersion = "1.3.0"
-            val log4jVersion = "2.20.0"
+            val log4jVersion = "2.21.1"
 
             library("kotlin-reflect", "org.jetbrains.kotlin", "kotlin-reflect").version(kotlinVersion)
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").version(kotlinVersion)
