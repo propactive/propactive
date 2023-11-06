@@ -3,19 +3,9 @@
     "labels": [ "dependencies" ],
     "schedule": [ "after 5pm on saturday and sunday" ],
     "dependencyDashboard": true,
-    "gradle": {
-        "enabled": true,
-        "path": "settings.gradle.kts"
-    },
-    "gradle-wrapper": {
-        "enabled": true,
-        "path": "gradle/wrapper/gradle-wrapper.properties"
-    },
-    "dockerfile": {
-        "enabled": true,
-        "pinDigests": true,
-        "path": "Dockerfile"
-    },
+    "gradle": { "enabled": true },
+    "gradle-wrapper": { "enabled": true },
+    "dockerfile": { "enabled": true, "pinDigests": true },
     "packageRules": [
         {
             "matchUpdateTypes": ["major"],

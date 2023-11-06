@@ -4,13 +4,29 @@ on: [
   workflow_dispatch
 ]
 
+# See: https://docs.renovatebot.com/self-hosted-configuration
+env:
+  RENOVATE_TOKEN: ${{ secrets.PROPACTIVE_BOT_ACCESS_TOKEN }}
+  RENOVATE_ONBOARDING_CONFIG_FILE_NAME: renovate.json
+  RENOVATE_REPOSITORIES: "propactive/propactive"
+  RENOVATE_PLATFORM: "github"
+
 jobs:
   manual-renovate:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout to current branch'
         uses: actions/checkout@v4
-      - name: 'Setup Node.js'
+        with:
+          ref: main
+          # Use a scope-restricted (bot) account to bypass branch protection limitations
+          # see: https://github.com/community/community/discussions/13836
+          token: ${{ secrets.PROPACTIVE_BOT_ACCESS_TOKEN }}
+      - name: 'Set Git environment to allow Renovate to commit changes as a bot'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: 'Setup Node.js environment (needed for Renovate executables)'
         uses: actions/setup-node@v4
         with:
           node-version: 20
