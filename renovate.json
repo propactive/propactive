@@ -1,0 +1,60 @@
+{
+    "extends": ["config:recommended", ":semanticCommits"],
+    "labels": [ "dependencies" ],
+    "schedule": [ "after 5pm on saturday and sunday" ],
+    "dependencyDashboard": true,
+    "gradle": {
+        "enabled": true,
+        "path": "settings.gradle.kts"
+    },
+    "gradle-wrapper": {
+        "enabled": true,
+        "path": "gradle/wrapper/gradle-wrapper.properties"
+    },
+    "dockerfile": {
+        "enabled": true,
+        "pinDigests": true,
+        "path": "Dockerfile"
+    },
+    "packageRules": [
+        {
+            "matchUpdateTypes": ["major"],
+            "dependencyDashboardApproval": true
+        },
+        {
+            "matchPackagePatterns": ["^org.jetbrains.kotlin"],
+            "automerge": true,
+            "automergeType": "branch",
+            "matchUpdateTypes": ["minor", "patch"],
+            "groupName": "Kotlin dependencies"
+        },
+        {
+            "matchPackagePatterns": ["^log4j"],
+            "automerge": true,
+            "automergeType": "branch",
+            "matchUpdateTypes": ["minor", "patch"],
+            "groupName": "Log4j dependencies"
+        },
+        {
+            "matchPackagePatterns": ["^kotest"],
+            "automerge": true,
+            "automergeType": "branch",
+            "matchUpdateTypes": ["minor", "patch"],
+            "groupName": "Kotest dependencies"
+        },
+        {
+            "matchPackagePatterns": ["^junit"],
+            "automerge": true,
+            "automergeType": "branch",
+            "matchUpdateTypes": ["minor", "patch"],
+            "groupName": "Junit dependencies"
+        },
+        {
+            "matchPackagePatterns": ["^gradle-publish"],
+            "automerge": true,
+            "automergeType": "branch",
+            "matchUpdateTypes": ["minor", "patch"],
+            "groupName": "Gradle publish dependencies"
+        }
+    ]
+}

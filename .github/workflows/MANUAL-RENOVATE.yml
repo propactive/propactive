@@ -1,0 +1,20 @@
+name: MANUAL-RENOVATE
+
+on: [
+  workflow_dispatch
+]
+
+jobs:
+  manual-renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout to current branch'
+        uses: actions/checkout@v4
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 'Install Renovate globally'
+        run: npm install -g renovate
+      - name: 'Run Renovate on current branch'
+        run: renovate

@@ -32,17 +32,16 @@ dependencyResolutionManagement {
             val log4jKotlinVersion = "1.3.0"
             val log4jVersion = "2.20.0"
 
-            library("kotlin-reflect", "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-            library("kotlin-stdlib", "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion")
-            library("kotlinx-serialization-json", "org.jetbrains.kotlinx:kotlinx-serialization-json:$serializationVersion")
-            library("mockk", "io.mockk:mockk:$mockkVersion")
-            library("kotest-runner-junit5", "io.kotest:kotest-runner-junit5:$kotestVersion")
-            library("kotest-assertions-core", "io.kotest:kotest-assertions-core:$kotestVersion")
-            library("junit-jupiter", "org.junit.jupiter:junit-jupiter:$junitVersion")
-            library("equalsverifier", "nl.jqno.equalsverifier:equalsverifier:$equalsVersion")
-
-            library("log4j-api-kotlin", "org.apache.logging.log4j:log4j-api-kotlin:$log4jKotlinVersion")
-            library("log4j-core", "org.apache.logging.log4j:log4j-core:$log4jVersion")
+            library("kotlin-reflect", "org.jetbrains.kotlin", "kotlin-reflect").version(kotlinVersion)
+            library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").version(kotlinVersion)
+            library("kotlinx-serialization-json", "org.jetbrains.kotlinx", "kotlinx-serialization-json").version(serializationVersion)
+            library("mockk", "io.mockk", "mockk").version(mockkVersion)
+            library("kotest-runner-junit5", "io.kotest", "kotest-runner-junit5").version(kotestVersion)
+            library("kotest-assertions-core", "io.kotest", "kotest-assertions-core").version(kotestVersion)
+            library("junit-jupiter", "org.junit.jupiter", "junit-jupiter").version(junitVersion)
+            library("equalsverifier", "nl.jqno.equalsverifier", "equalsverifier").version(equalsVersion)
+            library("log4j-api-kotlin", "org.apache.logging.log4j", "log4j-api-kotlin").version(log4jKotlinVersion)
+            library("log4j-core", "org.apache.logging.log4j", "log4j-core").version(log4jVersion)
 
             plugin("jetbrains-kotlin-jvm", "org.jetbrains.kotlin.jvm").version(kotlinVersion)
             plugin("jetbrains-dokka", "org.jetbrains.dokka").version(dokkaVersion)
