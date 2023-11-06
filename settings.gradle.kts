@@ -24,7 +24,7 @@ dependencyResolutionManagement {
             val serializationVersion = "1.6.0"
             val mockkVersion = "1.13.8"
             val kotestVersion = "5.7.2"
-            val junitVersion = "5.10.0"
+            val junitVersion = "5.10.1"
             val ktlintVersion = "11.6.1"
             val publishVersion = "1.2.1"
             val publishNexusVersion = "1.3.0"
