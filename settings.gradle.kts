@@ -23,7 +23,7 @@ dependencyResolutionManagement {
             val dokkaVersion = "1.9.10" // TODO Upgrade to 1.9.20 when it is released (see https://github.com/Kotlin/dokka/milestone/30 )
             val serializationVersion = "1.6.0"
             val mockkVersion = "1.13.8"
-            val kotestVersion = "5.7.2"
+            val kotestVersion = "5.8.0"
             val junitVersion = "5.10.0"
             val ktlintVersion = "11.6.1"
             val publishVersion = "1.2.1"
