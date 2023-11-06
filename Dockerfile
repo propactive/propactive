@@ -6,7 +6,7 @@
 #     instead of the more common glibc used by most other Linux distributions. Many pre-built
 #     binaries, including many JDK distributions, expect glibc, so running Alpine risks us
 #     encounting unexpected errors and wasting time debugging them for no functional benefit.
-FROM gradle:8.4.0-jdk21-jammy
+FROM gradle:8.4.0-jdk21-jammy@sha256:97f1ca124aa6853e9b17d543d7ef75c8aecf64719606ade5862344a630fb927b
 
 # Image Metadata
 LABEL app="runner" \
