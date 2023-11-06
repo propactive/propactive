@@ -24,13 +24,13 @@ dependencyResolutionManagement {
             val serializationVersion = "1.6.0"
             val mockkVersion = "1.13.8"
             val kotestVersion = "5.8.0"
-            val junitVersion = "5.10.0"
+            val junitVersion = "5.10.1"
             val ktlintVersion = "11.6.1"
             val publishVersion = "1.2.1"
             val publishNexusVersion = "1.3.0"
             val equalsVersion = "3.15.3"
             val log4jKotlinVersion = "1.3.0"
-            val log4jVersion = "2.20.0"
+            val log4jVersion = "2.21.1"
 
             library("kotlin-reflect", "org.jetbrains.kotlin", "kotlin-reflect").version(kotlinVersion)
             library("kotlin-stdlib", "org.jetbrains.kotlin", "kotlin-stdlib").version(kotlinVersion)
