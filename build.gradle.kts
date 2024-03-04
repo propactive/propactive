@@ -3,7 +3,6 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Duration
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `java-library`
     jacoco
