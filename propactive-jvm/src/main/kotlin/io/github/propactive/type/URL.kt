@@ -9,10 +9,10 @@ import io.github.propactive.type.Type.Companion.VALID
  * NOTE:
  *  If you want to use "localhost" or other unsupported protocols,
  *  please use the URI type which is more lenient:
- *  @see propactive.type.URI
+ *  @see io.github.propactive.type.URI
  */
 object URL : Type {
     override fun validate(value: Any) = value
-        .runCatching { java.net.URL(toString()); VALID }
+        .runCatching { java.net.URI(toString()).toURL(); VALID }
         .getOrDefault(INVALID)
 }

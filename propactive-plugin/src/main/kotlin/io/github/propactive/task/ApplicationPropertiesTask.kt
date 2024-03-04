@@ -12,7 +12,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
-import java.net.URL
+import java.net.URI
 import java.net.URLClassLoader
 import kotlin.reflect.KClass
 
@@ -49,7 +49,7 @@ abstract class ApplicationPropertiesTask : DefaultTask() {
         internal fun FileCollection.find(clazz: String): KClass<out Any> = this
             .firstNotNullOfOrNull {
                 URLClassLoader
-                    .newInstance(arrayOf(URL("jar:file:${it.path}!/")), EnvironmentFactory::class.java.classLoader)
+                    .newInstance(arrayOf(URI("jar:file:${it.path}!/").toURL()), EnvironmentFactory::class.java.classLoader)
                     .runCatching { loadClass(clazz).kotlin }
                     .getOrNull()
             } ?: error("Expected to find class: $clazz")
