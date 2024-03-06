@@ -50,17 +50,6 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
         BuildOutput::class.java to this::retrieveBuildOutput,
     )
 
-    override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext) =
-        parameterTypeToRetriever
-            .map { it.key }
-            .any { parameterContext.parameter.type.isAssignableFrom(it) }
-
-    override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext) =
-        (
-            parameterTypeToRetriever[parameterContext.parameter.type]
-                ?: error("Unsupported parameter context '$parameterContext'")
-            )(extensionContext)
-
     override fun beforeAll(context: ExtensionContext) {
         val projectDirectory = ProjectDirectory(
             Files.createTempDirectory("under-test-project-").toFile(),
@@ -87,6 +76,16 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
             remove<BuildOutput>(context, Component.BuildOutput)
         }
     }
+
+    override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext) =
+        parameterTypeToRetriever
+            .map { it.key }
+            .any(parameterContext.parameter.type::isAssignableFrom)
+
+    override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext) =
+        checkNotNull(parameterTypeToRetriever[parameterContext.parameter.type]) {
+            "Unsupported parameter type: ${parameterContext.parameter.type}"
+        }(extensionContext)
 
     private fun retrieveProjectDirectory(context: ExtensionContext) = environmentNamespace
         .get<ProjectDirectory>(context, Component.ProjectDirectory)
