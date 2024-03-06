@@ -22,6 +22,7 @@ class ValidateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
     ) {
         GradleRunner
             .create()
+            .forwardOutput()
             .withProjectDir(projectDir)
             .withArguments(taskUnderTest)
             .withPluginClasspath()
@@ -38,6 +39,7 @@ class ValidateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
     ) {
         GradleRunner
             .create()
+            .forwardOutput()
             .withProjectDir(projectDir)
             .withArguments(taskUnderTest)
             .withPluginClasspath()
@@ -63,6 +65,7 @@ class ValidateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
 
         GradleRunner
             .create()
+            .forwardOutput()
             .withProjectDir(projectDir)
             .withArguments(taskUnderTest)
             .withPluginClasspath()

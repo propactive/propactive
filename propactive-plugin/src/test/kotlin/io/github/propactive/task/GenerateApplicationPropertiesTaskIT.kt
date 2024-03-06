@@ -23,6 +23,7 @@ class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
     ) {
         GradleRunner
             .create()
+            .forwardOutput()
             .withProjectDir(projectDir)
             .withArguments(taskUnderTest)
             .withPluginClasspath()
@@ -41,6 +42,7 @@ class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
     ) {
         GradleRunner
             .create()
+            .forwardOutput()
             .withProjectDir(projectDir)
             .withArguments(taskUnderTest)
             .withPluginClasspath()
@@ -68,6 +70,7 @@ class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
 
         GradleRunner
             .create()
+            .forwardOutput()
             .withProjectDir(projectDir)
             .withArguments(taskUnderTest)
             .withPluginClasspath()
@@ -93,6 +96,7 @@ class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
 
         GradleRunner
             .create()
+            .forwardOutput()
             .withProjectDir(projectDir)
             .withArguments(taskUnderTest)
             .withPluginClasspath()

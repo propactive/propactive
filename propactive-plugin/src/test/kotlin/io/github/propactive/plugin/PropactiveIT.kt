@@ -28,9 +28,9 @@ class PropactiveIT {
         shouldNotThrow<UnexpectedBuildFailure> {
             GradleRunner
                 .create()
+                .forwardOutput()
                 .withProjectDir(projectDir)
                 .withPluginClasspath()
-                .forwardOutput()
                 .build()
         }
     }
@@ -42,6 +42,7 @@ class PropactiveIT {
 
         GradleRunner
             .create()
+            .forwardOutput()
             .withProjectDir(projectDir)
             .withArguments(tasksTask)
             .withPluginClasspath()
