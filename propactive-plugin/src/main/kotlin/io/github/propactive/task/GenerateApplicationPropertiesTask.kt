@@ -6,6 +6,7 @@ import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
+import io.github.propactive.plugin.Propactive.Companion.LOGGER
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
 import org.gradle.api.tasks.TaskAction
 
@@ -42,18 +43,18 @@ open class GenerateApplicationPropertiesTask : ApplicationPropertiesTask() {
 
     @TaskAction
     fun run() = compiledClasses
-        .apply { logger.info("Generating application properties for environments: {}", environments) }
-        .apply { logger.debug("Task received the following compiledClasses: {}", compiledClasses.toList()) }
+        .apply { LOGGER.info("Generating application properties for environments: {}", environments) }
+        .apply { LOGGER.debug("Task received the following compiledClasses: {}", compiledClasses.toList()) }
         .find(implementationClass)
-        .apply { logger.debug("Found implementation class: {}", this) }
+        .apply { LOGGER.debug("Found implementation class: {}", this) }
         .run(EnvironmentFactory::create)
-        .apply { logger.debug("Created environment models: {}", this) }
+        .apply { LOGGER.debug("Created environment models: {}", this) }
         .run(FileFactory::create)
-        .apply { logger.debug("Created files models: {}", this) }
+        .apply { LOGGER.debug("Created files models: {}", this) }
         .filter { environments.contains(it.environment) || environments.contains(DEFAULT_ENVIRONMENTS) }
-        .apply { logger.debug("Filtered files models: {}", this) }
+        .apply { LOGGER.debug("Filtered files models: {}", this) }
         .forEach { it.write(destination, filenameOverride) }
-        .apply { logger.info("Done - wrote application properties to: {}", destination) }
+        .apply { LOGGER.info("Done - wrote application properties to: {}", destination) }
 
     init {
         group = PROPACTIVE_GROUP
