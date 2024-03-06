@@ -4,6 +4,11 @@ import io.github.propactive.support.utils.alphaNumeric
 import org.junit.jupiter.api.extension.ExtensionContext
 import kotlin.random.Random
 
+/**
+ * A namespace for storing and retrieving values from an [ExtensionContext] for
+ * a [io.github.propactive.support.extension.project.ProjectDirectory] and its
+ * components.
+ */
 internal class EnvironmentNamespace(
     id: String = Random.alphaNumeric("environment-namespace"),
 ) {

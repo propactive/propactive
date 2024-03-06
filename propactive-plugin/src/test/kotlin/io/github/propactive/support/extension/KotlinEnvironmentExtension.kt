@@ -14,6 +14,31 @@ import org.junit.jupiter.api.extension.ParameterResolver
 import java.io.File
 import java.nio.file.Files
 
+/**
+ * A JUnit extension that provides a simulation of a Kotlin project environment.
+ *
+ * This extension is responsible for creating a temporary directory that simulates a Kotlin project.
+ * It also provides access to the project's build script, main source set, main resources set, and
+ * build output so tests can interact with them accordingly.
+ *
+ * It creates the following structure:
+ *
+ * ```
+ * project-directory/
+ * ├── build.gradle.kts
+ * ├── settings.gradle.kts
+ * ├── src/
+ * │   └── main/
+ * │       ├── kotlin/
+ * │       │   └── ApplicationProperties.kt
+ * │       └── resources/
+ * │           └── log4j2.xml
+ * └── build/
+ *    └── [build output]
+ * ```
+ *
+ * @see ProjectDirectory for more information about the project directory structure.
+ */
 class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAllCallback {
     private val environmentNamespace = EnvironmentNamespace()
 
@@ -78,6 +103,12 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
     private fun retrieveBuildOutput(context: ExtensionContext) = environmentNamespace
         .get<BuildOutput>(context, Component.BuildOutput)
 
+    /**
+     * Loads a resource file and writes its content to a file in the given extension's path.
+     *
+     * @param name the name of the resource file
+     * @param path the path to write the file to (defaults to the receiver's path)
+     */
     private fun File.withResource(
         name: String,
         path: String? = null,
