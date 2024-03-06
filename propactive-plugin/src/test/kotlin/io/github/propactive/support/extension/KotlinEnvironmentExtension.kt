@@ -6,12 +6,12 @@ import io.github.propactive.support.extension.project.BuildScript
 import io.github.propactive.support.extension.project.MainResourcesSet
 import io.github.propactive.support.extension.project.MainSourceSet
 import io.github.propactive.support.extension.project.ProjectDirectory
+import io.github.propactive.support.utils.addFileToDirFromTestResources
 import org.junit.jupiter.api.extension.AfterAllCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
-import java.io.File
 import java.nio.file.Files
 
 /**
@@ -51,13 +51,30 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
     )
 
     override fun beforeAll(context: ExtensionContext) {
+        val parent = Files.createTempDirectory("under-test-project-").toFile()
+
+        val buildScript = with("build.gradle.kts") {
+            BuildScript(parent.addFileToDirFromTestResources(this), this)
+        }
+
+        val mainSourceSet = MainSourceSet(parent.resolve("src/main/"), "kotlin").apply {
+            check(mkdirs()) { "Failed to create main source set directory: $this" }
+            addFileToDirFromTestResources("ApplicationProperties.kt")
+        }
+
+        val mainResourcesSet = MainResourcesSet(parent.resolve("src/main/"), "resources").apply {
+            check(mkdirs()) { "Failed to create main resources set directory: $this" }
+            addFileToDirFromTestResources("log4j2.xml")
+        }
+
         val projectDirectory = ProjectDirectory(
-            Files.createTempDirectory("under-test-project-").toFile(),
+            parent,
+            buildScript,
+            mainSourceSet,
+            mainResourcesSet,
+            BuildOutput(parent, "build"),
         ).apply {
-            withResource("settings.gradle.kts")
-            withResource("build.gradle.kts")
-            withResource("ApplicationProperties.kt", mainSourceSet.path)
-            withResource("log4j2.xml", mainResourcesSet.path)
+            addFileToDirFromTestResources("settings.gradle.kts")
         }
 
         environmentNamespace.put(context, Component.ProjectDirectory, projectDirectory)
@@ -101,26 +118,4 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
 
     private fun retrieveBuildOutput(context: ExtensionContext) = environmentNamespace
         .get<BuildOutput>(context, Component.BuildOutput)
-
-    /**
-     * Loads a resource file and writes its content to a file in the given extension's path.
-     *
-     * @param name the name of the resource file
-     * @param path the path to write the file to (defaults to the receiver's path)
-     */
-    private fun File.withResource(
-        name: String,
-        path: String? = null,
-    ) = this.apply {
-        KotlinEnvironmentExtension::class.java
-            .classLoader
-            .getResource(name)
-            .let { requireNotNull(it) { "Resource not found: $name" } }
-            .readBytes()
-            .also { content ->
-                File(path ?: this.path, name)
-                    .apply { parentFile.mkdirs() }
-                    .writeBytes(content)
-            }
-    }
 }
