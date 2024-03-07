@@ -1,6 +1,7 @@
 package io.github.propactive.support.extension
 
 import io.github.propactive.support.extension.EnvironmentNamespace.Component
+import io.github.propactive.support.extension.gradle.TaskExecutor
 import io.github.propactive.support.extension.project.BuildOutput
 import io.github.propactive.support.extension.project.BuildScript
 import io.github.propactive.support.extension.project.MainResourcesSet
@@ -37,12 +38,17 @@ import java.nio.file.Files
  *    └── [build output]
  * ```
  *
+ * On top of that, it also provides a [TaskExecutor] that can be used to execute Gradle tasks
+ * on the simulated project and output relevant logs to the console. This is useful for testing
+ * [io.github.propactive.plugin.Propactive] tasks that interact with the project's environment.
+ *
  * @see ProjectDirectory for more information about the project directory structure.
  */
 class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAllCallback {
     private val environmentNamespace = EnvironmentNamespace()
 
     private val parameterTypeToRetriever = mapOf(
+        TaskExecutor::class.java to this::retrieveTaskExecutor,
         ProjectDirectory::class.java to this::retrieveProjectDirectory,
         BuildScript::class.java to this::retrieveBuildScript,
         MainSourceSet::class.java to this::retrieveMainSourceSet,
@@ -77,6 +83,7 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
             addFileToDirFromTestResources("settings.gradle.kts")
         }
 
+        environmentNamespace.put(context, Component.TaskExecutor, TaskExecutor(projectDirectory))
         environmentNamespace.put(context, Component.ProjectDirectory, projectDirectory)
         environmentNamespace.put(context, Component.BuildScript, projectDirectory.buildScript)
         environmentNamespace.put(context, Component.MainSourceSet, projectDirectory.mainSourceSet)
@@ -86,6 +93,7 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
 
     override fun afterAll(context: ExtensionContext) {
         environmentNamespace.apply {
+            remove<TaskExecutor>(context, Component.TaskExecutor)
             remove<ProjectDirectory>(context, Component.ProjectDirectory)?.deleteRecursively()
             remove<BuildScript>(context, Component.BuildScript)
             remove<MainSourceSet>(context, Component.MainSourceSet)
@@ -103,6 +111,9 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
         checkNotNull(parameterTypeToRetriever[parameterContext.parameter.type]) {
             "Unsupported parameter type: ${parameterContext.parameter.type}"
         }(extensionContext)
+
+    private fun retrieveTaskExecutor(context: ExtensionContext) = environmentNamespace
+        .get<TaskExecutor>(context, Component.TaskExecutor)
 
     private fun retrieveProjectDirectory(context: ExtensionContext) = environmentNamespace
         .get<ProjectDirectory>(context, Component.ProjectDirectory)

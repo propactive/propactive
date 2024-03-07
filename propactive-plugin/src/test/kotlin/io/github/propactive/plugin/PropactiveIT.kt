@@ -1,14 +1,13 @@
 package io.github.propactive.plugin
 
 import io.github.propactive.support.extension.KotlinEnvironmentExtension
-import io.github.propactive.support.extension.project.ProjectDirectory
+import io.github.propactive.support.extension.gradle.TaskExecutor
+import io.github.propactive.support.extension.gradle.TaskExecutor.Outcome
 import io.github.propactive.task.GenerateApplicationPropertiesTask
 import io.github.propactive.task.ValidateApplicationPropertiesTask
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
 import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
@@ -24,39 +23,28 @@ import org.junit.jupiter.api.extension.ExtendWith
 class PropactiveIT {
     @Test
     @Order(1)
-    fun `should be able to run the project with given configurations`(projectDir: ProjectDirectory) {
+    fun `should be able to run the project with given configurations`(
+        taskExecutor: TaskExecutor,
+    ) {
         shouldNotThrow<UnexpectedBuildFailure> {
-            GradleRunner
-                .create()
-                .forwardOutput()
-                .withProjectDir(projectDir)
-                .withPluginClasspath()
-                .build()
+            taskExecutor
+                .execute("tasks")
         }
     }
 
     @Test
     @Order(2)
-    fun `should display Propactive's tasks description`(projectDir: ProjectDirectory) {
-        val tasksTask = "tasks"
-
-        GradleRunner
-            .create()
-            .forwardOutput()
-            .withProjectDir(projectDir)
-            .withArguments(tasksTask)
-            .withPluginClasspath()
-            .build()
+    fun `should display Propactive's tasks description`(
+        taskExecutor: TaskExecutor,
+    ) {
+        taskExecutor
+            .execute("tasks")
             .apply {
-                output shouldContain """
-                        Propactive tasks
-                        ----------------
-                        ${GenerateApplicationPropertiesTask.TASK_NAME} - .*?
+                output shouldContain "Propactive tasks"
+                output shouldContain "${GenerateApplicationPropertiesTask.TASK_NAME} - .*?".toRegex(RegexOption.DOT_MATCHES_ALL)
+                output shouldContain "${ValidateApplicationPropertiesTask.TASK_NAME} - .*?".toRegex(RegexOption.DOT_MATCHES_ALL)
 
-                        ${ValidateApplicationPropertiesTask.TASK_NAME} - .*?
-                """.trimIndent().toRegex(RegexOption.DOT_MATCHES_ALL)
-
-                task(":$tasksTask")?.outcome shouldBe TaskOutcome.SUCCESS
+                outcome shouldBe Outcome.SUCCESS
             }
     }
 }
