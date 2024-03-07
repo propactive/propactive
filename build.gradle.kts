@@ -3,7 +3,6 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.time.Duration
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     `java-library`
     jacoco
@@ -44,6 +43,15 @@ subprojects {
             useJUnitPlatform()
             testLogging { showStandardStreams = true }
             finalizedBy(jacocoTestReport)
+            /**
+             * The JDK team's plan (post JDK-21) is to disable dynamic agent loading by default,
+             * However, byte-buddy-agent is a dependency of mockk, and it is not a serviceability tool.
+             * So, we need to enable dynamic agent loading to hide the warning and make it work in future JDK versions.
+             *
+             * @see [JDK 21 - Dynamic Loading of Agent (byte-buddy-agent-1.14.4.jar) #3037](https://github.com/mockito/mockito/issues/3037)
+             * @see [JEP 451: Prepare to Disallow the Dynamic Loading of Agents](https://openjdk.org/jeps/451)
+             */
+            jvmArgs("-XX:+EnableDynamicAgentLoading")
         }
 
         jacocoTestReport {

@@ -17,7 +17,7 @@ import io.github.propactive.type.Type.Companion.VALID
  *
  * NOTE:
  *  For well-formed HTTP and HTTPs URIs, please use the stricter type, URL.
- *  @see propactive.type.URL
+ *  @see io.github.propactive.type.URL
  */
 object URI : Type {
     override fun validate(value: Any) = value

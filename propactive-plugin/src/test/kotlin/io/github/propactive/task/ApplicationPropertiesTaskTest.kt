@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import java.io.File
-import java.net.URL
+import java.net.URI
 import java.net.URLClassLoader
 import kotlin.random.Random
 import kotlin.reflect.KClass
@@ -94,7 +94,7 @@ class ApplicationPropertiesTaskTest {
 
             every {
                 URLClassLoader.newInstance(
-                    arrayOf(URL("jar:file:${file.path}!/")),
+                    arrayOf(URI("jar:file:${file.path}!/").toURL()),
                     EnvironmentFactory::class.java.classLoader,
                 )
             } returns urlClassLoader

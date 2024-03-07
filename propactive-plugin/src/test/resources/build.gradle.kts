@@ -2,10 +2,10 @@ import org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.9.20"
+    val kotlinVersion = "1.9.22"
     val propactiveVersion = "DEV-SNAPSHOT"
 
-    id("java-library")
+    java
     id("io.github.propactive") version propactiveVersion
     kotlin("jvm") version kotlinVersion
 }
