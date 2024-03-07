@@ -18,7 +18,7 @@ ij_visual_guides = none
 ij_wrap_on_typing = false
 
 [{*.kt,*.kts}]
-disabled_rules = import-ordering
+ktlint_disabled_rules = import-ordering
 ij_kotlin_align_in_columns_case_branch = false
 ij_kotlin_align_multiline_binary_operation = false
 ij_kotlin_align_multiline_extends_list = false

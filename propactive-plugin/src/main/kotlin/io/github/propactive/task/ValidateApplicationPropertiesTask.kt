@@ -4,6 +4,7 @@ import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.plugin.Configuration
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
+import io.github.propactive.plugin.Propactive.Companion.LOGGER
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
 import org.gradle.api.tasks.TaskAction
 
@@ -32,12 +33,12 @@ open class ValidateApplicationPropertiesTask : ApplicationPropertiesTask() {
 
     @TaskAction
     fun run() = compiledClasses
-        .apply { logger.info("Validating application properties") }
+        .apply { LOGGER.info("Validating application properties") }
         .find(implementationClass)
-        .apply { logger.debug("Found implementation class: {}", this) }
+        .apply { LOGGER.debug("Found implementation class: {}", this) }
         .run(EnvironmentFactory::create)
-        .apply { logger.debug("Validated the following environment models: {}", this) }
-        .apply { logger.info("Done - validated application properties") }
+        .apply { LOGGER.debug("Validated the following environment models: {}", this) }
+        .apply { LOGGER.info("Done - validated application properties") }
 
     init {
         group = PROPACTIVE_GROUP

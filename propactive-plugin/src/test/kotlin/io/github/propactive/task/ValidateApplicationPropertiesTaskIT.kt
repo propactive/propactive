@@ -1,12 +1,10 @@
 package io.github.propactive.task
 
-import io.github.propactive.support.extension.project.BuildOutput
+import io.github.propactive.support.extension.gradle.TaskExecutor
+import io.github.propactive.support.extension.gradle.TaskExecutor.Outcome
 import io.github.propactive.support.extension.project.MainSourceSet
-import io.github.propactive.support.extension.project.ProjectDirectory
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import org.gradle.testkit.runner.GradleRunner
-import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -17,41 +15,28 @@ class ValidateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
     @Test
     @Order(1)
     fun `should succeed validation when a valid ApplicationProperties is given`(
-        projectDir: ProjectDirectory,
-        buildOutput: BuildOutput,
+        taskExecutor: TaskExecutor,
     ) {
-        GradleRunner
-            .create()
-            .withProjectDir(projectDir)
-            .withArguments(taskUnderTest)
-            .withPluginClasspath()
-            .build()
-            .task(":$taskUnderTest")
-            ?.outcome shouldBe TaskOutcome.SUCCESS
+        taskExecutor
+            .execute(taskUnderTest)
+            .outcome shouldBe Outcome.SUCCESS
     }
 
     @Test
     @Order(2)
     fun `should use cached output when task is ran and no sourcecode changes occurred`(
-        projectDir: ProjectDirectory,
-        buildOutput: BuildOutput,
+        taskExecutor: TaskExecutor,
     ) {
-        GradleRunner
-            .create()
-            .withProjectDir(projectDir)
-            .withArguments(taskUnderTest)
-            .withPluginClasspath()
-            .build()
-            .task(":$taskUnderTest")
-            ?.outcome shouldBe TaskOutcome.UP_TO_DATE
+        taskExecutor
+            .execute(taskUnderTest)
+            .outcome shouldBe Outcome.UP_TO_DATE
     }
 
     @Test
     @Order(3)
     fun `should fail validation when an invalid ApplicationProperties is given`(
-        projectDir: ProjectDirectory,
+        taskExecutor: TaskExecutor,
         mainSourceSet: MainSourceSet,
-        buildOutput: BuildOutput,
     ) {
         val applicationPropertiesFile = File(mainSourceSet, "ApplicationProperties.kt")
 
@@ -61,14 +46,11 @@ class ValidateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
             .replace("@Property([\"42\"], type = INTEGER::class)", "@Property([\"NOT_AN_INT\"], type = INTEGER::class)")
             .also(applicationPropertiesFile::writeText)
 
-        GradleRunner
-            .create()
-            .withProjectDir(projectDir)
-            .withArguments(taskUnderTest)
-            .withPluginClasspath()
-            .buildAndFail()
+        taskExecutor
+            .expectFailure()
+            .execute(taskUnderTest)
             .apply {
-                task(":$taskUnderTest")?.outcome shouldBe TaskOutcome.FAILED
+                outcome shouldBe Outcome.FAILED
                 output shouldContain "Property named: propactive.dev.int.property.key was expected to be of type: INTEGER, but value was: NOT_AN_INT"
             }
     }

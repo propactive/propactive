@@ -3,7 +3,7 @@ package io.github.propactive.logging
 import org.apache.logging.log4j.kotlin.logger
 
 internal object PropactiveLogger {
-    internal const val NAME = "Propactive"
+    internal const val NAME = "io.github.propactive"
     private val DELEGATE = logger(NAME)
 
     @JvmStatic
