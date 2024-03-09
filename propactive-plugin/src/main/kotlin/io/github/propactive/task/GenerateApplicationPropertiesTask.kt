@@ -45,7 +45,7 @@ open class GenerateApplicationPropertiesTask : ApplicationPropertiesTask() {
     fun run() = compiledClasses
         .apply { LOGGER.info("Generating application properties for environments: {}", environments) }
         .apply { LOGGER.debug("Task received the following compiledClasses: {}", compiledClasses.toList()) }
-        .find(implementationClass)
+        .load(implementationClass)
         .apply { LOGGER.debug("Found implementation class: {}", this) }
         .run(EnvironmentFactory::create)
         .apply { LOGGER.debug("Created environment models: {}", this) }

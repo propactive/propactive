@@ -2,10 +2,10 @@ package io.github.propactive.support.extension.gradle
 
 import io.github.propactive.support.extension.gradle.TaskExecutor.Result
 import io.github.propactive.support.extension.project.ProjectDirectory
-import java.io.StringWriter
-import java.io.Writer
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
+import java.io.StringWriter
+import java.io.Writer
 
 /**
  * A utility class for executing Gradle tasks on a project directory.
@@ -22,6 +22,7 @@ class TaskExecutor(
     private val stdErrorWriter: Writer = StringWriter()
     private var logLevel: String = "--debug"
     private var expectFailure: Boolean = false
+    private var debugEnabled: Boolean = false
 
     /**
      * The result of a task execution.
@@ -47,6 +48,7 @@ class TaskExecutor(
      *
      * WARNING: These are log levels for the Gradle build API, not the log levels for the project itself.
      */
+    @Suppress("MemberVisibilityCanBePrivate")
     fun log(level: Level): TaskExecutor = apply {
         logLevel = when (level) {
             Level.ERROR -> "--error"
@@ -65,6 +67,14 @@ class TaskExecutor(
     }
 
     /**
+     * Enable this flag to prime the executor to run in debug mode.
+     */
+    @Suppress("unused")
+    fun withDebug() = apply {
+        debugEnabled = true
+    }
+
+    /**
      * Execute the given task and return the result.
      *
      * @param task The task to execute.
@@ -77,6 +87,7 @@ class TaskExecutor(
         .withProjectDir(projectDirectory)
         .withPluginClasspath()
         .withArguments(task, logLevel)
+        .run { if (debugEnabled) withDebug(true) else this }
         .run { if (expectFailure) buildAndFail() else build() }
         .let { result ->
             val t = checkNotNull(result.task(":$task")) { "Task not found: $task" }

@@ -1,7 +1,11 @@
 package io.github.propactive.task
 
+import io.github.propactive.plugin.Configuration
+import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
 import io.github.propactive.support.extension.gradle.TaskExecutor
 import io.github.propactive.support.extension.gradle.TaskExecutor.Outcome
+import io.github.propactive.support.extension.project.BuildOutput
+import io.github.propactive.support.extension.project.BuildScript
 import io.github.propactive.support.extension.project.MainSourceSet
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -24,9 +28,21 @@ class ValidateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
 
     @Test
     @Order(2)
-    fun `should use cached output when task is ran and no sourcecode changes occurred`(
+    fun `should use cached output when task is ran and no sourcecode changes occurred when an explicit class compile dependency with matching source set`(
         taskExecutor: TaskExecutor,
+        buildScript: BuildScript,
+        buildOutput: BuildOutput,
     ) {
+        buildScript.apply {
+            val content = readText()
+            val newContent = content.replace("$PROPACTIVE_GROUP {", "$PROPACTIVE_GROUP { ${Configuration::classCompileDependency.name} = \"compileKotlin\"")
+            writeText(newContent)
+        }
+
+        taskExecutor
+            .execute(taskUnderTest)
+            .outcome shouldBe Outcome.SUCCESS
+
         taskExecutor
             .execute(taskUnderTest)
             .outcome shouldBe Outcome.UP_TO_DATE

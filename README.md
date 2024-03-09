@@ -78,6 +78,23 @@ propactive {
 }
 ```
 
+### Optional: Class Compile Optimisation
+
+Since Propactive is a runtime property generator that relies on loading a properties class at runtime, we need to ensure that
+the properties class is compiled before the `generateApplicationProperties` task is executed. By default, the plugin will set
+the `classCompileDependency` option to [`classes`](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_tasks),
+which is an aggregate task that just depends on other tasks in which other plugins usually attach additional compilation tasks 
+to it.
+
+However, you can set the `classCompileDependency` option to `compileJava` (or `compileKotlin` if you are using Kotlin) if you
+want to optimise your build time. As doing so will only regenerate the properties file when the properties class is recompiled:
+
+```kotlin
+propactive {
+    classCompileDependency = "compileKotlin"
+}
+```
+
 ## Plugin Tasks
 
 ```
