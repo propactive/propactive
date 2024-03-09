@@ -214,7 +214,7 @@ your property values on runtime. Below is a reference for each type and the spec
 - [URI](propactive-jvm/src/main/kotlin/io/github/propactive/type/URI.kt): URI type as defined by [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
 - [URL](propactive-jvm/src/main/kotlin/io/github/propactive/type/URL.kt): URL type as defined by [RFC 2396](https://www.ietf.org/rfc/rfc2396.txt)
 - [UUID](propactive-jvm/src/main/kotlin/io/github/propactive/type/UUID.kt): UUID type as defined by [RFC 4122](https://www.ietf.org/rfc/rfc4122.txt)
-- [CLASS](propactive-jvm/src/main/kotlin/io/github/propactive/type/CLASS.kt): CLASS type as defined as a syntactically valid format as per [Java Language Specification (JLS) 3.8. Identifiers](https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.8).
+- [CLASS](propactive-jvm/src/main/kotlin/io/github/propactive/type/CLASS.kt): CLASS type as defined as a syntactically valid format as per [JLS 3.8. Identifiers](https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.8).
 
 If you believe we missed a common property type, feel free to let us know by opening an [issue](https://github.com/propactive/propactive/issues/new/choose) or make a PR, and we will be happy to merge.
 Otherwise, please see the next section to learn [how to write your custom property types](#writing-your-custom-property-types).
