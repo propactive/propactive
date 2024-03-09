@@ -15,11 +15,13 @@ abstract class TypeTestRunner {
 
     @ParameterizedTest
     @MethodSource("validValues")
-    fun `Given a valid type as string, when validated, then it should NOT error`(validValue: Any) =
+    fun `Given a valid type as string, when validated, then it should NOT error`(validValue: Any) {
         underTest.validate(validValue).shouldBeTrue()
+    }
 
     @ParameterizedTest
     @MethodSource("invalidValues")
-    fun `Given an invalid type as string, when validated, then it should error`(invalidValue: Any) =
+    fun `Given an invalid type as string, when validated, then it should error`(invalidValue: Any) {
         underTest.validate(invalidValue).shouldBeFalse()
+    }
 }
