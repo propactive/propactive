@@ -8,6 +8,7 @@ import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.plugin.Propactive.Companion.LOGGER
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
+import io.github.propactive.task.support.load
 import org.gradle.api.tasks.TaskAction
 
 open class GenerateApplicationPropertiesTask : ApplicationPropertiesTask() {
@@ -44,7 +45,8 @@ open class GenerateApplicationPropertiesTask : ApplicationPropertiesTask() {
     @TaskAction
     fun run() = compiledClasses
         .apply { LOGGER.info("Generating application properties for environments: {}", environments) }
-        .apply { LOGGER.debug("Task received the following compiledClasses: {}", compiledClasses.toList()) }
+        .toList()
+        .apply { LOGGER.debug("Task received the following compiledClasses: {}", this) }
         .load(implementationClass)
         .apply { LOGGER.debug("Found implementation class: {}", this) }
         .run(EnvironmentFactory::create)
