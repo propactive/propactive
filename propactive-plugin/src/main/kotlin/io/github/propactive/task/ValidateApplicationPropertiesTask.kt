@@ -34,7 +34,7 @@ open class ValidateApplicationPropertiesTask : ApplicationPropertiesTask() {
     @TaskAction
     fun run() = compiledClasses
         .apply { LOGGER.info("Validating application properties") }
-        .find(implementationClass)
+        .load(implementationClass)
         .apply { LOGGER.debug("Found implementation class: {}", this) }
         .run(EnvironmentFactory::create)
         .apply { LOGGER.debug("Validated the following environment models: {}", this) }

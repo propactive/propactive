@@ -85,7 +85,6 @@ class PropactiveTest {
         @BeforeEach
         internal fun setUp() {
             project = ProjectBuilder.builder()
-                .withName("temporary-project-${java.util.UUID.randomUUID()}")
                 .build()
                 .also { p -> p.plugins.apply("java") }
                 .also { p -> p.plugins.apply(Propactive::class.java) }
