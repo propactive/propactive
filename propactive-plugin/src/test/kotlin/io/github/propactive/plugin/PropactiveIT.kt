@@ -1,6 +1,7 @@
 package io.github.propactive.plugin
 
 import io.github.propactive.support.extension.KotlinEnvironmentExtension
+import io.github.propactive.support.extension.PublishSnapshotJars
 import io.github.propactive.support.extension.gradle.TaskExecutor
 import io.github.propactive.support.extension.gradle.TaskExecutor.Outcome
 import io.github.propactive.task.GenerateApplicationPropertiesTask
@@ -16,10 +17,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.extension.ExtendWith
+import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
 @TestInstance(PER_CLASS)
 @TestMethodOrder(OrderAnnotation::class)
-@ExtendWith(KotlinEnvironmentExtension::class)
+@ExtendWith(PublishSnapshotJars::class, KotlinEnvironmentExtension::class)
 class PropactiveIT {
     @Test
     @Order(1)
@@ -28,7 +30,7 @@ class PropactiveIT {
     ) {
         shouldNotThrow<UnexpectedBuildFailure> {
             taskExecutor
-                .execute("tasks")
+                .execute("assemble")
         }
     }
 
@@ -41,9 +43,8 @@ class PropactiveIT {
             .execute("tasks")
             .apply {
                 output shouldContain "Propactive tasks"
-                output shouldContain "${GenerateApplicationPropertiesTask.TASK_NAME} - .*?".toRegex(RegexOption.DOT_MATCHES_ALL)
-                output shouldContain "${ValidateApplicationPropertiesTask.TASK_NAME} - .*?".toRegex(RegexOption.DOT_MATCHES_ALL)
-
+                output shouldContain "${GenerateApplicationPropertiesTask.TASK_NAME} - .*?".toRegex(DOT_MATCHES_ALL)
+                output shouldContain "${ValidateApplicationPropertiesTask.TASK_NAME} - .*?".toRegex(DOT_MATCHES_ALL)
                 outcome shouldBe Outcome.SUCCESS
             }
     }

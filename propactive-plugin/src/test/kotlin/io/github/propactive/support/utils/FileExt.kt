@@ -12,7 +12,7 @@ import java.io.File
  *
  * @see loadResourceAsBytes
  */
-internal fun File.addFileToDirFromTestResources(name: String) = this.apply {
+internal fun <T : File> T.addFileToDirFromTestResources(name: String) = this.apply {
     check(isDirectory) { "File is not a directory: $this" }
     File(this, name)
         .apply(File::createNewFile)
