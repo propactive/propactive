@@ -47,6 +47,8 @@ abstract class ApplicationPropertiesTask : DefaultTask() {
 
     @get:OutputDirectory
     val destination: String = configuration.destination
+        .takeUnless(String::isBlank)
+        ?: project.layout.buildDirectory.dir("resources/main").get().asFile.absolutePath
 
     init {
         group = Propactive.PROPACTIVE_GROUP
