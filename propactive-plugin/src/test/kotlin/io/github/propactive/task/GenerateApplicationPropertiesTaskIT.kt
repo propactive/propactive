@@ -32,7 +32,7 @@ class GenerateApplicationPropertiesTaskIT {
 
     @Test
     @Order(1)
-    fun `should be able to generate a new property file when on first run`(
+    fun `should be able to generate a new property file when first run`(
         taskExecutor: TaskExecutor,
         buildScript: BuildScript,
         buildOutput: BuildOutput,
@@ -67,7 +67,7 @@ class GenerateApplicationPropertiesTaskIT {
             classCompileDependency = "compileKotlin",
         )
 
-        /** Second run with optimised classCompileDependency should re-compile the files (i.e. SUCCESS) */
+        /** Second run with optimised classCompileDependency should re-compile the files because of new resource about from previous test (i.e. SUCCESS) */
         taskExecutor
             .execute(taskUnderTest)
             .outcome shouldBe Outcome.SUCCESS
@@ -87,7 +87,6 @@ class GenerateApplicationPropertiesTaskIT {
     fun `should generate a new property file when the ApplicationProperties object has been modified`(
         taskExecutor: TaskExecutor,
         mainSourceSet: MainSourceSet,
-        buildScript: BuildScript,
         buildOutput: BuildOutput,
     ) {
         /** Now we modify the application properties class */
@@ -132,6 +131,37 @@ class GenerateApplicationPropertiesTaskIT {
 
         buildOutput
             .resolve("resources/main/test-application.properties")
+            .shouldExist()
+    }
+
+    @Test
+    @Order(5)
+    fun `should generate Propactive properties file for a class that is not located at root level`(
+        taskExecutor: TaskExecutor,
+        mainSourceSet: MainSourceSet,
+        buildScript: BuildScript,
+        buildOutput: BuildOutput,
+    ) {
+        mainSourceSet
+            /** Clean up the source set, so they won't interfere with the test */
+            .apply { listFiles()?.onEach(File::deleteRecursively) }
+            /** Create a new properties class that is not located at the root level (i.e. in a sub-package) */
+            .withKotlinFile("io/github/propactive/properties/$APPLICATION_PROPERTIES_CLASS_NAME.kt") {
+                applicationPropertiesKotlinSource(classPackagePath = "io.github.propactive.properties")
+            }
+
+        /** Set the Propactive implementation class to the new properties class created */
+        buildScript.asKts(
+            implementationClass = "io.github.propactive.properties.$APPLICATION_PROPERTIES_CLASS_NAME",
+        )
+
+        /** Fifth run should succeed validation (i.e. SUCCESS) */
+        taskExecutor
+            .execute(taskUnderTest)
+            .outcome shouldBe Outcome.SUCCESS
+
+        buildOutput
+            .resolve("resources/main/application.properties")
             .shouldExist()
     }
 }

@@ -5,6 +5,7 @@ import io.kotest.matchers.types.shouldHaveAnnotation
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
@@ -44,8 +45,14 @@ class ApplicationPropertiesTaskTest {
         }
 
         @Test
-        fun `should mark configuration compiledClasses as stable inputFiles with relative path`() {
-            ApplicationPropertiesTask::compiledClasses
+        fun `should mark configuration compiledClassesDirectories as internal as it cannot hold reference equality`() {
+            ApplicationPropertiesTask::compiledClassesDirectories
+                .shouldHaveAnnotation(Internal::class)
+        }
+
+        @Test
+        fun `should mark configuration compiledClassesFileTree as suitable type for inputFiles caching with relative path`() {
+            ApplicationPropertiesTask::compiledClassesFileTree
                 .apply { shouldHaveAnnotation(InputFiles::class) }
                 .shouldHaveAnnotation(PathSensitive::class)
                 .let { it as PathSensitive }

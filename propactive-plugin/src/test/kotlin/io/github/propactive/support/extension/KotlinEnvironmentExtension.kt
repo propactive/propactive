@@ -51,12 +51,12 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
     private val environmentNamespace = EnvironmentNamespace()
 
     private val parameterTypeToRetriever = mapOf(
-        TaskExecutor::class.java to this::retrieveTaskExecutor,
         ProjectDirectory::class.java to this::retrieveProjectDirectory,
         BuildScript::class.java to this::retrieveBuildScript,
         MainSourceSet::class.java to this::retrieveMainSourceSet,
         MainResourcesSet::class.java to this::retrieveMainResourcesSet,
         BuildOutput::class.java to this::retrieveBuildOutput,
+        TaskExecutor::class.java to this::retrieveTaskExecutor,
     )
 
     override fun beforeAll(context: ExtensionContext) {
@@ -71,7 +71,6 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
             BuildOutput(root),
         )
 
-        environmentNamespace.put(context, Component.TaskExecutor, TaskExecutor(projectDirectory))
         environmentNamespace.put(context, Component.ProjectDirectory, projectDirectory)
         environmentNamespace.put(context, Component.BuildScript, projectDirectory.buildScript)
         environmentNamespace.put(context, Component.MainSourceSet, projectDirectory.mainSourceSet)
@@ -81,7 +80,6 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
 
     override fun afterAll(context: ExtensionContext) {
         environmentNamespace.apply {
-            remove<TaskExecutor>(context, Component.TaskExecutor)
             remove<BuildScript>(context, Component.BuildScript)
             remove<MainSourceSet>(context, Component.MainSourceSet)
             remove<MainResourcesSet>(context, Component.ResourcesSourceSet)
@@ -100,9 +98,6 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
             "Unsupported parameter type: ${parameterContext.parameter.type}"
         }(extensionContext)
 
-    private fun retrieveTaskExecutor(context: ExtensionContext) = environmentNamespace
-        .get<TaskExecutor>(context, Component.TaskExecutor)
-
     private fun retrieveProjectDirectory(context: ExtensionContext) = environmentNamespace
         .get<ProjectDirectory>(context, Component.ProjectDirectory)
 
@@ -117,4 +112,8 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
 
     private fun retrieveBuildOutput(context: ExtensionContext) = environmentNamespace
         .get<BuildOutput>(context, Component.BuildOutput)
+
+    private fun retrieveTaskExecutor(context: ExtensionContext) = TaskExecutor(
+        retrieveProjectDirectory(context)!!,
+    )
 }

@@ -42,21 +42,21 @@ open class GenerateApplicationPropertiesTask : ApplicationPropertiesTask() {
     }
 
     @TaskAction
-    fun run() = compiledClasses
+    fun run() = compiledClassesDirectories
         .apply { LOGGER.info("Generating application properties for environments: {}", environments) }
-        .toList()
-        .apply { LOGGER.debug("Task received the following compiledClasses: {}", this) }
+        .apply { LOGGER.debug("Task received the following compiled classes directories: {}", this) }
         .load(implementationClass)
-        .apply { LOGGER.debug("Found implementation class: {}", this) }
+        .apply { LOGGER.info("Found Propactive implementation class: {}", this.qualifiedName) }
         .run(EnvironmentFactory::create)
         .apply { LOGGER.debug("Created environment models: {}", this) }
         .run(FileFactory::create)
         .apply { LOGGER.debug("Created files models: {}", this) }
         .filter { model -> environments.contains(model.environment) || environments.contains(DEFAULT_ENVIRONMENTS) }
-        .apply { LOGGER.debug("Filtered files models: {}", this) }
+        .apply { LOGGER.debug("Filtered files models as per requested environment(s): {}", this) }
         .apply { check(filenameOverride.isBlank() || size == 1) { "You cannot use ${Configuration::filenameOverride.name} when generating multiple property files" } }
-        .forEach { propertiesFile -> propertiesFile.write(destination, filenameOverride) }
-        .apply { LOGGER.info("Done - wrote application properties to: {}", destination) }
+        .apply { if (filenameOverride.isNotBlank()) LOGGER.info("Overriding filename to: {}", filenameOverride) }
+        .forEach { file -> file.write(destination, filenameOverride) }
+        .apply { LOGGER.info("Success - wrote application properties to: {}", destination) }
 
     init {
         group = PROPACTIVE_GROUP

@@ -2,7 +2,6 @@ package io.github.propactive.task
 
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.plugin.Configuration
-import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.plugin.Propactive.Companion.LOGGER
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
@@ -20,10 +19,6 @@ open class ValidateApplicationPropertiesTask : ApplicationPropertiesTask() {
             |Validates the application properties without generating any files.
             |
             |  Optional configurations:
-            |    -P${Configuration::environments.name}
-            |        Description: Comma separated list of environments to generate the properties for.
-            |        Example: "test,stage,prod"
-            |        Default: "$DEFAULT_ENVIRONMENTS" (All provided environments)
             |    -P${Configuration::implementationClass.name}
             |        Description: Sets the location of your properties object.
             |        Example: "com.package.path.to.your.ApplicationProperties"
@@ -33,15 +28,13 @@ open class ValidateApplicationPropertiesTask : ApplicationPropertiesTask() {
     }
 
     @TaskAction
-    fun run() = compiledClasses
+    fun run() = compiledClassesDirectories
         .apply { LOGGER.info("Validating application properties") }
-        .toList()
-        .apply { LOGGER.debug("Task received the following compiledClasses: {}", this) }
+        .apply { LOGGER.debug("Task received the following compiled classes directories: {}", this) }
         .load(implementationClass)
-        .apply { LOGGER.debug("Found implementation class: {}", this) }
+        .apply { LOGGER.info("Found Propactive implementation class: {}", this.qualifiedName) }
         .run(EnvironmentFactory::create)
-        .apply { LOGGER.debug("Validated the following environment models: {}", this) }
-        .apply { LOGGER.info("Done - validated application properties") }
+        .apply { LOGGER.info("Success - validated application properties with no errors!") }
 
     init {
         group = PROPACTIVE_GROUP

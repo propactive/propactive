@@ -1,18 +1,22 @@
 package io.github.propactive.task
 
 import io.github.propactive.plugin.Configuration
-import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CONFIGURATION
 import io.github.propactive.plugin.Propactive
-import io.github.propactive.plugin.Propactive.Companion.LOGGER
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
 import org.gradle.api.file.FileTree
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity.RELATIVE
+import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.SourceSet.MAIN_SOURCE_SET_NAME
+import org.gradle.api.tasks.SourceSetContainer
+import java.io.File
 
 @CacheableTask
 abstract class ApplicationPropertiesTask : DefaultTask() {
@@ -29,26 +33,45 @@ abstract class ApplicationPropertiesTask : DefaultTask() {
     @get:Input
     val filenameOverride: String = configuration.filenameOverride
 
+    /**
+     * A reference used to resolve the location of the project's compiled classes.
+     *
+     * It's important to note this is not a live representation of the main source set's output directory.
+     * But rather a reference to the location of the compiled classes used in conjunction with the
+     * [io.github.propactive.task.support.PropertyClassLoader] to load the application properties
+     * class, so we can effectively generate the application properties file.
+     *
+     * @see [compiledClassesFileTree] for how we track the compiled classes as input files for caching purposes.
+     * */
+    @get:Internal
+    val compiledClassesDirectories: MutableSet<File> by lazy {
+        project.mainSourceSetConfigs().output.files
+    }
+
     @get:InputFiles
     @get:PathSensitive(RELATIVE)
-    val compiledClasses: FileTree =
-        when (configuration.classCompileDependency) {
-            DEFAULT_CLASS_COMPILE_DEPENDENCY -> {
-                LOGGER.info("Using default ${Configuration::classCompileDependency.name}: $DEFAULT_CLASS_COMPILE_DEPENDENCY")
-                LOGGER.info("This will hinder cache optimization. Please provide a specific ${Configuration::classCompileDependency.name} to optimize the task.")
-                LOGGER.info("E.g, if you are using Kotlin and your class is within the source set, set ${Configuration::classCompileDependency.name} to: 'compileKotlin'")
-                project.layout.buildDirectory.asFileTree
-            }
-            else -> {
-                LOGGER.debug("Using ${Configuration::classCompileDependency.name}: ${configuration.classCompileDependency}")
-                project.tasks.getByName(configuration.classCompileDependency).outputs.files.asFileTree
-            }
-        }.matching { f -> f.include("**/*.class") }
+    internal val compiledClassesFileTree: FileTree
+        get() = project
+            .mainSourceSetConfigs()
+            .output.classesDirs.asFileTree
+            .matching { it.include("**/*.class") }
 
     @get:OutputDirectory
-    val destination: String = configuration.destination
-        .takeUnless(String::isBlank)
-        ?: project.layout.buildDirectory.dir("resources/main").get().asFile.absolutePath
+    val destination: String
+        get() = configuration.destination
+            .takeUnless(String::isBlank)
+            ?: project
+                .mainSourceSetConfigs()
+                .output.resourcesDir?.absolutePath
+            ?: project.layout
+                .buildDirectory.dir("resources/$MAIN_SOURCE_SET_NAME").get()
+                .asFile.absolutePath
+
+    /** We collect the main source set configurations instead of path guessing. */
+    private fun Project.mainSourceSetConfigs(): SourceSet = extensions
+        .getByName("sourceSets")
+        .let { ext -> ext as SourceSetContainer }
+        .getByName(MAIN_SOURCE_SET_NAME)
 
     init {
         group = Propactive.PROPACTIVE_GROUP
