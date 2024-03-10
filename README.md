@@ -201,16 +201,17 @@ You can have a look below for the [list of natively supported property types](#n
 Propactive comes with a set of natively supported property types that you can use for validating
 your property values on runtime. Below is a reference for each type and the specification followed:
 
-- [BASE64](propactive-jvm/src/main/kotlin/io/github/propactive/type/BASE64.kt): BASE64 type as defined by [RFC 4648](https://www.ietf.org/rfc/rfc4648.txt)
-- [BOOLEAN](propactive-jvm/src/main/kotlin/io/github/propactive/type/BOOLEAN.kt): BOOLEAN type as defined by your JVM.
-- [DECIMAL](propactive-jvm/src/main/kotlin/io/github/propactive/type/DECIMAL.kt): DECIMAL type as defined by [IEEE 754](https://standards.ieee.org/ieee/754/6210/)
-- [INTEGER](propactive-jvm/src/main/kotlin/io/github/propactive/type/INTEGER.kt): INTEGER type is a 32-bit signed integer, as defined by your JVM.
-- [JSON](propactive-jvm/src/main/kotlin/io/github/propactive/type/JSON.kt): JSON type as defined by [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259)
-- [STRING](propactive-jvm/src/main/kotlin/io/github/propactive/type/STRING.kt): STRING type represents character strings, as defined by your JVM.
-- [URI](propactive-jvm/src/main/kotlin/io/github/propactive/type/URI.kt): URI type as defined by [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
-- [URL](propactive-jvm/src/main/kotlin/io/github/propactive/type/URL.kt): URL type as defined by [RFC 2396](https://www.ietf.org/rfc/rfc2396.txt)
-- [UUID](propactive-jvm/src/main/kotlin/io/github/propactive/type/UUID.kt): UUID type as defined by [RFC 4122](https://www.ietf.org/rfc/rfc4122.txt)
-- [CLASS](propactive-jvm/src/main/kotlin/io/github/propactive/type/CLASS.kt): CLASS type defined as a syntactically valid format as per [JLS 3.8](https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.8).
+- [BASE64](propactive-jvm/src/main/kotlin/io/github/propactive/type/BASE64.kt): type as defined by [RFC 4648](https://www.ietf.org/rfc/rfc4648.txt)
+- [BOOLEAN](propactive-jvm/src/main/kotlin/io/github/propactive/type/BOOLEAN.kt): type as defined by your JVM.
+- [DECIMAL](propactive-jvm/src/main/kotlin/io/github/propactive/type/DECIMAL.kt): type as defined by [IEEE 754](https://standards.ieee.org/ieee/754/6210/)
+- [INTEGER](propactive-jvm/src/main/kotlin/io/github/propactive/type/INTEGER.kt): type is a 32-bit signed integer, as defined by your JVM.
+- [JSON](propactive-jvm/src/main/kotlin/io/github/propactive/type/JSON.kt): type as defined by [RFC 8259](https://datatracker.ietf.org/doc/html/rfc8259)
+- [STRING](propactive-jvm/src/main/kotlin/io/github/propactive/type/STRING.kt): type represents character strings, as defined by your JVM.
+- [URI](propactive-jvm/src/main/kotlin/io/github/propactive/type/URI.kt): type as defined by [RFC 3986](https://www.ietf.org/rfc/rfc3986.txt)
+- [URL](propactive-jvm/src/main/kotlin/io/github/propactive/type/URL.kt): type as defined by [RFC 2396](https://www.ietf.org/rfc/rfc2396.txt)
+- [UUID](propactive-jvm/src/main/kotlin/io/github/propactive/type/UUID.kt): type as defined by [RFC 4122](https://www.ietf.org/rfc/rfc4122.txt)
+- [CLASS](propactive-jvm/src/main/kotlin/io/github/propactive/type/CLASS.kt): type defined as a syntactically valid format as per [JLS 3.8](https://docs.oracle.com/javase/specs/jls/se21/html/jls-3.html#jls-3.8).
+- [PORT](propactive-jvm/src/main/kotlin/io/github/propactive/type/PORT.kt): type as defined by [RFC 6335](https://www.ietf.org/rfc/rfc6335.txt)
 
 If you believe we missed a common property type, feel free to let us know by opening an [issue](https://github.com/propactive/propactive/issues/new/choose) or make a PR, and we will be happy to merge.
 Otherwise, please see the next section to learn [how to write your custom property types](#writing-your-custom-property-types).
