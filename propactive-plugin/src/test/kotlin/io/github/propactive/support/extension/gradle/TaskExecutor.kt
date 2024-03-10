@@ -40,22 +40,22 @@ class TaskExecutor(
     }
 
     enum class Level {
-        ERROR, WARN, INFO, DEBUG, TRACE
+        QUIET, WARN, INFO, DEBUG
     }
 
     /**
      * Set the log [level] for the task execution, default is DEBUG.
      *
      * WARNING: These are log levels for the Gradle build API, not the log levels for the project itself.
+     * @see [Gradle - Choosing a log level](https://docs.gradle.org/current/userguide/logging.html#sec:choosing_a_log_level)
      */
     @Suppress("MemberVisibilityCanBePrivate")
     fun log(level: Level): TaskExecutor = apply {
         logLevel = when (level) {
-            Level.ERROR -> "--error"
+            Level.QUIET -> "--quiet"
             Level.WARN -> "--warn"
             Level.INFO -> "--info"
             Level.DEBUG -> "--debug"
-            Level.TRACE -> "--stacktrace"
         }
     }
 
