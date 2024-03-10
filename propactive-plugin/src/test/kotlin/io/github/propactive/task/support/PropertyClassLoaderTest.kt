@@ -2,6 +2,7 @@ package io.github.propactive.task.support
 
 import io.github.propactive.environment.EnvironmentFactory
 import io.github.propactive.support.utils.alphaNumeric
+import io.github.propactive.task.support.PropertyClassLoader.load
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.file.shouldNotBeADirectory
 import io.kotest.matchers.shouldBe
@@ -19,7 +20,7 @@ import java.net.URLClassLoader
 import kotlin.random.Random
 import kotlin.reflect.KClass
 
-class FileExtKtTest {
+class PropertyClassLoaderTest {
     private val existingClassName = KClass::class.simpleName!!
     private val givenPathname = Random.alphaNumeric("path/to/your/desired/location/ApplicationProperties", ".class")
 
