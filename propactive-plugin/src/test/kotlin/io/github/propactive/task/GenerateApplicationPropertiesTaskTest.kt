@@ -1,15 +1,15 @@
 package io.github.propactive.task
 
-import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
-import io.github.propactive.plugin.Configuration.Companion.DEFAULT_FILENAME_OVERRIDE
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
 import io.github.propactive.task.GenerateApplicationPropertiesTask.Companion.TASK_NAME
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldBeBlank
+import io.kotest.matchers.string.shouldContain
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,12 +48,12 @@ class GenerateApplicationPropertiesTaskTest {
     }
 
     @Test
-    fun `should set filename override input`() {
-        task.filenameOverride shouldBe DEFAULT_FILENAME_OVERRIDE
+    fun `should NOT set filename override input by default`() {
+        task.filenameOverride.shouldBeBlank()
     }
 
     @Test
-    fun `should set destination output`() {
-        task.destination shouldBe DEFAULT_BUILD_DESTINATION
+    fun `should set destination output to main resources`() {
+        task.destination shouldContain task.project.layout.buildDirectory.dir("resources/main").get().asFile.absolutePath
     }
 }

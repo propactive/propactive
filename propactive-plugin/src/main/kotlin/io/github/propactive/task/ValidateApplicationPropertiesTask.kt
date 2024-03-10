@@ -27,7 +27,7 @@ open class ValidateApplicationPropertiesTask : ApplicationPropertiesTask() {
             |    -P${Configuration::implementationClass.name}
             |        Description: Sets the location of your properties object.
             |        Example: "com.package.path.to.your.ApplicationProperties"
-            |        Default: "$DEFAULT_IMPLEMENTATION_CLASS" (At the root of your project)
+            |        Default: "$DEFAULT_IMPLEMENTATION_CLASS" (At the root of your project, without a package path.)
             |
         """.trimMargin()
     }

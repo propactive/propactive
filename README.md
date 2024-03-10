@@ -110,27 +110,23 @@ generateApplicationProperties - Generates application properties file for each g
     -PimplementationClass
         Description: Sets the location of your properties object.
         Example: "com.package.path.to.your.ApplicationProperties"
-        Default: "ApplicationProperties" (At the root of your project)
+        Default: "ApplicationProperties" (At the root of your project, without a package path.)
     -Pdestination
         Description: Sets the location of your generated properties file within the build directory.
-        Example: "path/to/your/desired/location"
-        Default: "properties" (i.e. in a directory called "properties" within your build directory)
+        Example: layout.buildDirectory.dir("properties").get().asFile.absolutePath
+        Default: layout.buildDirectory.dir("resources/main").get().asFile.absolutePath (In the main resources directory)
     -PfilenameOverride
-        Description: Allows overriding given filename for an environment.
-        Example: "custom-filename-application.properties"
-        Note: This should only be used when generating application properties for a singular environment.
+        Description: Allows overriding given filename for when you're generating properties for a single environment.
+        Example: "dev-application.properties"
+        Note: This can only be used when generating application properties for a singular environment.
 
 validateApplicationProperties - Validates the application properties without generating any files.
 
   Optional configurations:
-    -Penvironments
-        Description: Comma separated list of environments to generate the properties for.
-        Example: "test,stage,prod"
-        Default: "*" (All provided environments)
     -PimplementationClass
         Description: Sets the location of your properties object.
         Example: "com.package.path.to.your.ApplicationProperties"
-        Default: "ApplicationProperties" (At the root of your project)
+        Default: "ApplicationProperties" (At the root of your project, without a package path.)
 ```
 
 ## Runtime Property Validation
