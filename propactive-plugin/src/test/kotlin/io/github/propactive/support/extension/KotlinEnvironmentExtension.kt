@@ -4,8 +4,11 @@ import io.github.propactive.support.extension.EnvironmentNamespace.Component
 import io.github.propactive.support.extension.gradle.TaskExecutor
 import io.github.propactive.support.extension.project.BuildOutput
 import io.github.propactive.support.extension.project.BuildScript
+import io.github.propactive.support.extension.project.BuildScript.Companion.BUILD_SCRIPT_KTS
 import io.github.propactive.support.extension.project.MainResourcesSet
 import io.github.propactive.support.extension.project.MainSourceSet
+import io.github.propactive.support.extension.project.MainSourceSet.Companion.APPLICATION_PROPERTIES_CLASS_NAME
+import io.github.propactive.support.extension.project.MainSourceSet.Companion.applicationPropertiesKotlinSource
 import io.github.propactive.support.extension.project.ProjectDirectory
 import io.github.propactive.support.utils.addFileToDirFromTestResources
 import org.junit.jupiter.api.extension.AfterAllCallback
@@ -48,42 +51,26 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
     private val environmentNamespace = EnvironmentNamespace()
 
     private val parameterTypeToRetriever = mapOf(
-        TaskExecutor::class.java to this::retrieveTaskExecutor,
         ProjectDirectory::class.java to this::retrieveProjectDirectory,
         BuildScript::class.java to this::retrieveBuildScript,
         MainSourceSet::class.java to this::retrieveMainSourceSet,
         MainResourcesSet::class.java to this::retrieveMainResourcesSet,
         BuildOutput::class.java to this::retrieveBuildOutput,
+        TaskExecutor::class.java to this::retrieveTaskExecutor,
     )
 
     override fun beforeAll(context: ExtensionContext) {
-        val parent = Files.createTempDirectory("under-test-project-").toFile()
-
-        val buildScript = with("build.gradle.kts") {
-            BuildScript(parent.addFileToDirFromTestResources(this), this)
-        }
-
-        val mainSourceSet = MainSourceSet(parent.resolve("src/main/"), "kotlin").apply {
-            check(mkdirs()) { "Failed to create main source set directory: $this" }
-            addFileToDirFromTestResources("ApplicationProperties.kt")
-        }
-
-        val mainResourcesSet = MainResourcesSet(parent.resolve("src/main/"), "resources").apply {
-            check(mkdirs()) { "Failed to create main resources set directory: $this" }
-            addFileToDirFromTestResources("log4j2.xml")
-        }
-
+        val root = Files
+            .createTempDirectory("under-test-project-")
+            .toFile()
         val projectDirectory = ProjectDirectory(
-            parent,
-            buildScript,
-            mainSourceSet,
-            mainResourcesSet,
-            BuildOutput(parent, "build"),
-        ).apply {
-            addFileToDirFromTestResources("settings.gradle.kts")
-        }
+            root.addFileToDirFromTestResources("settings.gradle.kts"),
+            BuildScript(root, BUILD_SCRIPT_KTS).asKts(),
+            MainSourceSet(root).withKotlinFile(APPLICATION_PROPERTIES_CLASS_NAME.plus(".kt"), ::applicationPropertiesKotlinSource),
+            MainResourcesSet(root).addFileToDirFromTestResources("log4j2.xml"),
+            BuildOutput(root),
+        )
 
-        environmentNamespace.put(context, Component.TaskExecutor, TaskExecutor(projectDirectory))
         environmentNamespace.put(context, Component.ProjectDirectory, projectDirectory)
         environmentNamespace.put(context, Component.BuildScript, projectDirectory.buildScript)
         environmentNamespace.put(context, Component.MainSourceSet, projectDirectory.mainSourceSet)
@@ -93,27 +80,23 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
 
     override fun afterAll(context: ExtensionContext) {
         environmentNamespace.apply {
-            remove<TaskExecutor>(context, Component.TaskExecutor)
-            remove<ProjectDirectory>(context, Component.ProjectDirectory)?.deleteRecursively()
             remove<BuildScript>(context, Component.BuildScript)
             remove<MainSourceSet>(context, Component.MainSourceSet)
             remove<MainResourcesSet>(context, Component.ResourcesSourceSet)
             remove<BuildOutput>(context, Component.BuildOutput)
+            remove<ProjectDirectory>(context, Component.ProjectDirectory)?.deleteRecursively()
         }
     }
 
     override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext) =
         parameterTypeToRetriever
-            .map { it.key }
+            .map { entry -> entry.key }
             .any(parameterContext.parameter.type::isAssignableFrom)
 
     override fun resolveParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext) =
         checkNotNull(parameterTypeToRetriever[parameterContext.parameter.type]) {
             "Unsupported parameter type: ${parameterContext.parameter.type}"
         }(extensionContext)
-
-    private fun retrieveTaskExecutor(context: ExtensionContext) = environmentNamespace
-        .get<TaskExecutor>(context, Component.TaskExecutor)
 
     private fun retrieveProjectDirectory(context: ExtensionContext) = environmentNamespace
         .get<ProjectDirectory>(context, Component.ProjectDirectory)
@@ -129,4 +112,8 @@ class KotlinEnvironmentExtension : ParameterResolver, BeforeAllCallback, AfterAl
 
     private fun retrieveBuildOutput(context: ExtensionContext) = environmentNamespace
         .get<BuildOutput>(context, Component.BuildOutput)
+
+    private fun retrieveTaskExecutor(context: ExtensionContext) = TaskExecutor(
+        retrieveProjectDirectory(context)!!,
+    )
 }

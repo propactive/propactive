@@ -27,7 +27,6 @@ internal class EnvironmentNamespace(
         value.apply { get(context).put(component.name, value) }
 
     internal enum class Component {
-        TaskExecutor,
         ProjectDirectory,
         MainSourceSet,
         ResourcesSourceSet,

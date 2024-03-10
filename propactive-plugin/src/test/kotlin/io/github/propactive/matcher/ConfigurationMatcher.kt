@@ -37,7 +37,7 @@ class ConfigurationMatcher private constructor() : Matcher<Configuration> {
 
     override fun test(value: Configuration): MatcherResult = matchers
         // All Configuration fields should be matched...
-        .apply { keys.shouldContainAll(Field.values().toSet()) }
+        .apply { keys.shouldContainAll(Field.entries.toSet()) }
         .map { (field, matcher) -> matcher.test(field.extractor(value)) }
         .toFinalResult()
 
