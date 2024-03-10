@@ -1,32 +1,59 @@
 package io.github.propactive.task
 
-import io.github.propactive.plugin.Configuration
-import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
+import io.github.propactive.environment.Environment
+import io.github.propactive.property.Property
+import io.github.propactive.support.extension.KotlinEnvironmentExtension
+import io.github.propactive.support.extension.PublishSnapshotJars
 import io.github.propactive.support.extension.gradle.TaskExecutor
 import io.github.propactive.support.extension.gradle.TaskExecutor.Outcome
 import io.github.propactive.support.extension.project.BuildOutput
 import io.github.propactive.support.extension.project.BuildScript
 import io.github.propactive.support.extension.project.MainSourceSet
+import io.github.propactive.support.extension.project.MainSourceSet.Companion.APPLICATION_PROPERTIES_CLASS_NAME
+import io.github.propactive.support.extension.project.MainSourceSet.Companion.applicationPropertiesKotlinSource
 import io.kotest.matchers.file.shouldExist
+import io.kotest.matchers.file.shouldNotExist
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.junit.jupiter.api.Order
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import org.junit.jupiter.api.TestMethodOrder
+import org.junit.jupiter.api.extension.ExtendWith
 import java.io.File
 
-class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
-    GenerateApplicationPropertiesTask.TASK_NAME,
-) {
+@TestInstance(PER_CLASS)
+@TestMethodOrder(OrderAnnotation::class)
+@ExtendWith(PublishSnapshotJars::class, KotlinEnvironmentExtension::class)
+class GenerateApplicationPropertiesTaskIT {
+    private val taskUnderTest: String = GenerateApplicationPropertiesTask.TASK_NAME
+
     @Test
     @Order(1)
     fun `should be able to generate a new property file when on first run`(
         taskExecutor: TaskExecutor,
+        buildScript: BuildScript,
         buildOutput: BuildOutput,
     ) {
+        File(buildOutput, "properties/application.properties").shouldNotExist()
+
+        buildScript.asKts(
+            /** Rely on [Environment.value] default application properties value (i.e. `application.properties`) */
+            filenameOverride = "",
+            /** Coverage to test destination functionality */
+            destination = buildOutput.resolve("properties").path,
+        )
+
+        /** First run should generate the files (i.e. SUCCESS) */
         taskExecutor
             .execute(taskUnderTest)
             .outcome shouldBe Outcome.SUCCESS
 
-        File(buildOutput, "properties/application.properties").shouldExist()
+        buildOutput
+            .resolve("properties/application.properties")
+            .shouldExist()
     }
 
     @Test
@@ -36,21 +63,23 @@ class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
         buildScript: BuildScript,
         buildOutput: BuildOutput,
     ) {
-        buildScript.apply {
-            val content = readText()
-            val newContent = content.replace("$PROPACTIVE_GROUP {", "$PROPACTIVE_GROUP { ${Configuration::classCompileDependency.name} = \"compileKotlin\"")
-            writeText(newContent)
-        }
+        buildScript.asKts(
+            classCompileDependency = "compileKotlin",
+        )
 
+        /** Second run with optimised classCompileDependency should re-compile the files (i.e. SUCCESS) */
         taskExecutor
             .execute(taskUnderTest)
             .outcome shouldBe Outcome.SUCCESS
 
+        /** Third run without file modification should not re-generate the files (i.e. UP_TO_DATE) */
         taskExecutor
             .execute(taskUnderTest)
             .outcome shouldBe Outcome.UP_TO_DATE
 
-        File(buildOutput, "properties/application.properties").shouldExist()
+        buildOutput
+            .resolve("resources/main/application.properties")
+            .shouldExist()
     }
 
     @Test
@@ -58,21 +87,29 @@ class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
     fun `should generate a new property file when the ApplicationProperties object has been modified`(
         taskExecutor: TaskExecutor,
         mainSourceSet: MainSourceSet,
+        buildScript: BuildScript,
         buildOutput: BuildOutput,
     ) {
-        val applicationPropertiesFile = File(mainSourceSet, "ApplicationProperties.kt")
+        /** Now we modify the application properties class */
+        mainSourceSet.withKotlinFile(APPLICATION_PROPERTIES_CLASS_NAME.plus(".kt")) {
+            applicationPropertiesKotlinSource(
+                extraEntries = listOf(
+                    "@${Property::class.simpleName}([\"XYZ\"])",
+                    "const val secondStringPropertyKey = \"propactive.dev.second.string.property.key\"",
+                ),
+            )
+        }
 
-        // i.e. invalidate the cache
-        applicationPropertiesFile
-            .readText()
-            .replace("propactive.dev.string.property.key", "propactive.dev.string.property.key.modified")
-            .also(applicationPropertiesFile::writeText)
-
+        /** Fourth run should re-generate the files (i.e. SUCCESS) */
         taskExecutor
             .execute(taskUnderTest)
             .outcome shouldBe Outcome.SUCCESS
 
-        File(buildOutput, "properties/application.properties").shouldExist()
+        buildOutput
+            .resolve("resources/main/application.properties")
+            .apply(File::shouldExist)
+            .readText()
+            .shouldContain("propactive.dev.second.string.property.key=XYZ")
     }
 
     @Test
@@ -82,16 +119,19 @@ class GenerateApplicationPropertiesTaskIT : ApplicationPropertiesTaskIT(
         buildScript: BuildScript,
         buildOutput: BuildOutput,
     ) {
-        // i.e. invalidate the cache
-        buildScript
-            .readText()
-            .replace("filenameOverride = \"application.properties\"", "filenameOverride = \"application.properties.modified\"")
-            .also(buildScript::writeText)
+        /** Change Propactive configurations */
+        buildScript.asKts(
+            /** Also servers as coverage for filenameOverride functionality */
+            filenameOverride = "test-application.properties",
+        )
 
+        /** Fifth run should re-generate the files (i.e. SUCCESS) */
         taskExecutor
             .execute(taskUnderTest)
             .outcome shouldBe Outcome.SUCCESS
 
-        File(buildOutput, "properties/application.properties.modified").shouldExist()
+        buildOutput
+            .resolve("resources/main/test-application.properties")
+            .shouldExist()
     }
 }

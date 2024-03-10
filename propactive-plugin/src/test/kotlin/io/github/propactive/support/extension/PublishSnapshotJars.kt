@@ -1,24 +1,16 @@
-package io.github.propactive.task
+package io.github.propactive.support.extension
 
-import io.github.propactive.support.extension.KotlinEnvironmentExtension
 import org.gradle.tooling.GradleConnector
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
-import org.junit.jupiter.api.TestMethodOrder
-import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.BeforeAllCallback
+import org.junit.jupiter.api.extension.ExtensionContext
 import java.io.File
 
-@TestInstance(PER_CLASS)
-@TestMethodOrder(OrderAnnotation::class)
-@ExtendWith(KotlinEnvironmentExtension::class)
-abstract class ApplicationPropertiesTaskIT(
-    internal val taskUnderTest: String,
-) {
-
-    @BeforeAll
-    fun publishSnapshotJars() {
+/**
+ * Publishes Propactive snapshot jars to the local Maven repository before the tests are executed.
+ * This is most useful when running tests in a CI environment where the jars are not published to the local Maven repository.
+ */
+class PublishSnapshotJars : BeforeAllCallback {
+    override fun beforeAll(context: ExtensionContext) {
         // NOTE:
         //   We are relying on the fact that this sub-module is 1 level down the root project.
         val propactiveRootProject = System
