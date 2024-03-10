@@ -1,4 +1,4 @@
-# Gradle's official Ubuntu JDK17 image.
+# Gradle's official Ubuntu JDK21 image.
 #   See:
 #     https://github.com/keeganwitt/docker-gradle/blob/master/jdk17/Dockerfile
 #   NOTE:
@@ -6,7 +6,7 @@
 #     instead of the more common glibc used by most other Linux distributions. Many pre-built
 #     binaries, including many JDK distributions, expect glibc, so running Alpine risks us
 #     encounting unexpected errors and wasting time debugging them for no functional benefit.
-FROM gradle:8.4.0-jdk21-jammy@sha256:97f1ca124aa6853e9b17d543d7ef75c8aecf64719606ade5862344a630fb927b
+FROM gradle:8.6.0-jdk21-jammy@sha256:d7c9827aa7c7f6555921e1c31fdd1f3ab3f2eaec8a4931a896afd3eea6fb032a
 
 # Image Metadata
 LABEL app="runner" \
