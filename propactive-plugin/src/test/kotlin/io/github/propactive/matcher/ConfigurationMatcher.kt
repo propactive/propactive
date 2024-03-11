@@ -8,7 +8,7 @@ import io.kotest.matchers.equalityMatcher
 import io.kotest.matchers.should
 
 class ConfigurationMatcher private constructor() : Matcher<Configuration> {
-    private val matchers: MutableMap<Field, Matcher<String>> = mutableMapOf()
+    private val matchers: MutableMap<Field, Matcher<Any>> = mutableMapOf()
 
     companion object {
         fun Configuration.shouldMatch(matcher: ConfigurationMatcher.() -> Unit) =
@@ -35,6 +35,10 @@ class ConfigurationMatcher private constructor() : Matcher<Configuration> {
         matchers[Field.IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY] = equalityMatcher(expected)
     }
 
+    internal fun withAutoGenerateApplicationProperties(expected: Boolean) = apply {
+        matchers[Field.AUTO_GENERATE_APPLICATION_PROPERTIES] = equalityMatcher(expected)
+    }
+
     override fun test(value: Configuration): MatcherResult = matchers
         // All Configuration fields should be matched...
         .apply { keys.shouldContainAll(Field.entries.toSet()) }
@@ -52,11 +56,12 @@ class ConfigurationMatcher private constructor() : Matcher<Configuration> {
         )
     }
 
-    private enum class Field(val extractor: (Configuration) -> String) {
+    private enum class Field(val extractor: (Configuration) -> Any) {
         IMPLEMENTATION_CLASS(Configuration::implementationClass),
         DESTINATION(Configuration::destination),
         ENVIRONMENTS(Configuration::environments),
         FILENAME_OVERRIDE(Configuration::filenameOverride),
         IMPLEMENTATION_CLASS_COMPILE_DEPENDENCY(Configuration::classCompileDependency),
+        AUTO_GENERATE_APPLICATION_PROPERTIES(Configuration::autoGenerateApplicationProperties),
     }
 }

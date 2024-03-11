@@ -1,6 +1,7 @@
 package io.github.propactive.plugin
 
 import io.github.propactive.matcher.ConfigurationMatcher.Companion.shouldMatch
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_AUTO_GENERATE_APPLICATION_PROPERTIES
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
@@ -135,16 +136,18 @@ class PropactiveTest {
                     withDestination(DEFAULT_BUILD_DESTINATION)
                     withFilenameOverride(DEFAULT_FILENAME_OVERRIDE)
                     withImplementationClassCompileDependency(DEFAULT_CLASS_COMPILE_DEPENDENCY)
+                    withAutoGenerateApplicationProperties(DEFAULT_AUTO_GENERATE_APPLICATION_PROPERTIES)
                 }
         }
 
         @Test
-        fun `should allow modifying default configurations`() {
+        fun `should allow modifying default configurations via propactive extension`() {
             val customEnvironments = Random.alphaNumeric("customEnvironments")
             val customImplementationClass = Random.alphaNumeric("customImplementationClass")
             val customDestination = Random.alphaNumeric("customDestination")
             val customFilenameOverride = Random.alphaNumeric("customFilenameOverride")
             val customImplementationClassCompileDependency = Random.alphaNumeric("customImplementationClassCompileDependency")
+            val customAutoGenerateApplicationProperties = Random.nextBoolean()
 
             project
                 .extensions
@@ -155,6 +158,7 @@ class PropactiveTest {
                     destination = customDestination
                     filenameOverride = customFilenameOverride
                     classCompileDependency = customImplementationClassCompileDependency
+                    autoGenerateApplicationProperties = customAutoGenerateApplicationProperties
                 }
 
             project
@@ -166,11 +170,12 @@ class PropactiveTest {
                     withDestination(customDestination)
                     withFilenameOverride(customFilenameOverride)
                     withImplementationClassCompileDependency(customImplementationClassCompileDependency)
+                    withAutoGenerateApplicationProperties(customAutoGenerateApplicationProperties)
                 }
         }
 
         @Test
-        fun `should allow setting propactive configurations through system properties`() {
+        fun `should allow setting propactive configurations through system properties during runtime`() {
             val customEnvironments = Random.alphaNumeric("customEnvironments")
             val customImplementationClass = Random.alphaNumeric("customImplementationClass")
             val customDestination = Random.alphaNumeric("customDestination")
@@ -209,11 +214,12 @@ class PropactiveTest {
                     withDestination(customDestination)
                     withFilenameOverride(customFilenameOverride)
                     withImplementationClassCompileDependency(customImplementationClassCompileDependency)
+                    withAutoGenerateApplicationProperties(DEFAULT_AUTO_GENERATE_APPLICATION_PROPERTIES)
                 }
         }
 
         @Test
-        fun `should allow overriding propactive custom configurations with system properties`() {
+        fun `should allow overriding propactive custom configurations with system properties during runtime`() {
             val customConfigEnvironments = Random.alphaNumeric("customConfigEnvironments")
             val customConfigImplementationClass = Random.alphaNumeric("customConfigImplementationClass")
             val customConfigDestination = Random.alphaNumeric("customConfigDestination")
@@ -248,6 +254,7 @@ class PropactiveTest {
                     withDestination(customConfigDestination)
                     withFilenameOverride(customConfigFilenameOverride)
                     withImplementationClassCompileDependency(customConfigImplementationClassCompileDependency)
+                    withAutoGenerateApplicationProperties(DEFAULT_AUTO_GENERATE_APPLICATION_PROPERTIES)
                 }
 
             val properties = java.util.Properties().apply {
@@ -282,6 +289,7 @@ class PropactiveTest {
                     withDestination(customPropertyDestination)
                     withFilenameOverride(customPropertyFilenameOverride)
                     withImplementationClassCompileDependency(customPropertyImplementationClassCompileDependency)
+                    withAutoGenerateApplicationProperties(DEFAULT_AUTO_GENERATE_APPLICATION_PROPERTIES)
                 }
         }
     }

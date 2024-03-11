@@ -75,6 +75,5 @@ abstract class ApplicationPropertiesTask : DefaultTask() {
 
     init {
         group = Propactive.PROPACTIVE_GROUP
-        dependsOn.add(configuration.classCompileDependency)
     }
 }

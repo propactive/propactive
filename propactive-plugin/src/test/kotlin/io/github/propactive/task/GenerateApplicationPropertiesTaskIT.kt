@@ -58,6 +58,62 @@ class GenerateApplicationPropertiesTaskIT {
 
     @Test
     @Order(2)
+    fun `should be able to auto generate a new property file when autoGenerateApplicationProperties is set to true`(
+        taskExecutor: TaskExecutor,
+        buildScript: BuildScript,
+        buildOutput: BuildOutput,
+    ) {
+        buildOutput
+            /** Clean up the previous output, so it won't interfere with the test */
+            .apply { listFiles()?.onEach(File::deleteRecursively) }
+            .resolve("resources/main/application.properties")
+            .shouldNotExist()
+
+        buildScript.asKts(
+            /** Coverage to test auto-generate functionality */
+            autoGenerateApplicationProperties = true,
+        )
+
+        /** An indirect run (i.e. via classes) */
+        taskExecutor
+            .execute("classes")
+            .outcome shouldBe Outcome.SUCCESS
+
+        buildOutput
+            .resolve("resources/main/application.properties")
+            .shouldExist()
+    }
+
+    @Test
+    @Order(3)
+    fun `should NOT be able to auto generate a new property file when autoGenerateApplicationProperties is set to false`(
+        taskExecutor: TaskExecutor,
+        buildScript: BuildScript,
+        buildOutput: BuildOutput,
+    ) {
+        buildOutput
+            /** Clean up the previous output, so it won't interfere with the test */
+            .apply { listFiles()?.onEach(File::deleteRecursively) }
+            .resolve("resources/main/application.properties")
+            .shouldNotExist()
+
+        buildScript.asKts(
+            /** Coverage to test auto-generate functionality */
+            autoGenerateApplicationProperties = false,
+        )
+
+        /** An indirect run (i.e. via classes) */
+        taskExecutor
+            .execute("classes")
+            .outcome shouldBe Outcome.SUCCESS
+
+        buildOutput
+            .resolve("resources/main/application.properties")
+            .shouldNotExist()
+    }
+
+    @Test
+    @Order(4)
     fun `should use cached output when task is ran and no sourcecode changes occurred when an explicit class compile dependency with matching source set`(
         taskExecutor: TaskExecutor,
         buildScript: BuildScript,
@@ -83,7 +139,7 @@ class GenerateApplicationPropertiesTaskIT {
     }
 
     @Test
-    @Order(3)
+    @Order(5)
     fun `should generate a new property file when the ApplicationProperties object has been modified`(
         taskExecutor: TaskExecutor,
         mainSourceSet: MainSourceSet,
@@ -112,7 +168,7 @@ class GenerateApplicationPropertiesTaskIT {
     }
 
     @Test
-    @Order(4)
+    @Order(6)
     fun `should generate a new property file when the Configuration extension has been modified`(
         taskExecutor: TaskExecutor,
         buildScript: BuildScript,
@@ -135,7 +191,7 @@ class GenerateApplicationPropertiesTaskIT {
     }
 
     @Test
-    @Order(5)
+    @Order(7)
     fun `should generate Propactive properties file for a class that is not located at root level`(
         taskExecutor: TaskExecutor,
         mainSourceSet: MainSourceSet,

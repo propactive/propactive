@@ -1,12 +1,9 @@
 package io.github.propactive.task
 
-import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_IMPLEMENTATION_CLASS
 import io.github.propactive.plugin.Propactive.Companion.PROPACTIVE_GROUP
 import io.github.propactive.task.GenerateApplicationPropertiesTask.Companion.TASK_NAME
-import io.kotest.matchers.collections.shouldContain
-import io.kotest.matchers.collections.shouldNotBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldBeBlank
 import io.kotest.matchers.string.shouldContain
@@ -29,12 +26,6 @@ class GenerateApplicationPropertiesTaskTest {
     @Test
     fun `should set task group`() {
         task.group shouldBe PROPACTIVE_GROUP
-    }
-
-    @Test
-    fun `should set class compile dependency`() {
-        task.dependsOn.shouldNotBeEmpty()
-        task.dependsOn shouldContain DEFAULT_CLASS_COMPILE_DEPENDENCY
     }
 
     @Test
