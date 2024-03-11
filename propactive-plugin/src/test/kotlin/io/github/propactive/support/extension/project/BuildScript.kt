@@ -1,5 +1,6 @@
 package io.github.propactive.support.extension.project
 
+import io.github.propactive.plugin.Configuration.Companion.DEFAULT_AUTO_GENERATE_APPLICATION_PROPERTIES
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_BUILD_DESTINATION
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_CLASS_COMPILE_DEPENDENCY
 import io.github.propactive.plugin.Configuration.Companion.DEFAULT_ENVIRONMENTS
@@ -17,6 +18,7 @@ class BuildScript(parent: File, name: String) : File(parent, name) {
         destination: String = DEFAULT_BUILD_DESTINATION,
         filenameOverride: String = DEFAULT_FILENAME_OVERRIDE,
         classCompileDependency: String = DEFAULT_CLASS_COMPILE_DEPENDENCY,
+        autoGenerateApplicationProperties: Boolean = DEFAULT_AUTO_GENERATE_APPLICATION_PROPERTIES,
     ) = apply {
         writeText(
             """
@@ -35,6 +37,7 @@ class BuildScript(parent: File, name: String) : File(parent, name) {
                 destination = "$destination"
                 filenameOverride = "$filenameOverride"
                 classCompileDependency = "$classCompileDependency"
+                autoGenerateApplicationProperties = $autoGenerateApplicationProperties
             }
 
             repositories {

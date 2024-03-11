@@ -78,24 +78,49 @@ propactive {
 }
 ```
 
-### Optional: Class Compile Optimisation
-
-Since Propactive is a runtime property generator that relies on loading a properties class at runtime, we need to ensure that
-the properties class is compiled before the `generateApplicationProperties` task is executed. By default, the plugin will set
-the `classCompileDependency` option to [`classes`](https://docs.gradle.org/current/userguide/java_plugin.html#sec:java_tasks),
-which is an aggregate task that just depends on other tasks in which other plugins usually attach additional compilation tasks 
-to it.
-
-However, you can set the `classCompileDependency` option to `compileJava` (or `compileKotlin` if you are using Kotlin) if you
-want to optimise your build time. As doing so will only regenerate the properties file when the properties class is recompiled:
+The default values for the `propactive` extension are as follows:
 
 ```kotlin
 propactive {
-    classCompileDependency = "compileKotlin"
+    environments = "*"
+    implementationClass = "ApplicationProperties"
+    destination = layout.buildDirectory.dir("resources/main").get().asFile.absolutePath
+    autoGenerateApplicationProperties = true
+    filenameOverride = null
+    classCompileDependency = null
+}
+```
+
+### Optional: Enable Class Compile Optimisation For Custom Compilation Tasks
+
+Since Propactive is a runtime property generator that relies on loading a properties class at runtime, we need to ensure that
+the properties class is compiled before the `generateApplicationProperties` task is executed. By default, the plugin will set
+the `classCompileDependency` option to `compileJava` or/and `compileKotlin` if you are using Kotlin.
+
+However, you can set the `classCompileDependency` option to something else if you want to optimise your build time, or if
+you are compiling your classes from a different source set. For example, if you are [using Scala](https://xebia.com/blog/scala-and-kotlin-under-one-roof), 
+you can set the `classCompileDependency` option to `compileScala`:
+
+```kotlin
+propactive {
+    classCompileDependency = "compileScala"
+}
+```
+
+### Optional: Disable Auto-Generated Properties File
+
+By default, the plugin will generate the properties file when the `classes` task is executed. If you want to disable this
+behaviour, you can set the `autoGenerateApplicationProperties` option to `false`:
+
+```kotlin
+propactive {
+    autoGenerateApplicationProperties = false
 }
 ```
 
 ## Plugin Tasks
+
+Propactive provides 2 tasks that you can use to generate and validate your application properties files:
 
 ```
 Propactive tasks

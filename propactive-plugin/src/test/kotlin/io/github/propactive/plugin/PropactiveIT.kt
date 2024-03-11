@@ -4,6 +4,7 @@ import io.github.propactive.support.extension.KotlinEnvironmentExtension
 import io.github.propactive.support.extension.PublishSnapshotJars
 import io.github.propactive.support.extension.gradle.TaskExecutor
 import io.github.propactive.support.extension.gradle.TaskExecutor.Outcome
+import io.github.propactive.support.extension.project.ProjectDirectory
 import io.github.propactive.task.GenerateApplicationPropertiesTask
 import io.github.propactive.task.ValidateApplicationPropertiesTask
 import io.kotest.assertions.throwables.shouldNotThrow
@@ -30,13 +31,14 @@ class PropactiveIT {
     ) {
         shouldNotThrow<UnexpectedBuildFailure> {
             taskExecutor
-                .execute("assemble")
+                .execute("init")
         }
     }
 
     @Test
     @Order(2)
-    fun `should display Propactive's tasks description`(
+    fun `should register propactive tasks`(
+        projectDirectory: ProjectDirectory,
         taskExecutor: TaskExecutor,
     ) {
         taskExecutor
