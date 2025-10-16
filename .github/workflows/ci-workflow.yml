@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout to current branch'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 'tests: propactive-jvm'
         run: make test-propactive-jvm
       - name: 'tests: propactive-plugin (acceptance)'
@@ -19,7 +19,7 @@ jobs:
         run: make test-integration-propactive-plugin
       - name: 'Uploading test artifacts'
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-artifacts
           path: |
@@ -33,19 +33,18 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout to current branch'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 'Downloading all artifacts'
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       - name: 'Generating test report for Github actions'
         uses: dorny/test-reporter@v1.6.0
         with:
           name: 'Test Report: JUnit'
           path: ./test-artifacts/*/build/test-results/test/*.xml
           reporter: java-junit
-      - name: 'Uploading propactive-jvm coverage results to CodeClimate'
-        uses: paambaati/codeclimate-action@v3.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: "${{ github.workspace }}/propactive-jvm/src/main/kotlin"
+      - name: 'Uploading propactive-jvm coverage results to Qltysh'
+        uses: qltysh/qlty-action/coverage@v2
         with:
-          coverageLocations: ${{ github.workspace }}/test-artifacts/propactive-jvm/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
+          token: ${{ secrets.CC_TEST_REPORTER_ID }}
+          files: ${{ github.workspace }}/test-artifacts/propactive-jvm/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
+          add-prefix: propactive-jvm/src/main/kotlin
