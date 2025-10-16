@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout to current branch'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: 'Building Project JARs'
         run: make build-jars SIGNING_GNUPG_PRIVATE_KEY="${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}"
       - name: 'Uploading propactive-jvm JAR artifacts'
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: 'Checkout to current branch'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Fetch all history for all tags and branches
           # See: https://github.com/actions/checkout#fetch-all-history-for-all-tags-and-branches
