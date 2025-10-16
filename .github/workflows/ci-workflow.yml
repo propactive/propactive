@@ -42,10 +42,9 @@ jobs:
           name: 'Test Report: JUnit'
           path: ./test-artifacts/*/build/test-results/test/*.xml
           reporter: java-junit
-      - name: 'Uploading propactive-jvm coverage results to CodeClimate'
-        uses: paambaati/codeclimate-action@v3.0.0
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: "${{ github.workspace }}/propactive-jvm/src/main/kotlin"
+      - name: 'Uploading propactive-jvm coverage results to Qltysh'
+        uses: qltysh/qlty-action/coverage@v2
         with:
-          coverageLocations: ${{ github.workspace }}/test-artifacts/propactive-jvm/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
+          token: ${{ secrets.CC_TEST_REPORTER_ID }}
+          files: ${{ github.workspace }}/test-artifacts/propactive-jvm/build/reports/jacoco/test/jacocoTestReport.xml:jacoco
+          add-prefix: propactive-jvm/src/main/kotlin
