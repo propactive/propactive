@@ -32,7 +32,7 @@ jobs:
       - name: 'Building Project JARs'
         run: make build-jars SIGNING_GNUPG_PRIVATE_KEY="${{ secrets.SIGNING_GNUPG_PRIVATE_KEY }}"
       - name: 'Uploading propactive-jvm JAR artifacts'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jar-artifacts
           path: ./propactive-*/build/libs

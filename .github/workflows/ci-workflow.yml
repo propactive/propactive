@@ -19,7 +19,7 @@ jobs:
         run: make test-integration-propactive-plugin
       - name: 'Uploading test artifacts'
         if: success() || failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-artifacts
           path: |
